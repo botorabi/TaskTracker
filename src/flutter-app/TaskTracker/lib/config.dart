@@ -10,8 +10,10 @@ import 'package:TaskTracker/service/authstatus.dart';
 
 class Config {
 
-  /// Adapt the base URL if e.g. your server is behind a proxy
-  static final String baseURL = '';
+  /// Adapt the base URL if e.g. your server is behind a reverse proxy, or
+  /// during the development set it to 'http://localhost:8080' in order to
+  /// use Flutter's devtools server.
+  static final String baseURL = 'http://localhost:8080';
 
   static AuthStatus authStatus = AuthStatus();
 

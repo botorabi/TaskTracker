@@ -7,7 +7,9 @@
  */
 package net.vrfun.tasktracker.user;
 
-import org.springframework.lang.NonNull;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.lang.*;
+
 import java.util.*;
 
 public enum Role {
@@ -35,6 +37,22 @@ public enum Role {
                 createAuthor(),
                 createTeamLead()
         );
+    }
+
+    @NonNull
+    public static Collection<String> getAllRolesAsString() {
+        return getRolesAsString(getAllRoles());
+    }
+
+    @NonNull
+    public static Collection<String> getRolesAsString(@Nullable Collection<UserRole> roles) {
+        List<String> roleStrings = new ArrayList<>();
+        if (roles !=  null) {
+            for (UserRole role : roles) {
+                roleStrings.add(role.getRole().name());
+            }
+        }
+        return roleStrings;
     }
 
     @NonNull

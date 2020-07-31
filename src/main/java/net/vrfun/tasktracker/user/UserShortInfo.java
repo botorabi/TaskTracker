@@ -35,6 +35,15 @@ public class UserShortInfo {
 
     public UserShortInfo() {}
 
+    public UserShortInfo(@NonNull final User user) {
+        this.id = user.getId();
+        this.realName = user.getRealName();
+        this.login = user.getLogin();
+        this.creationDate = user.getCreationDate();
+        this.lastLogin = user.getLastLogin();
+        this.roles = Role.getRolesAsString(user.getRoles());
+    }
+
     public UserShortInfo(long id,
                          final String realName,
                          final String login,
@@ -94,17 +103,5 @@ public class UserShortInfo {
 
     public void setRoles(Collection<String> roles) {
         this.roles = roles;
-    }
-
-    @JsonIgnore
-    @NonNull
-    public static Collection<String> createRoleStrings(@Nullable Collection<UserRole> roles) {
-        List<String> roleStrings = new ArrayList<>();
-        if (roles !=  null) {
-            for (UserRole role : roles) {
-                roleStrings.add(role.getRole().name());
-            }
-        }
-        return roleStrings;
     }
 }

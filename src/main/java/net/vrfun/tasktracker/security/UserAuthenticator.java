@@ -74,7 +74,8 @@ public class UserAuthenticator {
         try {
             DirContextOperations user = ldapConfiguration.authenticate(authentication);
             if (user != null) {
-                mapUserRoles(0L, login, login);
+                String name = user.attributeExists("name") ? user.getStringAttribute("name") : login;
+                mapUserRoles(0L, name, login);
                 return true;
             }
             return false;

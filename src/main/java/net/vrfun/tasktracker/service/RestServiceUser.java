@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -136,6 +135,11 @@ public class RestServiceUser {
         }
         else if (userAuthenticator.loginLDAPUser(reqLogin.getLogin(), reqLogin.getPassword())) {
             LOGGER.info("LDAP user {} successfully logged in", reqLogin.getLogin());
+            LOGGER.info("  Creating a local user for ", reqLogin.getLogin());
+            users.getOrCreateLocalUserFromLdap(reqLogin);
+            if (!userAuthenticator.loginLocalUser(reqLogin.getLogin(), reqLogin.getPassword())) {
+                LOGGER.error("  Failed to login local user {}!", reqLogin.getLogin());
+            }
         }
         else {
             LOGGER.info("User login failed, {}", reqLogin.getLogin());
@@ -148,6 +152,11 @@ public class RestServiceUser {
     public ResponseEntity<RespAuthenticationStatus> logoutUser() {
         userAuthenticator.logoutUser();
         return createAuthenticationStatusResponse();
+    }
+
+    @GetMapping("/user/availableroles")
+    public ResponseEntity<Collection<String>> getAvailableRoles() {
+        return new ResponseEntity<>(Role.getAllRolesAsString(), HttpStatus.OK);
     }
 
     @GetMapping("/user/status")

@@ -7,9 +7,10 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.service.comm.ReqLogin;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -147,6 +148,29 @@ public class Users {
     }
 
     @NonNull
+    public UserShortInfo getOrCreateLocalUserFromLdap(@NonNull final ReqLogin reqLogin) {
+        Optional<UserShortInfo> user = userRepository.getUserByLdapLogin(reqLogin.getLogin());
+        if (user.isPresent()) {
+            fetchUserRoles(user.get());
+            return user.get();
+        }
+        else {
+            User newUser = new User();
+            ReqUserEdit reqUserEdit = new ReqUserEdit();
+            reqUserEdit.setRealName(reqLogin.getLogin());
+            reqUserEdit.setLogin(reqLogin.getLogin());
+            reqUserEdit.setPassword(reqLogin.getPassword());
+
+            createOrUpdateUser(reqUserEdit, newUser, true);
+
+            newUser.setLdapLogin(reqLogin.getLogin());
+            userRepository.save(newUser);
+
+            return new UserShortInfo(newUser);
+        }
+    }
+
+    @NonNull
     public List<UserRole> databaseRolesFromNames(@NonNull final Set<String> roleNames) {
         final List<UserRole> roles = new ArrayList<>();
         for(final String roleName: roleNames) {
@@ -181,7 +205,7 @@ public class Users {
     protected void fetchUserRoles(@NonNull UserShortInfo user) {
         Optional<User> foundUser = userRepository.findById(user.getId());
         if (foundUser.isPresent()) {
-            user.setRoles(UserShortInfo.createRoleStrings(foundUser.get().getRoles()));
+            user.setRoles(Role.getRolesAsString(foundUser.get().getRoles()));
         }
     }
 

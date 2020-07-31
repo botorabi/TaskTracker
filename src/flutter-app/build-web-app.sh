@@ -5,7 +5,9 @@ echo "Building Flutter Project in Working Directory: $(pwd)"
 
 DST_DIR=../../main/resources/static
 
-../../misc/patch-flutter-withCredentials.sh revert
+source ../../misc/setup-env.sh
+./patch-flutter-withCredentials.sh revert
+./patch-base-url.sh revert
 
 cd TaskTracker
 flutter pub get

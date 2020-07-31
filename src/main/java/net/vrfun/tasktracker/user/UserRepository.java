@@ -35,4 +35,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.login = :login")
     Optional<UserShortInfo> getUserByLogin(@NonNull @Param("login") String login);
+
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+            "from net.vrfun.tasktracker.user.User user where user.ldapLogin = :ldapLogin")
+    Optional<UserShortInfo> getUserByLdapLogin(@NonNull @Param("ldapLogin") String ldapLogin);
 }

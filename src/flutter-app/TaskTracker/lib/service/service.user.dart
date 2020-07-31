@@ -33,6 +33,23 @@ class ServiceUser {
     }
   }
 
+  Future<List<String>> getAvailableRoles() async {
+    Response response = await get(Config.baseURL + '/api/user/availableroles',
+                                  headers: _httpHeaders);
+
+    if (response.statusCode == HttpStatus.ok) {
+      List<String> roles = List<String>();
+      dynamic users = jsonDecode(response.body);
+      users.forEach((element) {
+        roles.add(element);
+      });
+      return roles;
+    }
+    else {
+      return Future<List<String>>.error(response.statusCode);
+    }
+  }
+
   Future<UserInfo> getUser(int userId) async {
     Response response = await get(Config.baseURL + '/api/user/' + userId.toString(),
                                   headers: _httpHeaders);

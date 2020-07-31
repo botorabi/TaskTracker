@@ -32,6 +32,8 @@ public class User extends BaseEntity implements Serializable {
     @Column(unique=true, nullable=false)
     private String login;
 
+    private String ldapLogin;
+
     @Column(nullable=false)
     private String password;
 
@@ -64,6 +66,14 @@ public class User extends BaseEntity implements Serializable {
 
     public void setLogin(@NonNull final String login) {
         this.login = login;
+    }
+
+    public String getLdapLogin() {
+        return ldapLogin;
+    }
+
+    public void setLdapLogin(@NonNull final String ldapLogin) {
+        this.ldapLogin = ldapLogin;
     }
 
     public String getPassword() {
