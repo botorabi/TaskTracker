@@ -9,6 +9,7 @@
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 
 class WidgetRoles extends StatefulWidget {
@@ -23,14 +24,28 @@ class WidgetRoles extends StatefulWidget {
   void setUserRoles(List<String> roles) {
     _widgetRoleState.setUserRoles(roles);
   }
+
+  List<String> getUserRoles() {
+    return _widgetRoleState.getUserRoles();
+  }
+
+  void setReadOnly(bool readOnly) {
+    _widgetRoleState.setReadOnly(readOnly);
+  }
+
+  /// Call after using setUserRoles or setReadOnly in order to update the UI.
+  void updateUI() {
+    _widgetRoleState.updateUI();
+  }
 }
 
 class _WidgetRolesState extends State<WidgetRoles> {
 
   final _serviceUser = ServiceUser();
   List<Container> _rolesWidget = List<Container>();
-  List<String> _userRoles;
+  List<String> _userRoles = List<String>();
   List<String> _availableRoles;
+  bool _readOnly = false;
 
   _WidgetRolesState() {
     _retrieveRoles();
@@ -38,6 +53,18 @@ class _WidgetRolesState extends State<WidgetRoles> {
 
   void setUserRoles(List<String> roles) {
     _userRoles = roles;
+    _createRolesUI(_availableRoles);
+  }
+
+  List<String> getUserRoles() {
+    return _userRoles;
+  }
+
+  void setReadOnly(bool readOnly) {
+    this._readOnly = readOnly;
+  }
+
+  void updateUI() {
     _createRolesUI(_availableRoles);
     setState(() {});
   }
@@ -94,7 +121,14 @@ class _WidgetRolesState extends State<WidgetRoles> {
             children: [
               Checkbox(
                 value: (_userRoles != null) ? _userRoles.contains(element) : false,
-                onChanged: (value) => print("TODO: $element was checked"),
+                onChanged: _readOnly ? null :
+                    (value) {
+                      _userRoles.remove(element);
+                      if (value) {
+                        _userRoles.add(element);
+                    }
+                    _createRolesUI(_availableRoles);
+                  },
               ),
               Text(element),
             ],

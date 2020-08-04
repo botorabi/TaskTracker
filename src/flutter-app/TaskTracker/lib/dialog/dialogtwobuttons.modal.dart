@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /*
  * Example for using the Two-Button-Dialog
  *
- * var button = await DialogTwoButtonsModal(context).show('Attention', 'You really want to delete the user?', 'Yes', 'No');
+ * var button = await DialogTwoButtonsModal(context).show('Attention', 'You really want to delete the user?', ButtonID.YES, ButtonID.NO);
  * if (button != 'Yes') {
  *   return;
  * }

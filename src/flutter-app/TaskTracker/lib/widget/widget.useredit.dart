@@ -8,6 +8,8 @@
 
 import 'dart:io';
 
+import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
@@ -42,7 +44,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   _WidgetUserEditState({this.userId}) {
     if (userId != 0) {
       _newUser = false;
-      retrieveUserInfo();
+      _retrieveUserInfo();
     }
     else {
       _newUser = true;
@@ -138,19 +140,19 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                               padding: EdgeInsets.only(top: 10.0, right: 10.0),
                               child: RaisedButton(
                                 child: Text('Cancel'),
-                                onPressed: () => { Navigator.of(context).pop('Cancel') },
+                                onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                               ),
                             ),
                             Padding(
                               padding: EdgeInsets.only(top: 10.0, right: 10.0),
                               child: RaisedButton(
-                                child: Text(_newUser ? 'Create' : 'Apply'),
+                                child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
                                 onPressed: () {
                                   if (_newUser) {
-                                    createUser(context);
+                                    _createUser(context);
                                   }
                                   else {
-                                    applyChanges(context);
+                                    _applyChanges(context);
                                   }
                                 },
                               ),
@@ -177,7 +179,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     );
   }
 
-  void createUser(BuildContext context) {
+  void _createUser(BuildContext context) {
     if (_textEditingControllerPassword.text != _textEditingControllerPasswordRepeat.text) {
       DialogModal(context).show("Attention", "Passwords mismatch!", true);
       return;
@@ -191,18 +193,13 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     userInfo.login = _textEditingControllerLoginName.text;
     userInfo.realName = _textEditingControllerRealName.text;
     userInfo.password = _textEditingControllerPassword.text;
+    userInfo.roles = _widgetRoles.getUserRoles();
 
     _serviceUser
         .create(userInfo)
         .then((id) {
-          DialogModal(context).show("New User", "New user was successfully created.", false);
-          _textEditingControllerLoginName.text = '';
-          _textEditingControllerRealName.text = '';
-          _textEditingControllerPassword.text = '';
-          _textEditingControllerPasswordRepeat.text = '';
-
-          _focusLoginName.requestFocus();
-          setState(() {});
+          DialogModal(context).show("New User", "New user was successfully created.", false)
+              .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
@@ -217,7 +214,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     );
   }
 
-  void applyChanges(BuildContext context) {
+  void _applyChanges(BuildContext context) {
     if (_textEditingControllerPassword.text != _textEditingControllerPasswordRepeat.text) {
       DialogModal(context).show("Attention", "Passwords mismatch!", true);
       return;
@@ -230,12 +227,14 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     if (_textEditingControllerPassword.text.isNotEmpty) {
       userInfo.password = _textEditingControllerPassword.text;
     }
+    userInfo.roles = _widgetRoles.getUserRoles();
 
     _serviceUser
       .edit(userInfo)
       .then((success) {
           if (success) {
-            DialogModal(context).show("User Profile", "All changes successfully applied.", false);
+            DialogModal(context).show("User Profile", "All changes successfully applied.", false)
+            .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
@@ -244,7 +243,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
       );
   }
 
-  void retrieveUserInfo() {
+  void _retrieveUserInfo() {
     if(userId == 0) {
       print('Internal error, use this widget for an authenticated user');
       return;
@@ -259,6 +258,12 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
           _textEditingControllerPassword.text = '';
           _textEditingControllerPasswordRepeat.text = '';
           _widgetRoles.setUserRoles(_currentUserInfo.roles);
+          _widgetRoles.setReadOnly(!(Config.authStatus.isAdmin() && (userId != Config.authStatus.userId)));
+          if (_currentUserInfo.isAdmin()) {
+            _widgetRoles.setReadOnly(true);
+          }
+          _widgetRoles.updateUI();
+
           setState(() {});
         },
         onError: (err) {

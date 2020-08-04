@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
+import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/common/datetime.formatter.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
@@ -48,7 +49,7 @@ class _WidgetUserEditState extends State<WidgetUserList> {
       return Column();
     }
     else {
-      _dataTable = createDataTable();
+      _dataTable = _createDataTable();
       return SizedBox(
         width: Config.defaultPanelWidth,
         child: _dataTable,
@@ -63,9 +64,9 @@ class _WidgetUserEditState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete user '$realName'?", 'Yes', 'No');
+        .show('Attention', "You really want to delete user '$realName'?", ButtonID.YES, ButtonID.NO);
 
-    if (button != 'Yes') {
+    if (button != ButtonID.YES) {
       return;
     }
 
@@ -92,7 +93,7 @@ class _WidgetUserEditState extends State<WidgetUserList> {
           });
   }
 
-  PaginatedDataTable createDataTable() {
+  PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
       header: Text("Users"),
       columns: const <DataColumn>[
@@ -164,7 +165,13 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.edit, 16, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id);
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id)
+                        .then((value) {
+                            if (value != ButtonID.CANCEL) {
+                              parent._retrieveUsers();
+                            }
+                          }
+                        );
                   }
                 ),
               ),
