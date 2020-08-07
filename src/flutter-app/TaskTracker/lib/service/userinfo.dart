@@ -9,6 +9,9 @@
 import 'dart:convert';
 
 class UserInfo {
+
+  static const String ROLE_PREFIX = 'ROLE_';
+
   int id;
   String realName = '';
   String login = '';

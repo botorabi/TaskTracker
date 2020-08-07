@@ -38,7 +38,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   final _textEditingControllerLoginName = TextEditingController();
   final _textEditingControllerPassword = TextEditingController();
   final _textEditingControllerPasswordRepeat = TextEditingController();
-  final _focusLoginName = FocusNode();
+
   WidgetRoles _widgetRoles = WidgetRoles(title: 'Roles');
 
   _WidgetUserEditState({this.userId}) {
@@ -97,7 +97,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                             padding: EdgeInsets.all(10.0),
                             child: TextFormField(
                               controller: _textEditingControllerLoginName,
-                              focusNode: _focusLoginName,
+                              autofocus: true,
                               decoration: InputDecoration(
                                 labelText: 'Login Name',
                               ),

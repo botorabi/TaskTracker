@@ -157,7 +157,7 @@ class _DataProvider extends DataTableSource {
             textAlign: TextAlign.center
           ),
         ),
-        DataCell(Text(parent._users[index].roles.join("\n"))),
+        DataCell(Text(parent._users[index].roles.join("\n").replaceAll(UserInfo.ROLE_PREFIX,''))),
         DataCell(
           Row(
             children: [

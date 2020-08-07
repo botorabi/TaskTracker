@@ -8,6 +8,7 @@
 
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
+import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
@@ -130,7 +131,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
                     _createRolesUI(_availableRoles);
                   },
               ),
-              Text(element),
+              Text(element.replaceAll(UserInfo.ROLE_PREFIX,'')),
             ],
           )
         )
