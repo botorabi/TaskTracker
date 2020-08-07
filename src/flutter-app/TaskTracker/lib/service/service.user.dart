@@ -10,19 +10,15 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/service/service.common.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:http/http.dart';
 
 class ServiceUser {
 
-  static final Map<String, String> _httpHeaders = {
-    'Content-type': 'application/json',
-    'withCredentials': 'true'
-  };
-
   Future<List<UserInfo>> getUsers() async {
     Response response = await get(Config.baseURL + '/api/user',
-                                  headers: _httpHeaders);
+                                  headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       List<UserInfo> users = UserInfo.listFromJsonString(response.body);
@@ -35,7 +31,7 @@ class ServiceUser {
 
   Future<List<String>> getAvailableRoles() async {
     Response response = await get(Config.baseURL + '/api/user/availableroles',
-                                  headers: _httpHeaders);
+                                  headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       List<String> roles = List<String>();
@@ -52,7 +48,7 @@ class ServiceUser {
 
   Future<UserInfo> getUser(int userId) async {
     Response response = await get(Config.baseURL + '/api/user/' + userId.toString(),
-                                  headers: _httpHeaders);
+                                  headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       return UserInfo.fromJsonString(response.body);
@@ -62,9 +58,9 @@ class ServiceUser {
     }
   }
 
-  Future<bool> edit(UserInfo userInfo) async {
+  Future<bool> editUser(UserInfo userInfo) async {
     Response response = await put(Config.baseURL + '/api/user/edit',
-                                  headers: _httpHeaders,
+                                  headers: ServiceCommon.HTTP_HEADERS_REST,
                                   body: jsonEncode(userInfo));
 
     if (response.statusCode == HttpStatus.ok) {
@@ -75,9 +71,9 @@ class ServiceUser {
     }
   }
 
-  Future<int> create(UserInfo userInfo) async {
+  Future<int> createUser(UserInfo userInfo) async {
     Response response = await post(Config.baseURL + '/api/user/create',
-                                   headers: _httpHeaders,
+                                   headers: ServiceCommon.HTTP_HEADERS_REST,
                                    body: jsonEncode(userInfo));
 
     if (response.statusCode == HttpStatus.ok) {
@@ -90,7 +86,7 @@ class ServiceUser {
 
   Future<bool> deleteUser(int id) async {
     Response response = await delete(Config.baseURL + '/api/user/' + id.toString(),
-                                     headers: _httpHeaders);
+                                     headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       return true;

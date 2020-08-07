@@ -6,7 +6,6 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 

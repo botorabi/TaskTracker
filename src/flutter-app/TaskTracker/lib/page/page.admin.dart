@@ -6,6 +6,8 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/widget/widget.teamedit.dart';
+import 'package:TaskTracker/widget/widget.teamlist.dart';
 import 'package:TaskTracker/widget/widget.userlist.dart';
 import 'package:flutter/material.dart';
 
@@ -29,9 +31,11 @@ class _PageAdminState extends State<PageAdmin> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            WidgetUserList()
+            WidgetUserList().setExpanded(true),
+            WidgetTeamList().setExpanded(false),
           ],
         ),
       ),

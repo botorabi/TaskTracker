@@ -164,7 +164,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                   ),
                 ),
                 Visibility(
-                  visible: true,//_newUser == false,
+                  visible: true,
                   child:
                     Padding(
                       padding: EdgeInsets.all(10.0),
@@ -196,7 +196,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     userInfo.roles = _widgetRoles.getUserRoles();
 
     _serviceUser
-        .create(userInfo)
+        .createUser(userInfo)
         .then((id) {
           DialogModal(context).show("New User", "New user was successfully created.", false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
@@ -230,10 +230,10 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     userInfo.roles = _widgetRoles.getUserRoles();
 
     _serviceUser
-      .edit(userInfo)
+      .editUser(userInfo)
       .then((success) {
           if (success) {
-            DialogModal(context).show("User Profile", "All changes successfully applied.", false)
+            DialogModal(context).show("Edit User", "All changes successfully applied.", false)
             .then((value) => Navigator.of(context).pop());
           }
         },

@@ -38,18 +38,18 @@ public class RestServiceUser {
 
 
     @Autowired
-    public RestServiceUser(@NonNull UserAuthenticator userAuthenticator,
-                           @NonNull Users users) {
+    public RestServiceUser(@NonNull final UserAuthenticator userAuthenticator,
+                           @NonNull final Users users) {
 
         this.userAuthenticator = userAuthenticator;
         this.users = users;
     }
 
     @PostMapping("/user/create")
-    @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<Long> create(@RequestBody ReqUserEdit userCreate) {
+    @Secured({Role.ROLE_NAME_ADMIN})
+    public ResponseEntity<Long> create(@RequestBody ReqUserEdit reqUserEdit) {
         try {
-            return new ResponseEntity<>(users.createUser(userCreate).getId(), HttpStatus.OK);
+            return new ResponseEntity<>(users.createUser(reqUserEdit).getId(), HttpStatus.OK);
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not create new user, reason: {}", throwable.getMessage());
@@ -58,19 +58,19 @@ public class RestServiceUser {
     }
 
     @PutMapping("/user/edit")
-    public ResponseEntity<Long> edit(@RequestBody ReqUserEdit userEdit) {
+    public ResponseEntity<Long> edit(@RequestBody ReqUserEdit reqUserEdit) {
         try {
-            if (StringUtils.isEmpty(userEdit.getLogin())) {
+            if (StringUtils.isEmpty(reqUserEdit.getLogin())) {
                 LOGGER.info("Could not edit user, missing login name!");
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-            if (userAuthenticator.getUserLogin().equals(userEdit.getLogin())) {
+            if (userAuthenticator.getUserLogin().equals(reqUserEdit.getLogin())) {
                 // users are not allowed to change their own roles
-                userEdit.setRoles(null);
-                return new ResponseEntity<>(users.editUser(userEdit).getId(), HttpStatus.OK);
+                reqUserEdit.setRoles(null);
+                return new ResponseEntity<>(users.editUser(reqUserEdit).getId(), HttpStatus.OK);
             }
             else if (userAuthenticator.isRoleAdmin()) {
-                return new ResponseEntity<>(users.editUser(userEdit).getId(), HttpStatus.OK);
+                return new ResponseEntity<>(users.editUser(reqUserEdit).getId(), HttpStatus.OK);
             }
             else {
                 LOGGER.info("Could not edit user, missing privilege!");
@@ -84,7 +84,7 @@ public class RestServiceUser {
     }
 
     @DeleteMapping("/user/{id}")
-    @Secured({"ROLE_ADMIN"})
+    @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
             users.deleteUser(id);

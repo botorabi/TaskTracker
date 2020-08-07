@@ -127,7 +127,7 @@ public class Users {
     @NonNull
     protected User createOrUpdateUser(@NonNull final ReqUserEdit reqUser, @NonNull User user, boolean create) throws IllegalArgumentException {
         if (!StringUtils.isEmpty(reqUser.getRealName())) {
-            user.setRealName(reqUser.getRealName());
+            user.setRealName(reqUser.getRealName().trim());
         }
         if (!StringUtils.isEmpty(reqUser.getPassword())) {
             user.setPassword(passwordEncoder.encode(reqUser.getPassword()));

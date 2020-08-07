@@ -8,42 +8,41 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
-import 'package:TaskTracker/common/datetime.formatter.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
-import 'package:TaskTracker/service/service.user.dart';
-import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/service/service.team.dart';
+import 'package:TaskTracker/service/team.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetUserList extends StatefulWidget {
-  WidgetUserList({Key key, this.title = 'Users'}) : super(key: key);
+class WidgetTeamList extends StatefulWidget {
+  WidgetTeamList({Key key, this.title = 'Teams'}) : super(key: key);
 
   final String title;
-  final _WidgetUserListState _widgetUserListState = _WidgetUserListState();
+  final _WidgetTeamListState _widgetTeamListState = _WidgetTeamListState();
 
   @override
-  _WidgetUserListState createState() {
-    return _widgetUserListState;
+  _WidgetTeamListState createState() {
+    return _widgetTeamListState;
   }
 
-  WidgetUserList setExpanded(bool expanded) {
-    _widgetUserListState.setExpanded(expanded);
+  WidgetTeamList setExpanded(bool expanded) {
+    _widgetTeamListState.setExpanded(expanded);
     return this;
   }
 }
 
-class _WidgetUserListState extends State<WidgetUserList> {
+class _WidgetTeamListState extends State<WidgetTeamList> {
 
-  final _serviceUser = ServiceUser();
+  final _serviceTeam = ServiceTeam();
   PaginatedDataTable _dataTable;
-  List<UserInfo> _users = [];
+  List<Team> _teams = [];
   bool _expanded = false;
 
-  _WidgetUserListState() {
-    _retrieveUsers();
+  _WidgetTeamListState() {
+    _retrieveTeams();
   }
 
   void setExpanded(bool expanded) {
@@ -63,7 +62,6 @@ class _WidgetUserListState extends State<WidgetUserList> {
     }
     else {
       _dataTable = _createDataTable();
-
       return Card(
         elevation: 5,
         margin: EdgeInsets.all(10.0),
@@ -90,45 +88,45 @@ class _WidgetUserListState extends State<WidgetUserList> {
     }
   }
 
-  void _addUser() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_USER);
-    _retrieveUsers();
+  void _addTeam() async {
+    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_TEAM);
+    _retrieveTeams();
   }
 
-  void _deleteUser(int id, String realName) async {
+  void _deleteTeam(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete user '$realName'?", ButtonID.YES, ButtonID.NO);
+        .show('Attention', "You really want to delete team '$name'?", ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
     }
 
-    _serviceUser
-      .deleteUser(id)
+    _serviceTeam
+      .deleteTeam(id)
       .then((status) {
-          DialogModal(context).show('User Deletion', 'User was successfully deleted.', false);
-          _retrieveUsers();
+          DialogModal(context).show('Team Deletion', 'Team was successfully deleted.', false);
+          _retrieveTeams();
         },
         onError: (err) {
-          print('Failed to delete user, reason: ' + err.toString());
+          print('Failed to delete team, reason: ' + err.toString());
       });
   }
 
-  void _retrieveUsers() {
-    _serviceUser
-        .getUsers()
-        .then((listUserInfo) {
-            _users = listUserInfo;
+  void _retrieveTeams() {
+    _serviceTeam
+        .getTeams()
+        .then((listTeam) {
+            _teams = listTeam;
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve users, reason: " + err.toString());
+            print("Failed to retrieve teams, reason: " + err.toString());
           });
   }
 
   PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text("Users"),
+      header: Text(''),
       columns: const <DataColumn>[
         DataColumn(
           label: Text(
@@ -138,19 +136,19 @@ class _WidgetUserListState extends State<WidgetUserList> {
         ),
         DataColumn(
           label: Text(
-            'Login',
+            'Description',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Last Login',
+            'Active',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Roles',
+            'Count Team Members',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -162,7 +160,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       onRowsPerPageChanged: null,
       source: _DataProvider(this),
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addUser()),
+        CircleButton.create(24, Icons.add, 16, () => _addTeam()),
       ],
     );
 
@@ -172,7 +170,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
 class _DataProvider extends DataTableSource {
 
-  _WidgetUserListState parent;
+  _WidgetTeamListState parent;
 
   _DataProvider(this.parent);
 
@@ -181,16 +179,10 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._users[index].realName)),
-        DataCell(Text(parent._users[index].login)),
-        DataCell(
-          Text(
-            DateAndTimeFormatter.formatDate(parent._users[index].lastLogin) +
-                '\n' + DateAndTimeFormatter.formatTime(parent._users[index].lastLogin),
-            textAlign: TextAlign.center
-          ),
-        ),
-        DataCell(Text(parent._users[index].roles.join("\n").replaceAll(UserInfo.ROLE_PREFIX,''))),
+        DataCell(Text(parent._teams[index].name)),
+        DataCell(Text(parent._teams[index].description)),
+        DataCell(Text(parent._teams[index].active ? 'Yes' : 'No')),
+        DataCell(Text(parent._teams[index].users?.length.toString())),
         DataCell(
           Row(
             children: [
@@ -198,10 +190,10 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.edit, 16, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id)
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_TEAM, arguments: parent._teams[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
-                              parent._retrieveUsers();
+                              parent._retrieveTeams();
                             }
                           }
                         );
@@ -212,8 +204,7 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.delete, 16,
-                    (parent._users[index].id == Config.authStatus.userId) ?
-                    null : () => parent._deleteUser(parent._users[index].id, parent._users[index].realName)
+                          () => parent._deleteTeam(parent._teams[index].id, parent._teams[index].name)
                 ),
               ),
             ],
@@ -227,7 +218,7 @@ class _DataProvider extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => parent._users.length;
+  int get rowCount => parent._teams.length;
 
   @override
   int get selectedRowCount => 0;

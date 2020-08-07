@@ -9,20 +9,16 @@
 import 'dart:io';
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/service/service.common.dart';
 import 'package:http/http.dart';
 
 import 'authstatus.dart';
 
 class ServiceLogin {
 
-  static final Map<String, String> _httpHeaders = {
-    'Content-type': 'application/json',
-    'withCredentials': 'true'
-  };
-
   Future<AuthStatus> getLoginStatus() async {
     Response response = await get(Config.baseURL + '/api/user/status',
-                                  headers: _httpHeaders);
+                                  headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       return AuthStatus.fromJsonString(response.body);
@@ -34,7 +30,7 @@ class ServiceLogin {
 
   Future<AuthStatus> loginUser(final String login, final String password) async {
     Response response = await post(Config.baseURL + '/api/user/login',
-                                   headers: _httpHeaders,
+                                   headers: ServiceCommon.HTTP_HEADERS_REST,
                                    body: '{"login": "' + login + '", "password": "' + password + '"}');
 
     if (response.statusCode == HttpStatus.ok) {
@@ -47,7 +43,7 @@ class ServiceLogin {
 
   Future<bool> logoutUser() async {
     Response response = await get(Config.baseURL + '/api/user/logout',
-                                  headers: _httpHeaders);
+                                  headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       return true;
