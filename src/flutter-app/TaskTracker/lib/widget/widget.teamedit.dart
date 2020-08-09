@@ -12,6 +12,7 @@ import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/widget/widget.teammembers.dart';
 import 'package:flutter/material.dart';
 
 
@@ -35,6 +36,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   final _serviceTeam = ServiceTeam();
   final _textEditingControllerName = TextEditingController();
   final _textEditingControllerDescription = TextEditingController();
+  final _widgetTeamMembers = WidgetTeamMembers();
 
   _WidgetTeamEditState({this.teamId}) {
     if (teamId != 0) {
@@ -137,41 +139,48 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                     ),
                   ),
                 ),
-                Column(
-                  children: [
-                    Visibility(
-                      visible: !_newTeam,
-                      child:
-                        Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 10.0, top: 20.0, right: 10.0),
-                              child:
-                              Checkbox(
-                                value: _active,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _active = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 20.0),
-                              child:
+                SizedBox(
+                  width: 185.0,
+                  child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Visibility(
+                        visible: !_newTeam,
+                        child:
+                          Row(
+                            children: [
+                              Padding(
+                                  padding: EdgeInsets.only(top: 20.0),
+                                  child:
                                   Text('Active',
                                     style: TextStyle(fontWeight: FontWeight.w600),
                                     textAlign: TextAlign.left,
                                   )
-                            ),
-                          ],
-                        ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(10.0),
-//                      child: _widgetTeamUsers,
-                    ),
-                  ],
+                              ),
+                              Spacer(),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20.0),
+                                child:
+                                Checkbox(
+                                  value: _active,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _active = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0),
+                        child: _widgetTeamMembers,
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -190,9 +199,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
     Team team = new Team();
     team.name = _textEditingControllerName.text;
     team.description = _textEditingControllerDescription.text;
-    //! TODO team users
-//    team.users = _widgetTeamUsers.getTeamUsers();
-
+    team.users = _widgetTeamMembers.getMemberIDs();
 
     _serviceTeam
         .createTeam(team)
@@ -214,14 +221,12 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   }
 
   void _applyChanges(BuildContext context) {
-
     Team team = new Team();
     team.id = _currentTeam.id;
     team.name = _textEditingControllerName.text;
     team.description = _textEditingControllerDescription.text;
     team.active = _active;
-    //! TODO team users
-//    team.users = _widgetTeamUsers.getTeamUsers();
+    team.users = _widgetTeamMembers.getMemberIDs();
 
     _serviceTeam
       .editTeam(team)
@@ -251,8 +256,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
           _textEditingControllerDescription.text = _currentTeam.description;
           _active = _currentTeam.active;
 
-//          _widgetTeamUsers.setUsersRoles(_currentTeam.users);
-//          _widgetTeamUsers.updateUI();
+          _widgetTeamMembers.setMemberIDs(_currentTeam.users);
+          _widgetTeamMembers.updateUI();
 
           setState(() {});
         },

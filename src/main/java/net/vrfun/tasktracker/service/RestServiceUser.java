@@ -8,11 +8,14 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.service.comm.*;
+import net.vrfun.tasktracker.service.comm.ReqLogin;
+import net.vrfun.tasktracker.service.comm.RespAuthenticationStatus;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
@@ -99,7 +102,7 @@ public class RestServiceUser {
     @GetMapping("/user")
     public ResponseEntity<List<UserShortInfo>> getUsers() {
         try {
-            if (userAuthenticator.isRoleAdmin()) {
+            if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
                 return new ResponseEntity<>(users.getUsers(), HttpStatus.OK);
             }
             else {
@@ -116,7 +119,13 @@ public class RestServiceUser {
     @GetMapping("/user/{id}")
     public ResponseEntity<UserShortInfo> getUser(@PathVariable("id") Long id) {
         try {
-            return new ResponseEntity<>(users.getUserById(id), HttpStatus.OK);
+            UserShortInfo user = users.getUserById(id);
+            //! NOTE don't leak user info to others!
+            if (!userAuthenticator.isRoleAdmin() || (id != userAuthenticator.getUserId())) {
+                user.setLastLogin(null);
+                user.setLogin("");
+            }
+            return new ResponseEntity<>(user, HttpStatus.OK);
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not get user, reason: {}", throwable.getMessage());

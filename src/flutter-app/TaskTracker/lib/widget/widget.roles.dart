@@ -53,7 +53,6 @@ class _WidgetRolesState extends State<WidgetRoles> {
 
   void setUserRoles(List<String> roles) {
     _userRoles = roles;
-    _createRolesUI(_availableRoles);
   }
 
   List<String> getUserRoles() {
@@ -66,7 +65,6 @@ class _WidgetRolesState extends State<WidgetRoles> {
 
   void updateUI() {
     _createRolesUI(_availableRoles);
-    setState(() {});
   }
 
   @override

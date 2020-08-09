@@ -7,11 +7,10 @@
  */
 package net.vrfun.tasktracker.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
 
 /**
  * User's short info.

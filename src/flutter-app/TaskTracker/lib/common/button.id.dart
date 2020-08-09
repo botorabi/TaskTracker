@@ -13,6 +13,8 @@ abstract class ButtonID {
   static const String YES = 'Yes';
   static const String NO = 'No';
   static const String ALL = 'All';
+  static const String DISMISS = 'Dismiss';
   static const String APPLY = 'Apply';
   static const String CREATE = 'Create';
+  static const String CHOOSE = 'Choose';
 }
