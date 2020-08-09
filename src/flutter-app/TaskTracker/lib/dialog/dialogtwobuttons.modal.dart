@@ -24,30 +24,29 @@ class DialogTwoButtonsModal {
 
   Future<String> show(String title, String text, String buttonLabel1, String buttonLabel2) {
     return showDialog<String>(
-        context: _context,
-        barrierDismissible: true,
-        builder: (_) =>
-        new AlertDialog(
-          title: new Text(title),
-          content: new Text(
-            text,
-            style: TextStyle(fontWeight: FontWeight.w300),
+      context: _context,
+      barrierDismissible: true,
+      builder: (_) => AlertDialog(
+        title: Text(title),
+        content: Text(
+          text,
+          style: TextStyle(fontWeight: FontWeight.w300),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text(buttonLabel2),
+            onPressed: () {
+              Navigator.of(_context).pop(buttonLabel2);
+            },
           ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text(buttonLabel2),
-              onPressed: () {
-                Navigator.of(_context).pop(buttonLabel2);
-              },
-            ),
-            FlatButton(
-              child: Text(buttonLabel1),
-              onPressed: () {
-                Navigator.of(_context).pop(buttonLabel1);
-              },
-            ),
-          ],
-        )
+          FlatButton(
+            child: Text(buttonLabel1),
+            onPressed: () {
+              Navigator.of(_context).pop(buttonLabel1);
+            },
+          ),
+        ],
+      )
     );
   }
 }

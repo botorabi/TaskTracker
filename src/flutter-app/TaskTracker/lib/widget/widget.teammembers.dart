@@ -123,14 +123,13 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                     CircleButton.create(24, Icons.add, 16, () {
 
                         /// TODO get all available users from back-end
-
                         List<UserInfo> availableUsers = List<UserInfo>();
-                        UserInfo user = UserInfo();
-                        user.realName = "Foo";
-                        availableUsers.add(user);
-                        UserInfo anotheruser = UserInfo();
-                        anotheruser.realName = "Bar";
-                        availableUsers.add(anotheruser);
+                        for (int i = 0; i < 20; i++) {
+                          UserInfo user = UserInfo();
+                          user.realName = "Foo Bar" + i.toString();
+                          availableUsers.add(user);
+                        }
+                        ////////////////////////////////////////////////
 
                         DialogChooseUser(context).show('Choose User', 'Choose a user to add as member to team.', availableUsers)
                             .then((chosenUsers) {
@@ -154,14 +153,6 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
 
   void _createUI() {
     _membersWidget = List<Container>();
-
-    //TODO remove this
-    UserInfo user = UserInfo();
-    user.realName = "BLAAA";
-    _members.add(user);
-    print("Count member: " + _members.length.toString());
-    /////////////////////
-
     _members.forEach((element) {
       _membersWidget.add(Container(
         child:
