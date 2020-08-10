@@ -13,9 +13,9 @@ import 'package:flutter/material.dart';
 
 
 class PageHome extends StatefulWidget {
-  PageHome({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageHome({Key key, this.title}) : super(key: key);
 
   @override
   _PageHomeState createState() => _PageHomeState();

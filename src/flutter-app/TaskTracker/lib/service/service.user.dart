@@ -95,4 +95,16 @@ class ServiceUser {
       return Future<bool>.error(response.statusCode);
     }
   }
+
+  Future<List<UserInfo>> searchUser(String value) async {
+    Response response = await get(Config.baseURL + '/api/user/search/' + value,
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return UserInfo.listFromJsonString(response.body);
+    }
+    else {
+      return Future<List<UserInfo>>.error(response.statusCode);
+    }
+  }
 }

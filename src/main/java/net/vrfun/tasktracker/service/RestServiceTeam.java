@@ -85,7 +85,7 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team")
-    public ResponseEntity<List<Team>> getTeams() {
+    public ResponseEntity<List<TeamShortInfo>> getTeams() {
         try {
             return new ResponseEntity<>(teams.getTeams(), HttpStatus.OK);
         }
@@ -96,7 +96,7 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team/{id}")
-    public ResponseEntity<Team> getTeam(@PathVariable("id") Long id) {
+    public ResponseEntity<TeamShortInfo> getTeam(@PathVariable("id") Long id) {
         try {
             return new ResponseEntity<>(teams.getTeamById(id), HttpStatus.OK);
         }

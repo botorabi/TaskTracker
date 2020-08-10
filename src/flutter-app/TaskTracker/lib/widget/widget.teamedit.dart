@@ -41,10 +41,17 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   _WidgetTeamEditState({this.teamId}) {
     if (teamId != 0) {
       _newTeam = false;
-      _retrieveTeam();
     }
     else {
       _newTeam = true;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_newTeam) {
+      _retrieveTeam();
     }
   }
 
@@ -92,7 +99,6 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                           padding: EdgeInsets.all(10.0),
                           child: TextFormField(
                             controller: _textEditingControllerName,
-                            autofocus: true,
                             decoration: InputDecoration(
                               labelText: 'Name',
                             ),
@@ -257,7 +263,6 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
           _active = _currentTeam.active;
 
           _widgetTeamMembers.setMemberIDs(_currentTeam.users);
-          _widgetTeamMembers.updateUI();
 
           setState(() {});
         },

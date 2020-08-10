@@ -41,7 +41,9 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
   List<Team> _teams = [];
   bool _expanded = false;
 
-  _WidgetTeamListState() {
+  @override
+  void initState() {
+    super.initState();
     _retrieveTeams();
   }
 

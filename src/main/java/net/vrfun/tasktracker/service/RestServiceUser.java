@@ -121,7 +121,7 @@ public class RestServiceUser {
         try {
             UserShortInfo user = users.getUserById(id);
             //! NOTE don't leak user info to others!
-            if (!userAuthenticator.isRoleAdmin() || (id != userAuthenticator.getUserId())) {
+            if (!userAuthenticator.isRoleAdmin() && (id != userAuthenticator.getUserId())) {
                 user.setLastLogin(null);
                 user.setLogin("");
             }
@@ -131,6 +131,12 @@ public class RestServiceUser {
             LOGGER.info("Could not get user, reason: {}", throwable.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/user/search/{filter}")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
+    public ResponseEntity<List<UserShortInfo>> searchUser(@PathVariable("filter") String filter) {
+        return new ResponseEntity<>(users.searchUser(filter), HttpStatus.OK);
     }
 
     @PostMapping("/user/login")

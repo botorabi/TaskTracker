@@ -44,10 +44,17 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   _WidgetUserEditState({this.userId}) {
     if (userId != 0) {
       _newUser = false;
-      _retrieveUserInfo();
     }
     else {
       _newUser = true;
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_newUser) {
+      _retrieveUserInfo();
     }
   }
 

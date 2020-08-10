@@ -10,9 +10,9 @@ import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:flutter/material.dart';
 
 class PageEditTeam extends StatefulWidget {
-  PageEditTeam({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageEditTeam({Key key, this.title}) : super(key: key);
 
   @override
   _PageEditTeamState createState() => _PageEditTeamState();

@@ -196,7 +196,7 @@ public class Users {
     @NonNull
     public List<UserShortInfo> getUsers() {
         List<UserShortInfo> users = userRepository.getUsers();
-        for (UserShortInfo user :users) {
+        for (UserShortInfo user: users) {
             fetchUserRoles(user);
         }
         return users;
@@ -227,5 +227,10 @@ public class Users {
         fetchUserRoles(user.get());
 
         return user.get();
+    }
+
+    @NonNull
+    public List<UserShortInfo> searchUser(@NonNull final String filter) {
+        return userRepository.searchUser(filter);
     }
 }

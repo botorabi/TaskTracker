@@ -11,9 +11,9 @@ import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
 class PageLogin extends StatefulWidget {
-  PageLogin({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageLogin({Key key, this.title}) : super(key: key);
 
   @override
   _PageLoginState createState() => _PageLoginState();

@@ -29,6 +29,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<UserShortInfo> getUsers();
 
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+            "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%')")
+    List<UserShortInfo> searchUser(@NonNull @Param("filter") String filter);
+
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.id = :id")
     Optional<UserShortInfo> getUserById(@NonNull @Param("id") Long id);
 

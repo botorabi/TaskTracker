@@ -13,9 +13,9 @@ import 'package:flutter/material.dart';
 
 
 class PageAdmin extends StatefulWidget {
-  PageAdmin({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageAdmin({Key key, this.title}) : super(key: key);
 
   @override
   _PageAdminState createState() => _PageAdminState();
@@ -31,8 +31,6 @@ class _PageAdminState extends State<PageAdmin> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             WidgetUserList().setExpanded(true),
             WidgetTeamList().setExpanded(false),

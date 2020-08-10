@@ -89,7 +89,7 @@ public class Teams {
                 .stream()
                 .forEach((userID) -> {
                     Optional<User> user = userRepository.findById(userID);
-                    if (!user.isPresent()) {
+                    if (user.isPresent()) {
                         users.add(user.get());
                     }
                     else {
@@ -120,18 +120,18 @@ public class Teams {
     }
 
     @NonNull
-    public List<Team> getTeams() {
-        List<Team> teams = new ArrayList<>();
-        teamRepository.findAll().forEach((team) -> teams.add(team));
+    public List<TeamShortInfo> getTeams() {
+        List<TeamShortInfo> teams = new ArrayList<>();
+        teamRepository.findAll().forEach((team) -> teams.add(new TeamShortInfo(team)));
         return teams;
     }
 
     @NonNull
-    public Team getTeamById(Long id) throws IllegalArgumentException {
+    public TeamShortInfo getTeamById(Long id) throws IllegalArgumentException {
         Optional<Team> foundTeam = teamRepository.findById(id);
         if (foundTeam.isEmpty()) {
             throw new IllegalArgumentException("Team with ID '" + id + "' does not exist!");
         }
-        return foundTeam.get();
+        return new TeamShortInfo(foundTeam.get());
     }
 }

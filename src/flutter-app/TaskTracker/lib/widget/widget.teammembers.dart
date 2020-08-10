@@ -6,11 +6,8 @@
  *          main directory for more details.
  */
 
-import 'dart:html';
-
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/dialog/dialog.chooseuser.dart';
-import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
@@ -38,24 +35,12 @@ class WidgetTeamMembers extends StatefulWidget {
   }
 
   List<int> getMemberIDs() {
-    /*
-    List<int> ids = List<int>();
-    _widgetTeamMembersState.getMembers().forEach((element) {
-      ids.add(element.id);
-    });
-    return ids;
-    */
     return _widgetTeamMembersState.getMembers()
-        .map((member) => member.id) as List<int>;
+        .map((member) => member.id).toList();
   }
 
   void setReadOnly(bool readOnly) {
     _widgetTeamMembersState.setReadOnly(readOnly);
-  }
-
-  /// Call after using setMembers or setReadOnly in order to update the UI.
-  void updateUI() {
-    _widgetTeamMembersState.updateUI();
   }
 }
 
@@ -80,16 +65,13 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
     userIDs.forEach((userID) {
       _serviceUser.getUser(userID).then((userInfo) {
         _members.add(userInfo);
+        _createUI();
       });
     });
   }
 
   void setReadOnly(bool readOnly) {
     this._readOnly = readOnly;
-  }
-
-  void updateUI() {
-    _createUI();
   }
 
   @override
@@ -121,21 +103,22 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                   padding: const EdgeInsets.only(right: 10.0),
                   child:
                     CircleButton.create(24, Icons.add, 16, () {
-
-                        /// TODO get all available users from back-end
-                        List<UserInfo> availableUsers = List<UserInfo>();
-                        for (int i = 0; i < 20; i++) {
-                          UserInfo user = UserInfo();
-                          user.realName = "Foo Bar" + i.toString();
-                          availableUsers.add(user);
-                        }
-                        ////////////////////////////////////////////////
-
-                        DialogChooseUser(context).show('Choose User', 'Choose a user to add as member to team.', availableUsers)
+                        DialogChooseUser(context).show('Team Members', 'Add new team members.')
                             .then((chosenUsers) {
-                              /// TODO pickup chosen users and update _membersWidget
-                              //_members = users;
-                              //print("USERS: " + chosenUsers.toString());
+                              if (chosenUsers.length > 0) {
+                                chosenUsers.forEach((userInfo) {
+                                  bool memberIsInList = false;
+                                  _members.forEach((member) {
+                                    if (member.id == userInfo.id) {
+                                      memberIsInList = true;
+                                    }
+                                  });
+                                  if (!memberIsInList) {
+                                    _members.add(userInfo);
+                                  }
+                                  _createUI();
+                                });
+                              }
                             });
                       }
                     ),
@@ -153,16 +136,16 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
 
   void _createUI() {
     _membersWidget = List<Container>();
-    _members.forEach((element) {
+    _members.forEach((userInfo) {
       _membersWidget.add(Container(
         child:
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(element.realName),
+              Text(userInfo.realName),
               CircleButton.create(24, Icons.remove, 16, () {
-                /// TODO
-                DialogModal(context).show('Under Construction', 'TODO: Remove team member....', false);
+                _members.remove(userInfo);
+                _createUI();
               }),
             ]
           )

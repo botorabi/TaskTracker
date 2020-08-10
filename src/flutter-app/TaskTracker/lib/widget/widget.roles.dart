@@ -35,7 +35,7 @@ class WidgetRoles extends StatefulWidget {
 
   /// Call after using setUserRoles or setReadOnly in order to update the UI.
   void updateUI() {
-    _widgetRoleState.updateUI();
+ //   _widgetRoleState.updateUI();
   }
 }
 
@@ -47,7 +47,9 @@ class _WidgetRolesState extends State<WidgetRoles> {
   List<String> _availableRoles;
   bool _readOnly = false;
 
-  _WidgetRolesState() {
+  @override
+  void initState() {
+    super.initState();
     _retrieveRoles();
   }
 
@@ -64,7 +66,9 @@ class _WidgetRolesState extends State<WidgetRoles> {
   }
 
   void updateUI() {
-    _createRolesUI(_availableRoles);
+    if (_availableRoles != null) {
+      _createRolesUI(_availableRoles);
+    }
   }
 
   @override

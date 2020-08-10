@@ -37,7 +37,9 @@ class UserInfo {
     if (fields['lastLogin'] != null) {
       userInfo.lastLogin = DateTime.parse(fields['lastLogin'].toString());
     }
-    userInfo.roles = List.from(fields['roles']);
+    if (fields['roles'] != null) {
+      userInfo.roles = List.from(fields['roles']);
+    }
     userInfo.password = '';
     return userInfo;
   }

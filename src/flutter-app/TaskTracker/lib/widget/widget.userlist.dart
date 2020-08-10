@@ -42,7 +42,9 @@ class _WidgetUserListState extends State<WidgetUserList> {
   List<UserInfo> _users = [];
   bool _expanded = false;
 
-  _WidgetUserListState() {
+  @override
+  void initState() {
+    super.initState();
     _retrieveUsers();
   }
 

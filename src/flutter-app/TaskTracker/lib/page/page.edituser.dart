@@ -10,9 +10,9 @@ import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
 class PageEditUser extends StatefulWidget {
-  PageEditUser({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageEditUser({Key key, this.title}) : super(key: key);
 
   @override
   _PageEditUserState createState() => _PageEditUserState();
