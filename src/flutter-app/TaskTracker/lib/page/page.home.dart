@@ -36,7 +36,7 @@ class _PageHomeState extends State<PageHome> {
           children: <Widget>[
             Text(
               'Welcome to Task Tracker',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headline6,
             ),
             Padding(
               padding: EdgeInsets.only(top: 20.0, bottom: 30),

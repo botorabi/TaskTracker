@@ -28,6 +28,7 @@ class DialogChooseUser {
   BuildContext _context;
   final _serviceUser = ServiceUser();
   final _chosenUsers = List<UserInfo>();
+  final _controller = ScrollController();
   dynamic _setState;
   List<Container> _listCandidates = List<Container>();
   List<Container> _listChosenUsers = List<Container>();
@@ -223,7 +224,7 @@ class DialogChooseUser {
     });
     _updateUI();
   }
-  final _controller = ScrollController();
+
   void _updateUI() {
     if (_setState != null) {
       _setState(() => {});

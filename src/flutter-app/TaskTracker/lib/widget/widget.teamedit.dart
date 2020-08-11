@@ -61,116 +61,123 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
     return Card(
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
-      child: SizedBox(
-        width: Config.defaultEditorWidth,
-        height: _newTeam ? 390 : 430,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: Config.defaultEditorWidth),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Text(
-                'Edit Team Settings',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Visibility(
-              visible: _newTeam == false,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Text(
-                  'Name: ' + _textEditingControllerName.text,
-                ),
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Form(
-                  child: Container(
-                    width: 350,
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
+            ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        'Edit Team Settings',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _newTeam == false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          'Name: ' + _textEditingControllerName.text,
+                        ),
+                      ),
+                    ),
+                    Wrap(
+                      spacing: 5,
+                      runSpacing: 10,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            controller: _textEditingControllerName,
-                            decoration: InputDecoration(
-                              labelText: 'Name',
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            controller: _textEditingControllerDescription,
-                            maxLines: 3,
-                            maxLength: 255,
-                            decoration: InputDecoration(
-                              labelText: 'Description',
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: !_newTeam,
-                          child: Row(
-                            children: [
-                              Padding(
-                                  padding: EdgeInsets.only(left: 10, right: 20.0),
-                                  child:
-                                  Text('Active',
-                                    //style: TextStyle(fontWeight: FontWeight.w600),
-                                    textAlign: TextAlign.left,
-                                  )
-                              ),
-                              //Spacer(),
-                              Padding(
-                                padding: EdgeInsets.only(top: 0.0),
-                                child:
-                                Checkbox(
-                                  value: _active,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _active = value;
-                                    });
-                                  },
+                        Form(
+                          child: Container(
+                            width: 350,
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: TextFormField(
+                                    controller: _textEditingControllerName,
+                                    decoration: InputDecoration(
+                                      labelText: 'Name',
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: TextFormField(
+                                    controller: _textEditingControllerDescription,
+                                    maxLines: 3,
+                                    maxLength: 255,
+                                    decoration: InputDecoration(
+                                      labelText: 'Description',
+                                    ),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: !_newTeam,
+                                  child: Row(
+                                    children: [
+                                      Padding(
+                                          padding: EdgeInsets.only(left: 10, right: 20.0),
+                                          child:
+                                          Text('Active',
+                                            textAlign: TextAlign.left,
+                                          )
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 0.0),
+                                        child:
+                                        Checkbox(
+                                          value: _active,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _active = value;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        ),
+                        LayoutBuilder(
+                            builder: (BuildContext context, BoxConstraints constraints) {
+                              double w = constraints.maxWidth < 535 ? 350 : 180;
+                              return ConstrainedBox(
+                                constraints: BoxConstraints(maxWidth: w),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: _newTeam ? 40.0 : 20.0, right: 10, left: 10
+                                  ),
+                                  child: _widgetTeamMembers,
+                                ),
+                              );
+                            }
                         ),
                       ],
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: 185.0,
-                  child:
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0),
-                        child: _widgetTeamMembers,
-                      ),
-                    ],
-                  ),
+                  ],
                 ),
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0),
+                  padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
                   child: RaisedButton(
                     child: Text('Cancel'),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0),
+                  padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
                   child: RaisedButton(
                     child: Text(_newTeam ? ButtonID.CREATE : ButtonID.APPLY),
                     onPressed: () {

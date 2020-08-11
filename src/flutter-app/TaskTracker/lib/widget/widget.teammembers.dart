@@ -136,7 +136,6 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                 Padding(
                   padding: const EdgeInsets.only(top: 10.0, left: 0.0, right: 0.0),
                   child:Container(
-                    width: 200,
                     height: 180,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
