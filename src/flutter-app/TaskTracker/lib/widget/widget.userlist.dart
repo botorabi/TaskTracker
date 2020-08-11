@@ -25,9 +25,7 @@ class WidgetUserList extends StatefulWidget {
   final _WidgetUserListState _widgetUserListState = _WidgetUserListState();
 
   @override
-  _WidgetUserListState createState() {
-    return _widgetUserListState;
-  }
+  _WidgetUserListState createState() => _widgetUserListState;
 
   WidgetUserList setExpanded(bool expanded) {
     _widgetUserListState.setExpanded(expanded);
@@ -41,6 +39,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
   PaginatedDataTable _dataTable;
   List<UserInfo> _users = [];
   bool _expanded = false;
+  bool _sortAscending = true;
 
   @override
   void initState() {
@@ -65,26 +64,24 @@ class _WidgetUserListState extends State<WidgetUserList> {
     }
     else {
       _dataTable = _createDataTable();
-
       return Card(
         elevation: 5,
         margin: EdgeInsets.all(10.0),
         child:
         SizedBox(
-          width: Config.defaultPanelWidth,
           child:
           Padding(
             padding: const EdgeInsets.all(0.0),
             child:
             ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: _dataTable,
-                  )
-                ]
+              title: Text(widget.title),
+              initiallyExpanded: _expanded,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: _dataTable,
+                )
+              ]
             ),
           ),
         ),
@@ -116,11 +113,19 @@ class _WidgetUserListState extends State<WidgetUserList> {
       });
   }
 
+  void _sortUsers(bool ascending) {
+    _users.sort((userInfoA, userInfoB) => userInfoA.realName?.compareTo(userInfoB?.realName));
+    if (!ascending) {
+      _users = _users.reversed.toList();
+    }
+  }
+
   void _retrieveUsers() {
     _serviceUser
         .getUsers()
         .then((listUserInfo) {
             _users = listUserInfo;
+            _sortUsers(_sortAscending);
             setState(() {});
           },
           onError: (err) {
@@ -130,13 +135,20 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text("Users"),
-      columns: const <DataColumn>[
+      header: Text(''),
+      columns: <DataColumn>[
         DataColumn(
           label: Text(
             'Name',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
+          onSort:(columnIndex, ascending) {
+            setState(() {
+              _sortAscending = !_sortAscending;
+              _sortUsers(_sortAscending);
+              _dataTable = _createDataTable();
+            });
+          },
         ),
         DataColumn(
           label: Text(
@@ -163,6 +175,8 @@ class _WidgetUserListState extends State<WidgetUserList> {
       rowsPerPage: 5,
       onRowsPerPageChanged: null,
       source: _DataProvider(this),
+      sortColumnIndex: 0,
+      sortAscending: _sortAscending,
       actions: [
         CircleButton.create(24, Icons.add, 16, () => _addUser()),
       ],

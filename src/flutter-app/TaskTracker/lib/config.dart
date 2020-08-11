@@ -6,6 +6,8 @@
  *          main directory for more details.
  */
 
+import 'dart:ui';
+
 import 'package:TaskTracker/service/authstatus.dart';
 
 class Config {
@@ -17,5 +19,11 @@ class Config {
 
   static AuthStatus authStatus = AuthStatus();
 
-  static final double defaultPanelWidth = 650;
+  static final double defaultPanelWidth = 750;
+
+  static final double defaultEditorWidth = 540;
+
+  static final Color listBackgroundColor = Color.fromARGB(255, 250, 250, 250);
+
+  static final Color listBorderColor = Color.fromARGB(255, 225, 225, 225);
 }

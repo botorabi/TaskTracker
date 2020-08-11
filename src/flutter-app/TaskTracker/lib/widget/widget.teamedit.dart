@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
@@ -38,13 +39,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   final _textEditingControllerDescription = TextEditingController();
   final _widgetTeamMembers = WidgetTeamMembers();
 
-  _WidgetTeamEditState({this.teamId}) {
-    if (teamId != 0) {
-      _newTeam = false;
-    }
-    else {
-      _newTeam = true;
-    }
+  _WidgetTeamEditState({this.teamId = 0}) {
+    _newTeam = teamId == 0;
   }
 
   @override
@@ -66,8 +62,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
       child: SizedBox(
-        width: 540,
-        height: _newTeam == false ? 410 : 460,
+        width: Config.defaultEditorWidth,
+        height: _newTeam ? 390 : 430,
         child: Column(
           children: [
             Padding(
@@ -92,7 +88,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                 Form(
                   child: Container(
                     width: 350,
-                    padding: const EdgeInsets.all(20.0),
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
                         Padding(
@@ -115,59 +111,21 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                             ),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.0, right: 10.0),
-                              child: RaisedButton(
-                                child: Text('Cancel'),
-                                onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.0, right: 10.0),
-                              child: RaisedButton(
-                                child: Text(_newTeam ? ButtonID.CREATE : ButtonID.APPLY),
-                                onPressed: () {
-                                  if (_newTeam) {
-                                    _createTeam(context);
-                                  }
-                                  else {
-                                    _applyChanges(context);
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 185.0,
-                  child:
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Visibility(
-                        visible: !_newTeam,
-                        child:
-                          Row(
+                        Visibility(
+                          visible: !_newTeam,
+                          child: Row(
                             children: [
                               Padding(
-                                  padding: EdgeInsets.only(top: 20.0),
+                                  padding: EdgeInsets.only(left: 10, right: 20.0),
                                   child:
                                   Text('Active',
-                                    style: TextStyle(fontWeight: FontWeight.w600),
+                                    //style: TextStyle(fontWeight: FontWeight.w600),
                                     textAlign: TextAlign.left,
                                   )
                               ),
-                              Spacer(),
+                              //Spacer(),
                               Padding(
-                                padding: EdgeInsets.only(top: 20.0),
+                                padding: EdgeInsets.only(top: 0.0),
                                 child:
                                 Checkbox(
                                   value: _active,
@@ -180,12 +138,49 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                               ),
                             ],
                           ),
-                      ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 185.0,
+                  child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Padding(
                         padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0),
                         child: _widgetTeamMembers,
                       ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0),
+                  child: RaisedButton(
+                    child: Text('Cancel'),
+                    onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0),
+                  child: RaisedButton(
+                    child: Text(_newTeam ? ButtonID.CREATE : ButtonID.APPLY),
+                    onPressed: () {
+                      if (_newTeam) {
+                        _createTeam(context);
+                      }
+                      else {
+                        _applyChanges(context);
+                      }
+                    },
                   ),
                 ),
               ],

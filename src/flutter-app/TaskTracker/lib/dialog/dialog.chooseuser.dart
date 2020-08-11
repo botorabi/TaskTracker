@@ -8,6 +8,7 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,6 @@ class DialogChooseUser {
             builder: (context, setState) {
               return AlertDialog(
                 title: Text(title),
-                //scrollable: true,
                 content: _createUsersUI(text, setState),
                 actions: <Widget>[
                   FlatButton(
@@ -68,27 +68,27 @@ class DialogChooseUser {
     _setState = setState;
     return SizedBox(
       width: 400,
-      height: 200,
+      height: 340,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(text, textAlign: TextAlign.left),
           Padding(
-            padding: EdgeInsets.only(top: 25.0, bottom: 10.0),
+            padding: EdgeInsets.only(top: 25.0, bottom: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Find User',
-                  style: TextStyle(fontWeight: FontWeight.w500)
+                    style: TextStyle(fontWeight: FontWeight.w500)
                 ),
                 TextField(
                   decoration: InputDecoration(
                       hintText: 'Enter at least 3 characters'
                   ),
                   onChanged: (value) {
-                      _searchUser(value).then((value) {
-                        _updateUI();
+                    _searchUser(value).then((value) {
+                      _updateUI();
                     });
                   },
                 ),
@@ -99,32 +99,89 @@ class DialogChooseUser {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                flex: 1,
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.only(top:10.0, left: 0.0),
-                  children: [
-                    Text('Found Users'),
-                    ... _listCandidates,
-                  ]
+              Card(
+                elevation: 2,
+                child:
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Text('Found Users',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child:
+                        Container(
+                          width: 170,
+                          height: 154,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(color: Config.listBorderColor),
+                            color: Config.listBackgroundColor,
+                          ),
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: <Widget> [... _listCandidates],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: ListView(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.only(top: 10.0, left: 10.0),
-                  children: [
-                    Text('Chosen Users'),
-                    ... _listChosenUsers,
-                  ],
+              Card(
+                elevation: 2,
+                child:
+                Padding(
+                  padding: EdgeInsets.all(5.0),
+                  child:
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Text('Chosen Users',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500),
+                          textAlign: TextAlign.left,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child:
+                        Container(
+                          width: 170,
+                          height: 154,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(5)),
+                            border: Border.all(color: Config.listBorderColor),
+                            color: Config.listBackgroundColor,
+                          ),
+                          child: ListView(
+                            controller: _controller,
+                            shrinkWrap: true,
+                            children: <Widget>[... _listChosenUsers],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
         ],
-      )
+      ),
     );
   }
 
@@ -133,14 +190,13 @@ class DialogChooseUser {
     users.forEach((userInfo) {
       _listCandidates.add(
         Container(
-          padding: const EdgeInsets.only(top: 5.0),
           child:
             ListTile(
               title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(24, Icons.arrow_right, 16, () {
-                if (!_chosenUsers.contains(userInfo)) {
-                  _chosenUsers.add(userInfo);
+              trailing: CircleButton.create(16, Icons.arrow_right, 12, () {
+                if (_addNewChosenUser(userInfo)) {
                   _updateChosenUsersUI();
+                  _scrollToLastChosenUser();
                 }
               }),
           ),
@@ -154,11 +210,10 @@ class DialogChooseUser {
     _chosenUsers.forEach((userInfo) {
       _listChosenUsers.add(
         Container(
-          padding: const EdgeInsets.only(top: 5.0),
           child:
           ListTile(
               title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(24, Icons.remove, 16, () {
+              trailing: CircleButton.create(16, Icons.remove, 12, () {
                 _chosenUsers.remove(userInfo);
                 _updateChosenUsersUI();
               }),
@@ -167,6 +222,31 @@ class DialogChooseUser {
       );
     });
     _updateUI();
+  }
+  final _controller = ScrollController();
+  void _updateUI() {
+    if (_setState != null) {
+      _setState(() => {});
+    }
+  }
+
+  bool _addNewChosenUser(UserInfo userInfo) {
+    bool userIsInList = false;
+    _chosenUsers.forEach((user) {
+      if (user.id == userInfo.id) {
+        userIsInList = true;
+      }
+    });
+    if (!userIsInList) {
+      _chosenUsers.add(userInfo);
+    }
+    return !userIsInList;
+  }
+
+  void _scrollToLastChosenUser() {
+    _controller.animateTo(_controller.position.maxScrollExtent + 50,
+        duration: Duration(seconds: 1),
+        curve: Curves.fastOutSlowIn);
   }
 
   Future<void> _searchUser(String value) async {
@@ -179,12 +259,6 @@ class DialogChooseUser {
     }
     else {
       _listCandidates = List<Container>();
-    }
-  }
-
-  void _updateUI() {
-    if (_setState != null) {
-      _setState(() => {});
     }
   }
 }

@@ -24,9 +24,7 @@ class WidgetTeamList extends StatefulWidget {
   final _WidgetTeamListState _widgetTeamListState = _WidgetTeamListState();
 
   @override
-  _WidgetTeamListState createState() {
-    return _widgetTeamListState;
-  }
+  _WidgetTeamListState createState() => _widgetTeamListState;
 
   WidgetTeamList setExpanded(bool expanded) {
     _widgetTeamListState.setExpanded(expanded);
@@ -40,6 +38,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
   PaginatedDataTable _dataTable;
   List<Team> _teams = [];
   bool _expanded = false;
+  bool _sortAscending = true;
 
   @override
   void initState() {
@@ -69,7 +68,6 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         margin: EdgeInsets.all(10.0),
         child:
         SizedBox(
-          width: Config.defaultPanelWidth,
           child:
           Padding(
             padding: const EdgeInsets.all(0.0),
@@ -114,11 +112,19 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       });
   }
 
+  void _sortTeams(bool ascending) {
+    _teams.sort((userInfoA, userInfoB) => userInfoA.name?.compareTo(userInfoB?.name));
+    if (!ascending) {
+      _teams = _teams.reversed.toList();
+    }
+  }
+
   void _retrieveTeams() {
     _serviceTeam
         .getTeams()
         .then((listTeam) {
             _teams = listTeam;
+            _sortTeams(_sortAscending);
             setState(() {});
           },
           onError: (err) {
@@ -129,12 +135,19 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
   PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
       header: Text(''),
-      columns: const <DataColumn>[
+      columns: <DataColumn>[
         DataColumn(
           label: Text(
             'Name',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
+          onSort:(columnIndex, ascending) {
+            setState(() {
+              _sortAscending = !_sortAscending;
+              _sortTeams(_sortAscending);
+              _dataTable = _createDataTable();
+            });
+          },
         ),
         DataColumn(
           label: Text(
@@ -150,7 +163,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         ),
         DataColumn(
           label: Text(
-            'Count Team Members',
+            'Members',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -161,6 +174,8 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       rowsPerPage: 5,
       onRowsPerPageChanged: null,
       source: _DataProvider(this),
+      sortColumnIndex: 0,
+      sortAscending: _sortAscending,
       actions: [
         CircleButton.create(24, Icons.add, 16, () => _addTeam()),
       ],

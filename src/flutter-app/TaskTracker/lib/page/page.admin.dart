@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
 import 'package:TaskTracker/widget/widget.userlist.dart';
@@ -30,13 +31,20 @@ class _PageAdminState extends State<PageAdmin> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          children: [
-            WidgetUserList().setExpanded(true),
-            WidgetTeamList().setExpanded(false),
-          ],
+        child: Container(
+          constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
+          padding: const EdgeInsets.all(20.0),
+          child:
+            ListView(
+              shrinkWrap: false,
+              children: [
+                WidgetUserList().setExpanded(true),
+                WidgetTeamList().setExpanded(true),
+              ],
+            ),
+          ),
         ),
-      ),
+      //),
     );
   }
 }

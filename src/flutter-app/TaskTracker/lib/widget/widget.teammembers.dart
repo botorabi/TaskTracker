@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.chooseuser.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
@@ -81,56 +82,78 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(left: 0.0),
-              child: Text(
-                widget.title,
-                style: TextStyle(fontWeight: FontWeight.w600),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            Spacer(),
-            Visibility(
-              visible: !_readOnly,
-              child:
-                Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child:
-                    CircleButton.create(24, Icons.add, 16, () {
-                        DialogChooseUser(context).show('Team Members', 'Add new team members.')
-                            .then((chosenUsers) {
-                              if (chosenUsers.length > 0) {
-                                chosenUsers.forEach((userInfo) {
-                                  bool memberIsInList = false;
-                                  _members.forEach((member) {
-                                    if (member.id == userInfo.id) {
-                                      memberIsInList = true;
-                                    }
-                                  });
-                                  if (!memberIsInList) {
-                                    _members.add(userInfo);
-                                  }
-                                  _createUI();
-                                });
-                              }
-                            });
-                      }
+    return Card(
+      elevation: 1,
+      child: (
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child:
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 0.0),
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.left,
+                      ),
                     ),
+                    Spacer(),
+                    Visibility(
+                      visible: !_readOnly,
+                      child:
+                      Padding(
+                        padding: const EdgeInsets.all(0.0),
+                        child:
+                        CircleButton.create(20, Icons.add, 16, () {
+                          DialogChooseUser(context).show('Team Members', 'Add new team members.')
+                              .then((chosenUsers) {
+                            if (chosenUsers.length > 0) {
+                              chosenUsers.forEach((userInfo) {
+                                bool memberIsInList = false;
+                                _members.forEach((member) {
+                                  if (member.id == userInfo.id) {
+                                    memberIsInList = true;
+                                  }
+                                });
+                                if (!memberIsInList) {
+                                  _members.add(userInfo);
+                                }
+                                _createUI();
+                              });
+                            }
+                          });
+                        }
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10.0, left: 0.0, right: 0.0),
+                  child:Container(
+                    width: 200,
+                    height: 180,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      border: Border.all(color: Config.listBorderColor,),
+                      color: Config.listBackgroundColor,
+                    ),
+                    child: ListView(
+                      children: <Widget>[
+                        Column(children: _membersWidget),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-         ],
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-          child: Column(children: _membersWidget),
-        ),
-      ],
+          )
+      ),
     );
   }
 
@@ -138,17 +161,19 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
     _membersWidget = List<Container>();
     _members.forEach((userInfo) {
       _membersWidget.add(Container(
-        child:
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(userInfo.realName),
-              CircleButton.create(24, Icons.remove, 16, () {
-                _members.remove(userInfo);
-                _createUI();
-              }),
-            ]
-          )
+        child: Padding(
+            padding: EdgeInsets.all(5.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(userInfo.realName),
+                CircleButton.create(16, Icons.remove, 12, () {
+                  _members.remove(userInfo);
+                  _createUI();
+                }),
+              ]
+            ),
+          ),
         ),
       );
     });

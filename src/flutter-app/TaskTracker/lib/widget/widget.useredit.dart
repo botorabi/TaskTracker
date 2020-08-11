@@ -69,8 +69,8 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
       child: SizedBox(
-        width: 540,
-        height: _newUser == false ? 410 : 460,
+        width: Config.defaultEditorWidth,
+        height: _newUser ? 470 : 420,
         child: Column(
           children: [
             Padding(
@@ -140,32 +140,6 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                             ),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.0, right: 10.0),
-                              child: RaisedButton(
-                                child: Text('Cancel'),
-                                onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 10.0, right: 10.0),
-                              child: RaisedButton(
-                                child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
-                                onPressed: () {
-                                  if (_newUser) {
-                                    _createUser(context);
-                                  }
-                                  else {
-                                    _applyChanges(context);
-                                  }
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -176,6 +150,32 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                     Padding(
                       padding: EdgeInsets.all(10.0),
                       child: _widgetRoles,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                    child: RaisedButton(
+                      child: Text('Cancel'),
+                      onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                    child: RaisedButton(
+                      child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
+                      onPressed: () {
+                        if (_newUser) {
+                          _createUser(context);
+                        }
+                        else {
+                          _applyChanges(context);
+                        }
+                      },
                     ),
                   ),
                 ],
