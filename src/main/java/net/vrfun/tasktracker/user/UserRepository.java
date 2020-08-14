@@ -24,23 +24,23 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * NOTE: There some trouble extracting the user roles in following queries! So we omit it and fetch the roles manually.
      */
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user")
     List<UserShortInfo> getUsers();
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%')")
     List<UserShortInfo> searchUser(@NonNull @Param("filter") String filter);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.id = :id")
     Optional<UserShortInfo> getUserById(@NonNull @Param("id") Long id);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.login = :login")
     Optional<UserShortInfo> getUserByLogin(@NonNull @Param("login") String login);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.creationDate, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.ldapLogin = :ldapLogin")
     Optional<UserShortInfo> getUserByLdapLogin(@NonNull @Param("ldapLogin") String ldapLogin);
 }

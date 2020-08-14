@@ -6,25 +6,25 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/widget/widget.teamedit.dart';
+import 'package:TaskTracker/widget/widget.taskedit.dart';
 import 'package:flutter/material.dart';
 
-class PageEditTeam extends StatefulWidget {
+class PageEditTask extends StatefulWidget {
   final String title;
 
-  PageEditTeam({Key key, this.title}) : super(key: key);
+  PageEditTask({Key key, this.title}) : super(key: key);
 
   @override
-  _PageEditTeamState createState() => _PageEditTeamState();
+  _PageEditTaskState createState() => _PageEditTaskState();
 }
 
-class _PageEditTeamState extends State<PageEditTeam> {
+class _PageEditTaskState extends State<PageEditTask> {
 
   @override
   Widget build(BuildContext context) {
 
-    final int teamId = ModalRoute.of(context).settings.arguments;
-    if (teamId == 0) {
+    final int taskId = ModalRoute.of(context).settings.arguments;
+    if (taskId == 0) {
       print("Invalid Page argument!");
       return Container();
     }
@@ -37,7 +37,7 @@ class _PageEditTeamState extends State<PageEditTeam> {
         child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            WidgetTeamEdit(teamId: teamId)
+            WidgetTaskEdit(taskId: taskId)
           ],
         ),
       ),

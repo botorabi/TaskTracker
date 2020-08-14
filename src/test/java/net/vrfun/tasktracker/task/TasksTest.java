@@ -36,28 +36,38 @@ public class TasksTest {
     }
 
     @Test
-    public void getAll() {
+    public void getTasks() {
         List<Task> allTasks = new ArrayList<>();
         allTasks.add(new Task("Task1"));
         allTasks.add(new Task("Task2"));
 
         doReturn(allTasks).when(taskRepository).findAll();
 
-        assertThat(tasks.getAll()).hasSize(allTasks.size());
+        assertThat(tasks.getTasks()).hasSize(allTasks.size());
     }
 
     @Test
     public void getExistingTask() {
         doReturn(Optional.of(new Task())).when(taskRepository).findById(anyLong());
 
-        assertThat(tasks.get(42L)).isNotNull();
+        try {
+            tasks.getTaskById(42L);
+            fail("Failed to find an existing task.");
+        }
+        catch(Throwable ignored) {
+        }
     }
 
     @Test
     public void getNonExistingTask() {
         doReturn(Optional.empty()).when(taskRepository).findById(anyLong());
 
-        assertThat(tasks.get(42L)).isNull();
+        try {
+            tasks.getTaskById(42L);
+            fail("Failed to detect non-existing task.");
+        }
+        catch(Throwable ignored) {
+        }
     }
 
     @Test
@@ -70,7 +80,7 @@ public class TasksTest {
             tasks.create(taskEdit);
             fail("Failed to detect existing title during task creation.");
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
         }
     }
 
@@ -83,7 +93,7 @@ public class TasksTest {
             tasks.create(taskEdit);
             fail("Failed to detect missing title during task creation.");
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
         }
     }
 
@@ -102,7 +112,7 @@ public class TasksTest {
             assertThat(newTask.getDateClosed()).isNull();
             assertThat(newTask.getDateCreation()).isNotNull();
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
             fail("Failed to create a new task, reason: " + ignored.getMessage());
         }
     }
@@ -147,7 +157,7 @@ public class TasksTest {
             assertThat(updatedTask.getDescription()).isEqualTo("MyDescriptionUpdated");
             assertThat(updatedTask.getDateClosed()).isNull();
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
             fail("Failed to update a task");
         }
     }
@@ -168,7 +178,7 @@ public class TasksTest {
             Task updatedTask = tasks.update(taskEdit);
             assertThat(updatedTask.getDateClosed()).isNotNull();
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
             fail("Failed to update a task");
         }
     }
@@ -184,7 +194,7 @@ public class TasksTest {
             Task updatedTask = tasks.update(taskEdit);
             fail("Failed to detect a non-existing task during update.");
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
         }
     }
 
@@ -198,7 +208,7 @@ public class TasksTest {
             Task updatedTask = tasks.update(taskEdit);
             fail("Failed to detect a non-valid task ID during update.");
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
         }
     }
 
@@ -209,7 +219,7 @@ public class TasksTest {
         try {
             tasks.delete(42L);
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
             fail("Failed to delete a task");
         }
     }
@@ -222,7 +232,7 @@ public class TasksTest {
             tasks.delete(42L);
             fail("Failed to detect non-existing task during deletion");
         }
-        catch (IllegalArgumentException ignored) {
+        catch (Throwable ignored) {
         }
     }
 }

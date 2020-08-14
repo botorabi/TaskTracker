@@ -13,7 +13,7 @@ import java.time.Instant;
 import java.util.*;
 
 /**
- * User's short info.
+ * Team's short info.
  *
  * @author          boto
  * Creation Date    August 2020
@@ -37,8 +37,8 @@ public class TeamShortInfo {
         this.name = team.getName();
         this.description = team.getDescription();
         this.active = team.getActive();
-        this.users = new ArrayList<>();
         if (team.getUsers() != null) {
+            this.users = new ArrayList<>();
             team.getUsers().stream().forEach((user) -> this.users.add(user.getId()));
         }
     }

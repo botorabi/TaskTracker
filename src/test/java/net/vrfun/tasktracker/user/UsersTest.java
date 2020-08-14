@@ -154,7 +154,7 @@ public class UsersTest {
         assertThat(user.getRoles()).hasSize(reqUser.getRoles().size());
 
         assertThat(user.getLogin()).isNull();
-        assertThat(user.getCreationDate()).isNull();
+        assertThat(user.getDateCreation()).isNull();
     }
 
     @Test
@@ -169,7 +169,7 @@ public class UsersTest {
         assertThat(user.getRoles()).hasSize(reqUser.getRoles().size());
 
         assertThat(user.getLogin()).isNotNull();
-        assertThat(user.getCreationDate()).isNotNull();
+        assertThat(user.getDateCreation()).isNotNull();
     }
 
     private ReqUserEdit prepareUserCreateOrEdit() {

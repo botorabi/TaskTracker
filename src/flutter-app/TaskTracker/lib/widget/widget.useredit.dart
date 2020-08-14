@@ -68,121 +68,136 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     return Card(
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
-      child: SizedBox(
-        width: Config.defaultEditorWidth,
-        height: _newUser ? 470 : 420,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: Config.defaultEditorWidth),
         child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Text(
-                'Edit User Settings',
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
-            Visibility(
-              visible: _newUser == false,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Text(
-                  'Login: ' + _textEditingControllerLoginName.text,
+          children: <Widget>[
+            ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        'Edit User Settings',
+                        style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _newUser == false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(
+                          'Login: ' + _textEditingControllerLoginName.text,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Form(
-                  child: Container(
-                    width: 350,
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      children: [
-                        Visibility(
-                          visible: _newUser == true,
-                          child: Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: TextFormField(
-                              controller: _textEditingControllerLoginName,
-                              autofocus: true,
-                              decoration: InputDecoration(
-                                labelText: 'Login Name',
+                Wrap(
+                  spacing: 5,
+                  runSpacing: 10,
+                  children: [
+                    Form(
+                      child: Container(
+                        width: 350,
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          children: [
+                            Visibility(
+                              visible: _newUser == true,
+                              child: Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: TextFormField(
+                                  controller: _textEditingControllerLoginName,
+                                  autofocus: true,
+                                  decoration: InputDecoration(
+                                    labelText: 'Login Name',
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            controller: _textEditingControllerRealName,
-                            decoration: InputDecoration(
-                              labelText: 'Real Name',
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                controller: _textEditingControllerRealName,
+                                decoration: InputDecoration(
+                                  labelText: 'Real Name',
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            controller: _textEditingControllerPassword,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                controller: _textEditingControllerPassword,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(10.0),
-                          child: TextFormField(
-                            controller: _textEditingControllerPasswordRepeat,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              labelText: 'Repeat Password',
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                controller: _textEditingControllerPasswordRepeat,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Repeat Password',
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    LayoutBuilder(
+                      builder: (BuildContext context, BoxConstraints constraints) {
+                        double topPadding = constraints.maxWidth < 535 ? 0.0 : 30.0;
+                        double w = constraints.maxWidth < 535 ? 350 : 180;
+                        return ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: w),
+                          child:
+                          Padding(
+                            padding: EdgeInsets.only(left: 20, top: topPadding),
+                            child: _widgetRoles,
+                          ),
+                        );
+                      }
+                    ),
+                  ],
                 ),
-                Visibility(
-                  visible: true,
-                  child:
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
                     Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: _widgetRoles,
+                      padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                      child: RaisedButton(
+                        child: Text('Cancel'),
+                        onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
-                    child: RaisedButton(
-                      child: Text('Cancel'),
-                      onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
+                    Padding(
+                      padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                      child: RaisedButton(
+                        child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
+                        onPressed: () {
+                          if (_newUser) {
+                            _createUser(context);
+                          }
+                          else {
+                            _applyChanges(context);
+                          }
+                        },
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
-                    child: RaisedButton(
-                      child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
-                      onPressed: () {
-                        if (_newUser) {
-                          _createUser(context);
-                        }
-                        else {
-                          _applyChanges(context);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+                  ],
+                ),
+              ],
+            ),
+          ],
         ),
+      ),
     );
   }
 
@@ -269,7 +284,6 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
           if (_currentUserInfo.isAdmin()) {
             _widgetRoles.setReadOnly(true);
           }
-          _widgetRoles.updateUI();
 
           setState(() {});
         },

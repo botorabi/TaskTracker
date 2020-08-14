@@ -26,7 +26,9 @@ class Team {
     if (fields.containsKey('active')) {
       team.active = fields['active'];
     }
-    team.users = List.from(fields['users']);
+    if (fields.containsKey('users')) {
+      team.users = List.from(fields['users']);
+    }
     return team;
   }
 
@@ -50,7 +52,7 @@ class Team {
       'name' : name,
       'description' : description,
       'active' : active,
-      'users' : users.toList()
+      'users' : users?.toList()
     };
   }
 }

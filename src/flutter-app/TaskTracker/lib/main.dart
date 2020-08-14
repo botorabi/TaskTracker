@@ -6,7 +6,9 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/page/page.edittask.dart';
 import 'package:TaskTracker/page/page.editteam.dart';
+import 'package:TaskTracker/page/page.newtask.dart';
 import 'package:TaskTracker/page/page.newteam.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +65,8 @@ class AppTaskTracker extends StatelessWidget {
         NavigationLinks.NAV_EDIT_USER  : (context) => PageEditUser(title: 'Edit User'),
         NavigationLinks.NAV_NEW_TEAM   : (context) => PageNewTeam(title: 'Create New Team'),
         NavigationLinks.NAV_EDIT_TEAM  : (context) => PageEditTeam(title: 'Edit Team'),
+        NavigationLinks.NAV_NEW_TASK   : (context) => PageNewTask(title: 'Create New Task'),
+        NavigationLinks.NAV_EDIT_TASK  : (context) => PageEditTask(title: 'Edit Task'),
       },
     );
   }

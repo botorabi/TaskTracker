@@ -7,7 +7,7 @@
  */
 package net.vrfun.tasktracker.task;
 
-import org.slf4j.*;
+import net.vrfun.tasktracker.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
 import org.springframework.stereotype.Service;
@@ -30,19 +30,6 @@ public class Tasks {
     @Autowired
     public Tasks(@NonNull final TaskRepository taskRepository) {
         this.taskRepository = taskRepository;
-    }
-
-    @NonNull
-    public List<Task> getAll() {
-        List<Task> tasks = new ArrayList<>();
-        taskRepository.findAll().forEach(tasks::add);
-        return tasks;
-    }
-
-    @Nullable
-    public Task get(long id) {
-        Optional<Task> task = taskRepository.findById(id);
-        return task.isPresent() ? task.get() : null;
     }
 
     @NonNull
@@ -96,5 +83,27 @@ public class Tasks {
         else {
             throw new IllegalArgumentException("Task does not exists.");
         }
+    }
+
+    @NonNull
+    public List<TaskShortInfo> getTasks() {
+        List<TaskShortInfo> tasks = new ArrayList<>();
+        Iterable<Task> allTasks = taskRepository.findAll();
+        if (allTasks != null) {
+            allTasks.forEach((task) -> {
+                TaskShortInfo t = new TaskShortInfo(task);
+                tasks.add(t);
+            });
+        }
+        return tasks;
+    }
+
+    @NonNull
+    public TaskShortInfo getTaskById(Long id) throws IllegalArgumentException {
+        Optional<Task> foundTask = taskRepository.findById(id);
+        if (foundTask.isEmpty()) {
+            throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
+        }
+        return new TaskShortInfo(foundTask.get());
     }
 }

@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/widget/widget.tasklist.dart';
 import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
 import 'package:TaskTracker/widget/widget.userlist.dart';
@@ -38,8 +39,9 @@ class _PageAdminState extends State<PageAdmin> {
             ListView(
               shrinkWrap: false,
               children: [
-                WidgetUserList().setExpanded(true),
-                WidgetTeamList().setExpanded(true),
+                WidgetTaskList().setExpanded(true),
+                WidgetUserList().setExpanded(false),
+                WidgetTeamList().setExpanded(false),
               ],
             ),
           ),

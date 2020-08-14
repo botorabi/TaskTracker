@@ -8,11 +8,13 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.common.BaseEntity;
+import net.vrfun.tasktracker.user.*;
 import org.springframework.lang.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Collection;
 
 @Entity
 public class Task extends BaseEntity implements Serializable {
@@ -32,6 +34,12 @@ public class Task extends BaseEntity implements Serializable {
 
     @Column(length = 1024)
     private String description;
+
+    @ManyToMany(targetEntity = User.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    private Collection<User> users;
+
+    @ManyToMany(targetEntity = Team.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    private Collection<Team> teams;
 
     public Task() {}
 
@@ -82,5 +90,23 @@ public class Task extends BaseEntity implements Serializable {
 
     public void setDescription(@Nullable String description) {
         this.description = description;
+    }
+
+    @Nullable
+    public Collection<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(@Nullable Collection<User> users) {
+        this.users = users;
+    }
+
+    @Nullable
+    public Collection<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(@Nullable Collection<Team> teams) {
+        this.teams = teams;
     }
 }

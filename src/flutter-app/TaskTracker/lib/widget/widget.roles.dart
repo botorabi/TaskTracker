@@ -32,11 +32,6 @@ class WidgetRoles extends StatefulWidget {
   void setReadOnly(bool readOnly) {
     _widgetRoleState.setReadOnly(readOnly);
   }
-
-  /// Call after using setUserRoles or setReadOnly in order to update the UI.
-  void updateUI() {
- //   _widgetRoleState.updateUI();
-  }
 }
 
 class _WidgetRolesState extends State<WidgetRoles> {
@@ -81,12 +76,12 @@ class _WidgetRolesState extends State<WidgetRoles> {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(top: 40.0, bottom: 10.0),
+            padding: const EdgeInsets.all(10.0),
             child: Text(
               widget.title,
-              style: TextStyle(fontWeight: FontWeight.w600),
               textAlign: TextAlign.left,
             ),
           ),
@@ -119,7 +114,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
         child:
           Row(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Checkbox(
                 value: (_userRoles != null) ? _userRoles.contains(element) : false,

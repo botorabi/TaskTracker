@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
+import net.vrfun.tasktracker.user.Role;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -38,7 +39,7 @@ public class RestServiceTask {
     }
 
     @PostMapping("/task/create")
-    @Secured({"ROLE_TEAM_LEAD"})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> create(@RequestBody ReqTaskEdit taskEdit) {
         try {
             return new ResponseEntity<>(tasks.create(taskEdit).getId(), HttpStatus.OK);
@@ -50,6 +51,7 @@ public class RestServiceTask {
     }
 
     @PutMapping("/task/edit")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> edit(@RequestBody ReqTaskEdit taskEdit) {
         try {
             return new ResponseEntity<>(tasks.update(taskEdit).getId(), HttpStatus.OK);
@@ -61,7 +63,7 @@ public class RestServiceTask {
     }
 
     @DeleteMapping("/task/{id}")
-    @Secured({"ROLE_TEAM_LEAD"})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
             tasks.delete(id);
@@ -74,14 +76,13 @@ public class RestServiceTask {
     }
 
     @GetMapping("/task")
-    public ResponseEntity<List<Task>> getAllTasks() {
-        return new ResponseEntity<>(tasks.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<TaskShortInfo>> getAllTasks() {
+        return new ResponseEntity<>(tasks.getTasks(), HttpStatus.OK);
     }
 
     @GetMapping("/task/{id}")
-    public ResponseEntity<Task> getTask(@PathVariable("id") Long id) {
-        LOGGER.info("getting task {}", id);
-        Task task = tasks.get(id);
+    public ResponseEntity<TaskShortInfo> getTask(@PathVariable("id") Long id) {
+        TaskShortInfo task = tasks.getTaskById(id);
         if (task == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

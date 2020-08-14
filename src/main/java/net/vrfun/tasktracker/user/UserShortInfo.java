@@ -26,7 +26,7 @@ public class UserShortInfo {
 
     private String login;
 
-    private Instant creationDate;
+    private Instant dateCreation;
 
     private Instant lastLogin;
 
@@ -38,7 +38,7 @@ public class UserShortInfo {
         this.id = user.getId();
         this.realName = user.getRealName();
         this.login = user.getLogin();
-        this.creationDate = user.getCreationDate();
+        this.dateCreation = user.getDateCreation();
         this.lastLogin = user.getLastLogin();
         this.roles = Role.getRolesAsString(user.getRoles());
     }
@@ -46,13 +46,13 @@ public class UserShortInfo {
     public UserShortInfo(long id,
                          final String realName,
                          final String login,
-                         final Instant creationDate,
+                         final Instant dateCreation,
                          final Instant lastLogin) {
 
         this.id = id;
         this.realName = realName;
         this.login = login;
-        this.creationDate = creationDate;
+        this.dateCreation = dateCreation;
         this.lastLogin = lastLogin;
     }
 
@@ -80,12 +80,12 @@ public class UserShortInfo {
         this.realName = realName;
     }
 
-    public Instant getCreationDate() {
-        return creationDate;
+    public Instant getDateCreation() {
+        return dateCreation;
     }
 
-    public void setCreationDate(Instant creationDate) {
-        this.creationDate = creationDate;
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
     }
 
     public Instant getLastLogin() {

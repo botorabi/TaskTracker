@@ -135,7 +135,7 @@ public class Users {
 
         if (create) {
             user.setLogin(reqUser.getLogin());
-            user.setCreationDate(Instant.now());
+            user.setDateCreation(Instant.now());
         }
 
         if (reqUser.getRoles() != null) {

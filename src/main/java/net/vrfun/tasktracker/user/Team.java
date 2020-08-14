@@ -79,11 +79,12 @@ public class Team extends BaseEntity implements Serializable {
         this.active = active;
     }
 
+    @Nullable
     public Collection<User> getUsers() {
         return users;
     }
 
-    public void setUsers(Collection<User> users) {
+    public void setUsers(@Nullable Collection<User> users) {
         this.users = users;
     }
 }
