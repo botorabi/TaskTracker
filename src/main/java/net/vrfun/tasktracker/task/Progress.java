@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.Collection;
 
 @Entity
-public class ProgressEntry extends BaseEntity implements Serializable {
+public class Progress extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,7 +24,10 @@ public class ProgressEntry extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable=false, length = 256)
+    @Column(nullable=false)
+    private Long ownerId;
+
+    @Column(length = 256)
     private String ownerName;
 
     @OneToMany(targetEntity = Tag.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
@@ -34,16 +37,20 @@ public class ProgressEntry extends BaseEntity implements Serializable {
     private Task task;
 
     @Column(nullable=false)
-    private Instant date;
+    private Instant dateCreation;
 
-    @Column(nullable=false, length = 1024)
+    @Column(nullable=false)
+    private String title;
+
+    @Column(nullable=false, length = (10 * 1024))
     private String text;
 
-    public ProgressEntry() {}
+    public Progress() {}
 
-    public ProgressEntry(@NonNull final String ownerName) {
+    public Progress(@NonNull final String ownerName, @NonNull final Long ownerId) {
         this.ownerName = ownerName;
-        this.date = Instant.now();
+        this.ownerId = ownerId;
+        this.dateCreation = Instant.now();
     }
 
     @Override
@@ -52,8 +59,17 @@ public class ProgressEntry extends BaseEntity implements Serializable {
     }
 
     @Override
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
+    }
+
+    @NonNull
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(@NonNull final Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     @NonNull
@@ -61,7 +77,7 @@ public class ProgressEntry extends BaseEntity implements Serializable {
         return ownerName;
     }
 
-    public void setOwnerName(@NonNull String loginName) {
+    public void setOwnerName(@NonNull final String loginName) {
         this.ownerName = loginName;
     }
 
@@ -70,7 +86,7 @@ public class ProgressEntry extends BaseEntity implements Serializable {
         return tags;
     }
 
-    public void setTags(@Nullable Collection<Tag> tags) {
+    public void setTags(@Nullable final Collection<Tag> tags) {
         this.tags = tags;
     }
 
@@ -79,17 +95,26 @@ public class ProgressEntry extends BaseEntity implements Serializable {
         return task;
     }
 
-    public void setTask(@Nullable Task task) {
+    public void setTask(@Nullable final Task task) {
         this.task = task;
     }
 
     @NonNull
-    public Instant getDate() {
-        return date;
+    public Instant getDateCreation() {
+        return dateCreation;
     }
 
-    public void setDate(@NonNull Instant date) {
-        this.date = date;
+    public void setDateCreation(@NonNull final Instant dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    @NonNull
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(@NonNull final String title) {
+        this.title = title;
     }
 
     @NonNull
@@ -97,7 +122,7 @@ public class ProgressEntry extends BaseEntity implements Serializable {
         return text;
     }
 
-    public void setText(@NonNull String text) {
+    public void setText(@NonNull final String text) {
         this.text = text;
     }
 }

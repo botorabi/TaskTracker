@@ -27,13 +27,13 @@ class _PageLoginState extends State<PageLogin> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetUserEdit(userId: Config.authStatus.userId)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetUserEdit(userId: Config.authStatus.userId),
+          ),
+        ],
       ),
     );
   }

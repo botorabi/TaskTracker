@@ -26,13 +26,18 @@ class _PageNewTaskState extends State<PageNewTask> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetTaskEdit(taskId: 0)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                WidgetTaskEdit(taskId: 0)
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

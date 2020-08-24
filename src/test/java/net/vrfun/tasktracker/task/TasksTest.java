@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 
+import net.vrfun.tasktracker.user.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -25,6 +26,10 @@ public class TasksTest {
 
     @Mock
     private TaskRepository taskRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private TeamRepository teamRepository;
 
     private Tasks tasks;
 
@@ -32,7 +37,7 @@ public class TasksTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        tasks = new Tasks(taskRepository);
+        tasks = new Tasks(taskRepository, userRepository, teamRepository);
     }
 
     @Test

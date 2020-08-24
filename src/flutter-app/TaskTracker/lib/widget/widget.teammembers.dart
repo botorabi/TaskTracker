@@ -8,7 +8,7 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/dialog/dialog.chooseuser.dart';
+import 'package:TaskTracker/dialog/dialog.chooseusers.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
@@ -110,24 +110,24 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(20, Icons.add, 16, () {
-                          DialogChooseUser(context).show('Team Members', 'Add new team members.')
+                          DialogChooseUsers(context).show('Team Members', 'Add new team members.')
                               .then((chosenUsers) {
-                            if (chosenUsers.length > 0) {
-                              chosenUsers.forEach((userInfo) {
-                                bool memberIsInList = false;
-                                _members.forEach((member) {
-                                  if (member.id == userInfo.id) {
-                                    memberIsInList = true;
+                              if (chosenUsers != null && chosenUsers.length > 0) {
+                                chosenUsers.forEach((userInfo) {
+                                  bool memberIsInList = false;
+                                  _members.forEach((member) {
+                                    if (member.id == userInfo.id) {
+                                      memberIsInList = true;
+                                    }
+                                  });
+                                  if (!memberIsInList) {
+                                    _members.add(userInfo);
                                   }
+                                  _createUI();
                                 });
-                                if (!memberIsInList) {
-                                  _members.add(userInfo);
-                                }
-                                _createUI();
-                              });
-                            }
-                          });
-                        }
+                              }
+                            });
+                          }
                         ),
                       ),
                     ),

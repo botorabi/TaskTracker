@@ -12,38 +12,38 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
-import 'package:TaskTracker/service/service.task.dart';
-import 'package:TaskTracker/service/task.dart';
+import 'package:TaskTracker/service/progress.dart';
+import 'package:TaskTracker/service/service.progress.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetTaskList extends StatefulWidget {
-  WidgetTaskList({Key key, this.title = 'Tasks'}) : super(key: key);
+class WidgetProgressList extends StatefulWidget {
+  WidgetProgressList({Key key, this.title = 'Progress'}) : super(key: key);
 
   final String title;
-  final _WidgetTaskListState _widgetTaskListState = _WidgetTaskListState();
+  final _WidgetProgressListState _widgetProgressListState = _WidgetProgressListState();
 
   @override
-  _WidgetTaskListState createState() => _widgetTaskListState;
+  _WidgetProgressListState createState() => _widgetProgressListState;
 
-  WidgetTaskList setExpanded(bool expanded) {
-    _widgetTaskListState.setExpanded(expanded);
+  WidgetProgressList setExpanded(bool expanded) {
+    _widgetProgressListState.setExpanded(expanded);
     return this;
   }
 }
 
-class _WidgetTaskListState extends State<WidgetTaskList> {
+class _WidgetProgressListState extends State<WidgetProgressList> {
 
-  final _serviceTask = ServiceTask();
+  final _serviceProgress = ServiceProgress();
   PaginatedDataTable _dataTable;
-  List<Task> _tasks = [];
+  List<Progress> _progresses = [];
   bool _expanded = false;
   bool _sortAscending = true;
 
   @override
   void initState() {
     super.initState();
-    _retrieveTasks();
+    _retrieveProgresses();
   }
 
   void setExpanded(bool expanded) {
@@ -88,47 +88,47 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
     }
   }
 
-  void _addTask() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_TASK);
-    _retrieveTasks();
+  void _addProgress() async {
+    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS);
+    _retrieveProgresses();
   }
 
-  void _deleteTask(int id, String name) async {
+  void _deleteProgress(int id) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete task '$name'?", ButtonID.YES, ButtonID.NO);
+        .show('Attention', "You really want to delete the progress entry?", ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
     }
 
-    _serviceTask
-      .deleteTask(id)
+    _serviceProgress
+      .deleteProgress(id)
       .then((status) {
-          DialogModal(context).show('Task Deletion', 'Task was successfully deleted.', false);
-          _retrieveTasks();
+          DialogModal(context).show('Progress Deletion', 'Progress entry was successfully deleted.', false);
+          _retrieveProgresses();
         },
         onError: (err) {
-          print('Failed to delete task, reason: ' + err.toString());
+          print('Failed to delete progress entry, reason: ' + err.toString());
       });
   }
 
-  void _sortTasks(bool ascending) {
-    _tasks.sort((taskA, taskB) => taskA.title?.compareTo(taskB?.title));
+  void _sortProgress(bool ascending) {
+    _progresses.sort((progressA, progressB) => progressA.dateCreation?.compareTo(progressB?.dateCreation));
     if (!ascending) {
-      _tasks = _tasks.reversed.toList();
+      _progresses = _progresses.reversed.toList();
     }
   }
 
-  void _retrieveTasks() {
-    _serviceTask
-        .getTasks()
+  void _retrieveProgresses() {
+    _serviceProgress
+        .getAllProgress()
         .then((listTasks) {
-            _tasks = listTasks;
-            _sortTasks(_sortAscending);
+            _progresses = listTasks;
+            _sortProgress(_sortAscending);
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve tasks, reason: " + err.toString());
+            print("Failed to retrieve progress entries, reason: " + err.toString());
           });
   }
 
@@ -141,19 +141,19 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
             'Title',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
-          onSort:(columnIndex, ascending) {
-            setState(() {
-              _sortAscending = !_sortAscending;
-              _sortTasks(_sortAscending);
-              _dataTable = _createDataTable();
-            });
-          },
         ),
         DataColumn(
           label: Text(
-            'Description',
+            'Creation Date',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
+          onSort:(columnIndex, ascending) {
+            setState(() {
+              _sortAscending = !_sortAscending;
+              _sortProgress(_sortAscending);
+              _dataTable = _createDataTable();
+            });
+          },
         ),
         DataColumn(
           label: Text(''),
@@ -165,7 +165,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addTask()),
+        CircleButton.create(24, Icons.add, 16, () => _addProgress()),
       ],
     );
 
@@ -175,7 +175,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
 
 class _DataProvider extends DataTableSource {
 
-  _WidgetTaskListState parent;
+  _WidgetProgressListState parent;
 
   _DataProvider(this.parent);
 
@@ -184,8 +184,8 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._tasks[index].title)),
-        DataCell(Text(parent._tasks[index].description)),
+        DataCell(Text(parent._progresses[index].title)),
+        DataCell(Text(parent._progresses[index].dateCreation.toIso8601String())),
         DataCell(
           Row(
             children: [
@@ -193,10 +193,10 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.edit, 16, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_TASK, arguments: parent._tasks[index].id)
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: parent._progresses[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
-                              parent._retrieveTasks();
+                              parent._retrieveProgresses();
                             }
                           }
                         );
@@ -207,7 +207,7 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.delete, 16,
-                          () => parent._deleteTask(parent._tasks[index].id, parent._tasks[index].title)
+                          () => parent._deleteProgress(parent._progresses[index].id)
                 ),
               ),
             ],
@@ -221,7 +221,7 @@ class _DataProvider extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => parent._tasks.length;
+  int get rowCount => parent._progresses.length;
 
   @override
   int get selectedRowCount => 0;

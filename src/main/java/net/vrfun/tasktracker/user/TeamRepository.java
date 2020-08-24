@@ -7,13 +7,21 @@
  */
 package net.vrfun.tasktracker.user;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
+import java.util.*;
 
 @Transactional
 public interface TeamRepository extends CrudRepository<Team, Long> {
 
-    Optional<Team> findTeamByName(String name);
+    Optional<Team> findTeamByName(@NonNull final String name);
+
+    @Query("select new net.vrfun.tasktracker.user.TeamShortInfo(team) " +
+            "from net.vrfun.tasktracker.user.Team team where " +
+            "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%'))")
+    List<TeamShortInfo> searchTeam(@NonNull @Param("filter") final String filter);
 }

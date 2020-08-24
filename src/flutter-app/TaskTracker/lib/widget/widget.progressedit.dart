@@ -11,42 +11,41 @@ import 'dart:io';
 import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
-import 'package:TaskTracker/service/service.task.dart';
-import 'package:TaskTracker/service/task.dart';
-import 'package:TaskTracker/widget/widget.taskaffiliates.dart';
+import 'package:TaskTracker/service/progress.dart';
+import 'package:TaskTracker/service/service.progress.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetTaskEdit extends StatefulWidget {
-  WidgetTaskEdit({Key key, this.title, this.taskId}) : super(key: key);
+class WidgetProgressEdit extends StatefulWidget {
+  WidgetProgressEdit({Key key, this.title, this.progressId}) : super(key: key);
 
   final String title;
-  final int    taskId;
+  final int    progressId;
 
   @override
-  _WidgetTaskEditState createState() => _WidgetTaskEditState(taskId: taskId);
+  _WidgetProgressEditState createState() => _WidgetProgressEditState(progressId: progressId);
 }
 
-class _WidgetTaskEditState extends State<WidgetTaskEdit> {
+class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
-  int taskId;
+  int progressId;
 
-  bool  _newTask;
-  Task  _currentTask;
-  final _serviceTask = ServiceTask();
+  bool  _newProgress;
+  Progress  _currentProgress;
+  final _serviceProgress = ServiceProgress();
   final _textEditingControllerTitle = TextEditingController();
-  final _textEditingControllerDescription = TextEditingController();
-  final _widgetAffiliates = WidgetTaskAffiliates();
+  final _textEditingControllerText = TextEditingController();
+  final _widgetChooseTask = Text('TODO choose task');//WidgetChooseTask();
 
-  _WidgetTaskEditState({this.taskId = 0}) {
-    _newTask = taskId == 0;
+  _WidgetProgressEditState({this.progressId = 0}) {
+    _newProgress = progressId == 0;
   }
 
   @override
   void initState() {
     super.initState();
-    if (!_newTask) {
-      _retrieveTask();
+    if (!_newProgress) {
+      _retrieveProgress();
     }
   }
 
@@ -72,17 +71,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        'Edit Task Settings',
+                        'Edit Progress Entry',
                         style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ),
-                    Visibility(
-                      visible: _newTask == false,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: Text(
-                          'Title: ' + _textEditingControllerTitle.text,
-                        ),
                       ),
                     ),
                     Wrap(
@@ -107,11 +97,10 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                                 Padding(
                                   padding: EdgeInsets.all(10.0),
                                   child: TextFormField(
-                                    controller: _textEditingControllerDescription,
-                                    maxLines: 3,
-                                    maxLength: 255,
+                                    controller: _textEditingControllerText,
+                                    maxLines: 5,
                                     decoration: InputDecoration(
-                                      labelText: 'Description',
+                                      labelText: 'Text',
                                     ),
                                   ),
                                 ),
@@ -126,9 +115,9 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                                 constraints: BoxConstraints(maxWidth: w),
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                      top: _newTask ? 40.0 : 20.0, right: 10, left: 10
+                                      top: _newProgress ? 40.0 : 20.0, right: 10, left: 10
                                   ),
-                                  child: _widgetAffiliates,
+                                  child: _widgetChooseTask,
                                 ),
                               );
                             }
@@ -152,10 +141,10 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(_newTask ? ButtonID.CREATE : ButtonID.APPLY),
+                    child: Text(_newProgress ? ButtonID.CREATE : ButtonID.APPLY),
                     onPressed: () {
-                      if (_newTask) {
-                        _createTask(context);
+                      if (_newProgress) {
+                        _createProgress(context);
                       }
                       else {
                         _applyChanges(context);
@@ -171,31 +160,31 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
     );
   }
 
-  void _createTask(BuildContext context) {
+  void _createProgress(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show("Attention", "Choose a task name!", true);
+      DialogModal(context).show("Attention", "Enter a progress title!", true);
       return;
     }
 
-    Task task = new Task();
-    task.title = _textEditingControllerTitle.text;
-    task.description = _textEditingControllerDescription.text;
-    task.users = _widgetAffiliates.getUserIDs();
-    task.teams = _widgetAffiliates.getTeamIDs();
+    Progress progress = new Progress();
+    progress.title = _textEditingControllerText.text;
+    progress.text = _textEditingControllerText.text;
+//TODO    progress.task = _widgetChooseTask;
+//TODO    progress.tags = _widgetTags;
 
-    _serviceTask
-        .createTask(task)
+    _serviceProgress
+        .createProgress(progress)
         .then((id) {
-          DialogModal(context).show("New Task", "New task was successfully created.", false)
+          DialogModal(context).show("New Progress", "New progress entry was successfully created.", false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = "Could not create new task!\nReason: A task with given title already exists.";
+            text = "Could not create new progress entry!\nPlease choose a task.";
           }
           else {
-            text = "Could not create new task!\nReason:" + err.toString();
+            text = "Could not create new progress entry!\nReason:" + err.toString();
           }
           DialogModal(context).show("Attention", text, true);
         }
@@ -203,18 +192,19 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
   }
 
   void _applyChanges(BuildContext context) {
-    Task task = new Task();
-    task.id = _currentTask.id;
-    task.title = _textEditingControllerTitle.text;
-    task.description = _textEditingControllerDescription.text;
-    task.users = _widgetAffiliates.getUserIDs();
-    task.teams = _widgetAffiliates.getTeamIDs();
+    Progress progress = new Progress();
+    progress.id = _currentProgress.id;
+    progress.title = _textEditingControllerText.text;
+    progress.text = _textEditingControllerText.text;
 
-    _serviceTask
-      .editTask(task)
+//TODO    progress.task = _widgetChooseTask.getTask();
+//TODO    progress.tags = _widgetTags.getTags();
+
+    _serviceProgress
+      .editProgress(progress)
       .then((success) {
           if (success) {
-            DialogModal(context).show("Edit Task", "All changes successfully applied.", false)
+            DialogModal(context).show("Edit Progress", "All changes successfully applied.", false)
             .then((value) => Navigator.of(context).pop());
           }
         },
@@ -224,25 +214,26 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
       );
   }
 
-  void _retrieveTask() {
-    if(taskId == 0) {
+  void _retrieveProgress() {
+    if(progressId == 0) {
       print('Internal error, use this widget for an authenticated user');
       return;
     }
 
-    _serviceTask
-        .getTask(taskId)
-        .then((task) {
-          _currentTask = task;
-          _textEditingControllerTitle.text = _currentTask.title;
-          _textEditingControllerDescription.text = _currentTask.description;
-          _widgetAffiliates.setUserIDs(_currentTask.users);
-          _widgetAffiliates.setTeamIDs(_currentTask.teams);
+    _serviceProgress
+        .getProgress(progressId)
+        .then((progress) {
+          _currentProgress = progress;
+          _textEditingControllerText.text = _currentProgress.title;
+          _textEditingControllerText.text = _currentProgress.text;
+
+//TODO          _widgetChooseTask.setTask(_currentProgress.task);
+//TODO          _widgetTags.setTags(_currentProgress.tags);
 
           setState(() {});
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve task! Reason: " + err.toString(), true);
+          DialogModal(context).show("Attention", "Could not retrieve progress entry! Reason: " + err.toString(), true);
         }
     );
   }

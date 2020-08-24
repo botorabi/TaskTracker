@@ -8,7 +8,6 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.service.comm.*;
 import net.vrfun.tasktracker.user.*;
 import org.junit.*;
 import org.junit.runner.RunWith;

@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/widget/widget.progresslist.dart';
 import 'package:TaskTracker/widget/widget.tasklist.dart';
 import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
@@ -31,22 +32,26 @@ class _PageAdminState extends State<PageAdmin> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Container(
-          constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
-          padding: const EdgeInsets.all(20.0),
-          child:
-            ListView(
-              shrinkWrap: false,
-              children: [
-                WidgetTaskList().setExpanded(true),
-                WidgetUserList().setExpanded(false),
-                WidgetTeamList().setExpanded(false),
-              ],
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
+              padding: const EdgeInsets.all(20.0),
+              child:
+                Column(
+                  children: [
+                    WidgetProgressList().setExpanded(true),
+                    WidgetTaskList().setExpanded(false),
+                    WidgetUserList().setExpanded(false),
+                    WidgetTeamList().setExpanded(false),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      //),
     );
   }
 }

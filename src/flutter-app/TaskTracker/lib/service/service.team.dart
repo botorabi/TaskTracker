@@ -77,4 +77,16 @@ class ServiceTeam {
       return Future<bool>.error(response.statusCode);
     }
   }
+
+  Future<List<Team>> searchTeam(String value) async {
+    Response response = await get(Config.baseURL + '/api/team/search/' + value,
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return Team.listFromJsonString(response.body);
+    }
+    else {
+      return Future<List<Team>>.error(response.statusCode);
+    }
+  }
 }

@@ -8,8 +8,8 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.service.comm.ReqLogin;
-import net.vrfun.tasktracker.service.comm.RespAuthenticationStatus;
+import net.vrfun.tasktracker.user.ReqLogin;
+import net.vrfun.tasktracker.user.RespAuthenticationStatus;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +136,7 @@ public class RestServiceUser {
     @GetMapping("/user/search/{filter}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<UserShortInfo>> searchUser(@PathVariable("filter") String filter) {
-        return new ResponseEntity<>(users.searchUser(filter), HttpStatus.OK);
+        return new ResponseEntity<>(users.searchUsers(filter), HttpStatus.OK);
     }
 
     @PostMapping("/user/login")

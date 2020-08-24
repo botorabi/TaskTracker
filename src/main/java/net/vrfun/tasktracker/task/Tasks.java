@@ -8,8 +8,9 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.user.*;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -25,11 +26,20 @@ import java.util.*;
 @Service
 public class Tasks {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
     private TaskRepository taskRepository;
+    private UserRepository userRepository;
+    private TeamRepository teamRepository;
 
     @Autowired
-    public Tasks(@NonNull final TaskRepository taskRepository) {
+    public Tasks(@NonNull final TaskRepository taskRepository,
+                 @NonNull final UserRepository userRepository,
+                 @NonNull final TeamRepository teamRepository) {
+
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
     }
 
     @NonNull
@@ -43,6 +53,9 @@ public class Tasks {
         }
         Task newTask = new Task(taskEdit.getTitle());
         newTask.setDescription(taskEdit.getDescription());
+
+        setTaskUsersAndTeams(newTask, taskEdit);
+
         return taskRepository.save(newTask);
     }
 
@@ -72,7 +85,36 @@ public class Tasks {
         if (taskEdit.isClosed()) {
             task.get().setDateClosed(Instant.now());
         }
+
+        setTaskUsersAndTeams(task.get(), taskEdit);
+
         return taskRepository.save(task.get());
+    }
+
+    private void setTaskUsersAndTeams(@NonNull final Task task, @NonNull final ReqTaskEdit taskEdit) {
+        Collection<User> users = new ArrayList<>();
+        Collection<Team> teams = new ArrayList<>();
+
+        if (taskEdit.getUsers() != null) {
+            taskEdit.getUsers().stream().forEach((userID) -> {
+                Optional<User> user = userRepository.findById(userID);
+                user.ifPresentOrElse(
+                        (foundUser) -> users.add(user.get()),
+                        () -> LOGGER.error("User with ID {} does not exist!", userID));
+            });
+        }
+
+        if (taskEdit.getTeams() != null) {
+            taskEdit.getTeams().stream().forEach((teamID) -> {
+                Optional<Team> team = teamRepository.findById(teamID);
+                team.ifPresentOrElse(
+                        (foundTeam) -> teams.add(team.get()),
+                        () -> LOGGER.error("Team with ID {} does not exist!", teamID));
+            });
+        }
+
+        task.setUsers(users);
+        task.setTeams(teams);
     }
 
     public void delete(long id) throws IllegalArgumentException {
@@ -105,5 +147,10 @@ public class Tasks {
             throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
         }
         return new TaskShortInfo(foundTask.get());
+    }
+
+    @NonNull
+    public List<TaskShortInfo> searchTasks(@NonNull final String filter) {
+        return taskRepository.searchTask(filter);
     }
 }

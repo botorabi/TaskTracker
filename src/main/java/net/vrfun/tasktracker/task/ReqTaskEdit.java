@@ -9,6 +9,8 @@ package net.vrfun.tasktracker.task;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collection;
+
 /**
  * Request for editing or creating a task
  *
@@ -21,6 +23,8 @@ public class ReqTaskEdit {
     private String title;
     private String description;
     private boolean closed;
+    private Collection<Long> users;
+    private Collection<Long> teams;
 
     public long getId() {
         return id;
@@ -55,5 +59,23 @@ public class ReqTaskEdit {
     @JsonProperty("close")
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public Collection<Long> getUsers() {
+        return users;
+    }
+
+    @JsonProperty("users")
+    public void setUsers(Collection<Long> users) {
+        this.users = users;
+    }
+
+    public Collection<Long> getTeams() {
+        return teams;
+    }
+
+    @JsonProperty("teams")
+    public void setTeams(Collection<Long> teams) {
+        this.teams = teams;
     }
 }

@@ -20,11 +20,11 @@ public interface TagRepository extends CrudRepository<Tag, Long> {
     Optional<Tag> findTagByName(@NonNull String name);
 
     @Query("select tag " +
-            "from net.vrfun.tasktracker.task.Tag tag where tag.name like :tagName")
-    List<Tag> findSimilarTags(@NonNull String tagName);
+            "from net.vrfun.tasktracker.task.Tag tag where tag.name like concat('%',:tagName,'%')")
+    List<Tag> findSimilarTags(@NonNull final String tagName);
 
     @Query("select entry " +
-            "from net.vrfun.tasktracker.task.ProgressEntry entry inner join " +
+            "from net.vrfun.tasktracker.task.Progress entry inner join " +
             "net.vrfun.tasktracker.task.Tag tag where tag.name = :tagName")
-    List<ProgressEntry> findAllTaggedProgressEntries(@NonNull String tagName);
+    List<Progress> findAllTaggedProgressEntries(@NonNull final String tagName);
 }

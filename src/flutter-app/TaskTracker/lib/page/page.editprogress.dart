@@ -6,25 +6,25 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/widget/widget.taskedit.dart';
+import 'package:TaskTracker/widget/widget.progressedit.dart';
 import 'package:flutter/material.dart';
 
-class PageEditTask extends StatefulWidget {
+class PageEditProgress extends StatefulWidget {
   final String title;
 
-  PageEditTask({Key key, this.title}) : super(key: key);
+  PageEditProgress({Key key, this.title}) : super(key: key);
 
   @override
-  _PageEditTaskState createState() => _PageEditTaskState();
+  _PageEditProgressState createState() => _PageEditProgressState();
 }
 
-class _PageEditTaskState extends State<PageEditTask> {
+class _PageEditProgressState extends State<PageEditProgress> {
 
   @override
   Widget build(BuildContext context) {
 
-    final int taskId = ModalRoute.of(context).settings.arguments;
-    if (taskId == 0) {
+    final int progressId = ModalRoute.of(context).settings.arguments;
+    if (progressId == 0) {
       print("Invalid Page argument!");
       return Container();
     }
@@ -38,7 +38,7 @@ class _PageEditTaskState extends State<PageEditTask> {
           shrinkWrap: true,
           children: [
             Center(
-              child: WidgetTaskEdit(taskId: taskId),
+              child: WidgetProgressEdit(progressId: progressId),
             ),
           ],
         ),

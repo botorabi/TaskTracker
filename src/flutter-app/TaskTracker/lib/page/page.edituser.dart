@@ -33,13 +33,13 @@ class _PageEditUserState extends State<PageEditUser> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetUserEdit(userId: userId)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetUserEdit(userId: userId),
+          ),
+        ],
       ),
     );
   }

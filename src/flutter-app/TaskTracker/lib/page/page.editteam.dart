@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:flutter/material.dart';
 
@@ -33,13 +34,13 @@ class _PageEditTeamState extends State<PageEditTeam> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetTeamEdit(teamId: teamId)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetTeamEdit(teamId: teamId),
+          ),
+        ],
       ),
     );
   }

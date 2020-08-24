@@ -53,6 +53,10 @@ public class Teams {
                 (reqTeamEdit.getDescription() != null) ? reqTeamEdit.getDescription().trim() : null
         );
 
+        if (reqTeamEdit.getUsers() != null) {
+            setTeamUsers(reqTeamEdit, team);
+        }
+
         return teamRepository.save(team);
     }
 
@@ -89,18 +93,12 @@ public class Teams {
                 .stream()
                 .forEach((userID) -> {
                     Optional<User> user = userRepository.findById(userID);
-                    if (user.isPresent()) {
-                        users.add(user.get());
+                    user.ifPresentOrElse(
+                            (foundUser) -> users.add(foundUser),
+                            () -> LOGGER.warn("Cannot add user with ID '{}' to team '{}', user does not exist!",
+                                    userID, reqTeamEdit.getName()));
                     }
-                    else {
-                        LOGGER.warn("Cannot add user with ID '{}' to team '{}', user does not exist!",
-                                userID, reqTeamEdit.getName());
-
-                        throw new IllegalArgumentException("Cannot add user with ID '" + userID + "' to team '" +
-                                reqTeamEdit.getName() + "', user does not exist!");
-                    }
-                }
-            );
+                );
 
         team.setUsers(users);
     }
@@ -133,5 +131,10 @@ public class Teams {
             throw new IllegalArgumentException("Team with ID '" + id + "' does not exist!");
         }
         return new TeamShortInfo(foundTeam.get());
+    }
+
+    @NonNull
+    public List<TeamShortInfo> searchTeams(@NonNull final String filter) {
+        return teamRepository.searchTeam(filter);
     }
 }

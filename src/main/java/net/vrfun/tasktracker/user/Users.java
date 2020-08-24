@@ -7,7 +7,6 @@
  */
 package net.vrfun.tasktracker.user;
 
-import net.vrfun.tasktracker.service.comm.ReqLogin;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
@@ -230,7 +229,7 @@ public class Users {
     }
 
     @NonNull
-    public List<UserShortInfo> searchUser(@NonNull final String filter) {
+    public List<UserShortInfo> searchUsers(@NonNull final String filter) {
         return userRepository.searchUser(filter);
     }
 }

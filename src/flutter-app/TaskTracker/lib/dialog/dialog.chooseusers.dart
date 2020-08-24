@@ -15,15 +15,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 /*
- Dialog for choosing a user.
+ Dialog for choosing users.
 
  Example for usage:
 
-  DialogChooseUser(context)
-    .show('Choose User', 'Choose a user to add as member to team.')
+  DialogChooseUsers(context)
+    .show('Choose User', 'Choose users to add as members to team.')
     .then((chosenUsers) => chosenUsers.forEach((user) => print("CHOSEN USER: " + user.realName)));
  */
-class DialogChooseUser {
+class DialogChooseUsers {
 
   BuildContext _context;
   final _serviceUser = ServiceUser();
@@ -33,7 +33,7 @@ class DialogChooseUser {
   List<Container> _listCandidates = List<Container>();
   List<Container> _listChosenUsers = List<Container>();
 
-  DialogChooseUser(this._context);
+  DialogChooseUsers(this._context);
 
   Future<List<UserInfo>> show(String title, String text) async {
     return showDialog(

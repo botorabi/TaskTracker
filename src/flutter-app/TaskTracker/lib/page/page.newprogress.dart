@@ -6,19 +6,19 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/widget/widget.teamedit.dart';
+import 'package:TaskTracker/widget/widget.progressedit.dart';
 import 'package:flutter/material.dart';
 
-class PageNewTeam extends StatefulWidget {
+class PageNewProgress extends StatefulWidget {
   final String title;
 
-  PageNewTeam({Key key, this.title}) : super(key: key);
+  PageNewProgress({Key key, this.title}) : super(key: key);
 
   @override
-  _PageNewTeamState createState() => _PageNewTeamState();
+  _PageNewProgressState createState() => _PageNewProgressState();
 }
 
-class _PageNewTeamState extends State<PageNewTeam> {
+class _PageNewProgressState extends State<PageNewProgress> {
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class _PageNewTeamState extends State<PageNewTeam> {
             child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                WidgetTeamEdit(teamId: 0)
+                WidgetProgressEdit(progressId: 0)
               ],
             ),
           ),

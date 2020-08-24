@@ -26,13 +26,13 @@ class _PageNewUserState extends State<PageNewUser> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetUserEdit(userId: 0)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetUserEdit(userId: 0)
+          ),
+        ],
       ),
     );
   }

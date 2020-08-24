@@ -89,4 +89,9 @@ public class RestServiceTask {
 
         return new ResponseEntity<>(task, HttpStatus.OK);
     }
+
+    @GetMapping("/task/search/{filter}")
+    public ResponseEntity<List<TaskShortInfo>> searchTasks(@PathVariable("filter") String filter) {
+        return new ResponseEntity<>(tasks.searchTasks(filter), HttpStatus.OK);
+    }
 }

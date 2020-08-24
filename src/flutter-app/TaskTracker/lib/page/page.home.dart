@@ -30,26 +30,34 @@ class _PageHomeState extends State<PageHome> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Welcome to Task Tracker',
-              style: Theme.of(context).textTheme.headline6,
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 20.0, bottom: 30),
+                  child: Text(
+                    'Welcome to Task Tracker',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 20.0, bottom: 30),
+                  child: Text(
+                      'Track and report your project activities.'
+                  ),
+                ),
+                Visibility(
+                  visible: (Config.authStatus.authenticated == false),
+                  child: WidgetLogin(),
+                ),
+               ],
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 20.0, bottom: 30),
-              child: Text(
-                  'Track and report your project activities.'
-              ),
-            ),
-            Visibility(
-              visible: (Config.authStatus.authenticated == false),
-              child: WidgetLogin(),
-            ),
-           ],
-        ),
+          ),
+        ],
       ),
     );
   }

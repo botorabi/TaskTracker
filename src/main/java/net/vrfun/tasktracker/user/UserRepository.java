@@ -30,17 +30,17 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%')")
-    List<UserShortInfo> searchUser(@NonNull @Param("filter") String filter);
+    List<UserShortInfo> searchUser(@NonNull @Param("filter") final String filter);
 
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.id = :id")
-    Optional<UserShortInfo> getUserById(@NonNull @Param("id") Long id);
+    Optional<UserShortInfo> getUserById(@NonNull @Param("id") final Long id);
 
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.login = :login")
-    Optional<UserShortInfo> getUserByLogin(@NonNull @Param("login") String login);
+    Optional<UserShortInfo> getUserByLogin(@NonNull @Param("login") final String login);
 
     @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.ldapLogin = :ldapLogin")
-    Optional<UserShortInfo> getUserByLdapLogin(@NonNull @Param("ldapLogin") String ldapLogin);
+    Optional<UserShortInfo> getUserByLdapLogin(@NonNull @Param("ldapLogin") final String ldapLogin);
 }

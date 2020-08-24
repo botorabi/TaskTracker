@@ -167,31 +167,32 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                     ),
                   ],
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
-                      child: RaisedButton(
-                        child: Text('Cancel'),
-                        onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
-                      child: RaisedButton(
-                        child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
-                        onPressed: () {
-                          if (_newUser) {
-                            _createUser(context);
-                          }
-                          else {
-                            _applyChanges(context);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  child: RaisedButton(
+                    child: Text('Cancel'),
+                    onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  child: RaisedButton(
+                    child: Text(_newUser ? ButtonID.CREATE : ButtonID.APPLY),
+                    onPressed: () {
+                      if (_newUser) {
+                        _createUser(context);
+                      }
+                      else {
+                        _applyChanges(context);
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
