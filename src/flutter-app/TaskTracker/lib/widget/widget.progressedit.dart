@@ -13,6 +13,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
+import 'package:TaskTracker/service/service.user.dart';
 import 'package:flutter/material.dart';
 
 
@@ -32,10 +33,14 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   bool  _newProgress;
   Progress  _currentProgress;
+  DropdownButton _userTaskDropdownButton;
+  List<DropdownMenuItem<int>> _userTaskDropdownItems = List();
+  int _userTaskDropdownSelection = 0;
+
   final _serviceProgress = ServiceProgress();
+  final _serviceUser = ServiceUser();
   final _textEditingControllerTitle = TextEditingController();
   final _textEditingControllerText = TextEditingController();
-  final _widgetChooseTask = Text('TODO choose task');//WidgetChooseTask();
 
   _WidgetProgressEditState({this.progressId = 0}) {
     _newProgress = progressId == 0;
@@ -44,8 +49,12 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   @override
   void initState() {
     super.initState();
+
     if (!_newProgress) {
       _retrieveProgress();
+    }
+    else {
+      _retrieveUserTasksAndSelect();
     }
   }
 
@@ -99,6 +108,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                   child: TextFormField(
                                     controller: _textEditingControllerText,
                                     maxLines: 5,
+                                    maxLength: 10 * 1024,
+                                    showCursor: true,
                                     decoration: InputDecoration(
                                       labelText: 'Text',
                                     ),
@@ -117,7 +128,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                   padding: EdgeInsets.only(
                                       top: _newProgress ? 40.0 : 20.0, right: 10, left: 10
                                   ),
-                                  child: _widgetChooseTask,
+                                  child: _userTaskDropdownButton,
                                 ),
                               );
                             }
@@ -167,10 +178,10 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     }
 
     Progress progress = new Progress();
-    progress.title = _textEditingControllerText.text;
+    progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
-//TODO    progress.task = _widgetChooseTask;
-//TODO    progress.tags = _widgetTags;
+    progress.task = _userTaskDropdownSelection;
+//TODO    progress.tags = _widgetTags.getTags();
 
     _serviceProgress
         .createProgress(progress)
@@ -192,12 +203,16 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   }
 
   void _applyChanges(BuildContext context) {
+    if (_textEditingControllerTitle.text.isEmpty) {
+      DialogModal(context).show("Attention", "Enter a progress title!", true);
+      return;
+    }
+
     Progress progress = new Progress();
     progress.id = _currentProgress.id;
-    progress.title = _textEditingControllerText.text;
+    progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
-
-//TODO    progress.task = _widgetChooseTask.getTask();
+    progress.task = _userTaskDropdownSelection;
 //TODO    progress.tags = _widgetTags.getTags();
 
     _serviceProgress
@@ -214,7 +229,17 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
       );
   }
 
-  void _retrieveProgress() {
+  void _retrieveUserTasksAndSelect([int selectTaskId = 0]) {
+    _serviceUser
+        .getUserTasks(Config.authStatus.userId)
+        .then((tasks) {
+          _userTaskDropdownItems = tasks.map((task) => DropdownMenuItem<int>(value: task.id, child: Text(task.title))).toList();
+          _userTaskDropdownItems.insert(0, DropdownMenuItem<int>(value: 0, child: Text('<Choose a Task>')));
+          _updateTaskChooser(selectTaskId);
+      });
+  }
+
+  void _retrieveProgress() async {
     if(progressId == 0) {
       print('Internal error, use this widget for an authenticated user');
       return;
@@ -224,10 +249,9 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
         .getProgress(progressId)
         .then((progress) {
           _currentProgress = progress;
-          _textEditingControllerText.text = _currentProgress.title;
+          _textEditingControllerTitle.text = _currentProgress.title;
           _textEditingControllerText.text = _currentProgress.text;
-
-//TODO          _widgetChooseTask.setTask(_currentProgress.task);
+          _retrieveUserTasksAndSelect(_currentProgress.task);
 //TODO          _widgetTags.setTags(_currentProgress.tags);
 
           setState(() {});
@@ -236,5 +260,15 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           DialogModal(context).show("Attention", "Could not retrieve progress entry! Reason: " + err.toString(), true);
         }
     );
+  }
+
+  void _updateTaskChooser(int taskId) {
+    _userTaskDropdownSelection = taskId;
+    _userTaskDropdownButton = DropdownButton(
+      value: _userTaskDropdownSelection,
+      items: _userTaskDropdownItems,
+      onChanged: (newValue) => _updateTaskChooser(newValue),
+    );
+    setState(() {});
   }
 }

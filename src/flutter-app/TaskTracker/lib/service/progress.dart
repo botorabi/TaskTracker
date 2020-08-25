@@ -16,7 +16,7 @@ class Progress {
   DateTime dateCreation;
   String title = '';
   String text = '';
-  List<int> tags = [];
+  List<String> tags = [];
   int task;
 
   Progress();
@@ -26,7 +26,7 @@ class Progress {
     progress.id = fields['id'];
     progress.ownerId = fields['ownerId'];
     progress.ownerName = fields['ownerName'];
-    progress.text = fields['title'];
+    progress.title = fields['title'];
     progress.text = fields['text'];
 
     if (fields['dateCreation'] != null) {
@@ -60,10 +60,8 @@ class Progress {
       'id' : id,
       'text' : text,
       'title' : title,
-      'ownerId' : ownerId,
-      'ownerName' : ownerName,
       'tags' : tags?.toList(),
-      'task' : task.toString(),
+      'task' : task,
     };
   }
 }

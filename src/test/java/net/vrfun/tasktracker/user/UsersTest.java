@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.task.TaskRepository;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -31,6 +32,12 @@ public class UsersTest {
     private UserRepository userRepository;
 
     @Mock
+    private TeamRepository teamRepository;
+
+    @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     private Users users;
@@ -43,7 +50,7 @@ public class UsersTest {
 
         when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        users = new Users(userRoleRepository, userRepository, passwordEncoder);
+        users = new Users(userRoleRepository, userRepository, teamRepository, taskRepository, passwordEncoder);
     }
 
     @Test

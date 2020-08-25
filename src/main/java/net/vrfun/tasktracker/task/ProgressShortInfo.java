@@ -1,0 +1,139 @@
+/*
+ * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * https://github.com/botorabi/TaskTracker
+ *
+ * License: MIT License (MIT), read the LICENSE text in
+ *          main directory for more details.
+ */
+package net.vrfun.tasktracker.task;
+
+import org.springframework.lang.NonNull;
+
+import java.time.Instant;
+import java.util.*;
+
+/**
+ * Progress short info.
+ *
+ * @author          boto
+ * Creation Date    August 2020
+ */
+public class ProgressShortInfo {
+
+    private Long id;
+
+    private String title;
+
+    private String text;
+
+    private Long ownerId;
+
+    private String ownerName;
+
+    private Instant dateCreation;
+
+    private Collection<String> tags;
+
+    private Long task;
+
+    public ProgressShortInfo() {}
+
+    public ProgressShortInfo(@NonNull final Progress progress) {
+        this.id = progress.getId();
+        this.title = progress.getTitle();
+        this.text = progress.getText();
+        this.dateCreation = progress.getDateCreation();
+        this.ownerId = progress.getOwnerId();
+        this.ownerName = progress.getOwnerName();
+        if (progress.getTask() != null) {
+            this.task = progress.getTask().getId();
+        }
+        if (progress.getTags() != null) {
+            this.tags = new ArrayList<>();
+            progress.getTags().stream().forEach((tag) -> this.tags.add(tag.getName()));
+        }
+    }
+
+    public ProgressShortInfo(long id,
+                             final String title,
+                             final String text,
+                             final Long ownerId,
+                             final String ownerName,
+                             final Instant dateCreation,
+                             final Collection<String> tags,
+                             final Long taskId) {
+
+        this.id = id;
+        this.title = title;
+        this.text = text;
+        this.dateCreation = dateCreation;
+        this.ownerId = ownerId;
+        this.ownerName = ownerName;
+        this.tags = tags;
+        this.task = taskId;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
+
+    public Instant getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public Collection<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(Collection<String> tags) {
+        this.tags = tags;
+    }
+
+    public Long getTask() {
+        return task;
+    }
+
+    public void setTask(Long task) {
+        this.task = task;
+    }
+}

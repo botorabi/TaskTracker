@@ -8,14 +8,11 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.user.ReqLogin;
-import net.vrfun.tasktracker.user.RespAuthenticationStatus;
+import net.vrfun.tasktracker.task.TaskShortInfo;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
@@ -129,6 +126,21 @@ public class RestServiceUser {
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not get user, reason: {}", throwable.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/user/tasks/{userId}")
+    public ResponseEntity<List<TaskShortInfo>> getUserTasks(@PathVariable("userId") Long userId) {
+        try {
+            // Normal users have access only to their own tasks!
+            if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
+                return new ResponseEntity<>(users.getUserTasks(userId), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(users.getUserTasks(userAuthenticator.getUserId()), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not get user tasks, reason: {}", throwable.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.task;
 
+import net.vrfun.tasktracker.user.*;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +24,15 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
     @Query("select entry " +
             "from net.vrfun.tasktracker.task.Progress entry inner join " +
             "net.vrfun.tasktracker.task.Task task where task.id = :taskId")
-    List<Progress> findAllAssociatedProgressEntries(@NonNull final Long taskId);
+    List<Progress> findProgressEntries(@NonNull final Long taskId);
+
+    @Query("select task " +
+            "from net.vrfun.tasktracker.task.Task task where :user member of task.users")
+    List<Task> findUserTasks(@NonNull final User user);
+
+    @Query("select task " +
+            "from net.vrfun.tasktracker.task.Task task where :team member of task.teams")
+    List<Task> findUserTasks(@NonNull final Team team);
 
     @Query("select new net.vrfun.tasktracker.task.TaskShortInfo(task) " +
             "from net.vrfun.tasktracker.task.Task task where task.title like concat('%',:filter,'%')")

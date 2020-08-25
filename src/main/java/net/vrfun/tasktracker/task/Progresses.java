@@ -31,6 +31,8 @@ public class Progresses {
 
     private final TaskRepository taskRepository;
 
+    private final TagRepository tagRepository;
+
     private final Tags tags;
 
     private final UserAuthenticator userAuthenticator;
@@ -38,42 +40,50 @@ public class Progresses {
     @Autowired
     public Progresses(@NonNull final ProgressRepository progressRepository,
                       @NonNull final TaskRepository taskRepository,
+                      @NonNull final TagRepository tagRepository,
                       @NonNull final Tags tags,
                       @NonNull final UserAuthenticator userAuthenticator) {
 
         this.progressRepository = progressRepository;
         this.taskRepository = taskRepository;
+        this.tagRepository = tagRepository;
         this.tags = tags;
         this.userAuthenticator = userAuthenticator;
     }
 
     @NonNull
-    public List<Progress> getAll() {
-        List<Progress> progs = new ArrayList<>();
-        progressRepository.findAll().forEach(progs::add);
+    public List<ProgressShortInfo> getAll() {
+        List<ProgressShortInfo> progs = new ArrayList<>();
+        progressRepository.findAll()
+                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+
         return progs;
     }
 
     @Nullable
-    public Progress get(long id) {
+    public ProgressShortInfo get(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
         if (progress.isPresent()) {
-            return progress.get();
+            return new ProgressShortInfo(progress.get());
         }
         return null;
     }
 
     @NonNull
-    public List<Progress> getUserProgress() {
-        List<Progress> progs = new ArrayList<>();
-        progressRepository.findProgressByOwnerId(userAuthenticator.getUserId()).forEach(progs::add);
+    public List<ProgressShortInfo> getUserProgress() {
+        List<ProgressShortInfo> progs = new ArrayList<>();
+        progressRepository.findProgressByOwnerId(userAuthenticator.getUserId())
+                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+
         return progs;
     }
 
     @NonNull
-    public List<Progress> getTeamProgress(@NonNull final Long teamId) {
-        List<Progress> progs = new ArrayList<>();
-        progressRepository.findProgressByTeam(teamId).forEach(progs::add);
+    public List<ProgressShortInfo> getTeamProgress(@NonNull final Long teamId) {
+        List<ProgressShortInfo> progs = new ArrayList<>();
+        progressRepository.findProgressByTeam(teamId)
+                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+
         return progs;
     }
 
@@ -86,7 +96,7 @@ public class Progresses {
             throw new IllegalArgumentException("Cannot create progress entry, invalid task ID!");
         }
 
-        if (!StringUtils.isEmpty(reqProgressEdit.getTitle())) {
+        if (StringUtils.isEmpty(reqProgressEdit.getTitle())) {
             LOGGER.debug("Cannot create progress entry, invalid progress title!");
             throw new IllegalArgumentException("Cannot create progress entry, invalid progress title!");
         }
@@ -117,6 +127,51 @@ public class Progresses {
                     .forEach((tagName) -> progressTags.add(tags.getOrCreate(tagName)));
         }
         newProgress.setTags(progressTags);
+    }
+
+    @NonNull
+    public Progress editProgress(@NonNull final ReqProgressEdit reqProgressEdit) throws IllegalAccessException {
+        Optional<Progress> foundProgress = progressRepository.findById(reqProgressEdit.getId());
+        if (!foundProgress.isPresent()) {
+            throw new IllegalArgumentException("A progress entry with given ID does not exist!");
+        }
+
+        if (!StringUtils.isEmpty(reqProgressEdit.getTitle())) {
+            foundProgress.get().setTitle(reqProgressEdit.getTitle());
+        }
+
+        if (!StringUtils.isEmpty(reqProgressEdit.getText())) {
+            foundProgress.get().setText(reqProgressEdit.getText());
+        }
+
+        if ((reqProgressEdit.getTask() != null) &&
+                (foundProgress.get().getTask().getId() != reqProgressEdit.getTask())) {
+
+            Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
+            task.orElseThrow(() -> new IllegalAccessException("Task with given ID does not exist!"));
+            foundProgress.get().setTask(task.get());
+        }
+
+        if (reqProgressEdit.getTags() != null) {
+            updateProgressEntryTags(foundProgress.get(), reqProgressEdit.getTags());
+        }
+
+        return progressRepository.save(foundProgress.get());
+    }
+
+    private void updateProgressEntryTags(@NonNull final Progress progress, @NonNull final Collection<String> tags) {
+        List<Tag> progressTags = new ArrayList<>();
+        tags.forEach((tagName) -> {
+            Optional<Tag> foundTag = tagRepository.findTagByName(tagName);
+            if (foundTag.isEmpty()) {
+                Tag newTag = new Tag(StringUtils.trimAllWhitespace(tagName));
+                progressTags.add(tagRepository.save(newTag));
+            }
+            else {
+                progressTags.add(foundTag.get());
+            }
+        });
+        progress.setTags(progressTags);
     }
 
     public void delete(long id) throws IllegalArgumentException {

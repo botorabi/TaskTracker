@@ -11,6 +11,7 @@ import 'dart:io';
 
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.common.dart';
+import 'package:TaskTracker/service/task.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:http/http.dart';
 
@@ -105,6 +106,18 @@ class ServiceUser {
     }
     else {
       return Future<List<UserInfo>>.error(response.statusCode);
+    }
+  }
+
+  Future<List<Task>> getUserTasks(int userId) async {
+    Response response = await get(Config.baseURL + '/api/user/tasks/' + userId.toString(),
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return Task.listFromJsonString(response.body);
+    }
+    else {
+      return Future<List<Task>>.error(response.statusCode);
     }
   }
 }

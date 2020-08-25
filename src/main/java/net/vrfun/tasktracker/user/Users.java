@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.task.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
@@ -16,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of user related services.
@@ -32,16 +34,24 @@ public class Users {
 
     private UserRepository userRepository;
 
+    private TeamRepository teamRepository;
+
+    private TaskRepository taskRepository;
+
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     public Users(
             @NonNull final UserRoleRepository userRoleRepository,
             @NonNull final UserRepository userRepository,
+            @NonNull final TeamRepository teamRepository,
+            @NonNull final TaskRepository taskRepository,
             @NonNull final PasswordEncoder passwordEncoder) {
 
         this.userRoleRepository = userRoleRepository;
         this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
+        this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -226,6 +236,20 @@ public class Users {
         fetchUserRoles(user.get());
 
         return user.get();
+    }
+
+    @NonNull
+    public List<TaskShortInfo> getUserTasks(@NonNull final Long userId) throws IllegalAccessException {
+        Optional<User> user = userRepository.findById(userId);
+        user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
+
+        List<Task> userTasks = taskRepository.findUserTasks(user.get());
+        List<Team> userTeams = teamRepository.findUserTeams(user.get());
+        userTeams.forEach((team) -> taskRepository.findUserTasks(team).forEach(userTasks::add));
+
+        return userTasks.stream()
+                .map((task) -> new TaskShortInfo(task))
+                .collect(Collectors.toList());
     }
 
     @NonNull
