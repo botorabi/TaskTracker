@@ -25,11 +25,6 @@ class WidgetProgressList extends StatefulWidget {
 
   @override
   _WidgetProgressListState createState() => _widgetProgressListState;
-
-  WidgetProgressList setExpanded(bool expanded) {
-    _widgetProgressListState.setExpanded(expanded);
-    return this;
-  }
 }
 
 class _WidgetProgressListState extends State<WidgetProgressList> {
@@ -37,17 +32,12 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   final _serviceProgress = ServiceProgress();
   PaginatedDataTable _dataTable;
   List<Progress> _progresses = [];
-  bool _expanded = false;
   bool _sortAscending = true;
 
   @override
   void initState() {
     super.initState();
     _retrieveProgresses();
-  }
-
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
   }
 
   @override
@@ -57,35 +47,28 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
-      return Column();
-    }
-    else {
-      _dataTable = _createDataTable();
-      return Card(
-        elevation: 5,
-        margin: EdgeInsets.all(10.0),
+    _dataTable = _createDataTable();
+    return Card(
+      elevation: 5,
+      margin: EdgeInsets.all(10.0),
+      child:
+      SizedBox(
         child:
-        SizedBox(
+        Padding(
+          padding: const EdgeInsets.all(0.0),
           child:
-          Padding(
-            padding: const EdgeInsets.all(0.0),
-            child:
-            ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: _dataTable,
-                  )
-                ]
-            ),
+            Column(
+            children: [
+              Text(widget.title),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: _dataTable,
+              )
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _addProgress() async {

@@ -8,6 +8,7 @@
 
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/navdrawer.dart';
+import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/widget/widget.login.dart';
 import 'package:flutter/material.dart';
 
@@ -54,6 +55,30 @@ class _PageHomeState extends State<PageHome> {
                   visible: (Config.authStatus.authenticated == false),
                   child: WidgetLogin(),
                 ),
+                Visibility(
+                  visible: (Config.authStatus.authenticated == true),
+                  child: Center(
+                    child:
+                      Column(
+                        children: [
+                          const SizedBox(height: 30),
+                          RaisedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS);
+                            },
+                            child: const Text('Create Progress Entry', style: TextStyle(fontSize: 20)),
+                          ),
+                          const SizedBox(height: 30),
+                          RaisedButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, NavigationLinks.NAV_VIEW_PROGRESS);
+                            },
+                            child: const Text('View Your Progress', style: TextStyle(fontSize: 20)),
+                          ),
+                        ],
+                      ),
+                    )
+                  ),
                ],
             ),
           ),

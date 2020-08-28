@@ -17,6 +17,7 @@ abstract class NavigationLinks {
   static const String NAV_EDIT_TEAM     = '/editteam';
   static const String NAV_NEW_TASK      = '/newtask';
   static const String NAV_EDIT_TASK     = '/edittask';
+  static const String NAV_VIEW_PROGRESS = '/viewprogress';
   static const String NAV_NEW_PROGRESS  = '/newprogress';
   static const String NAV_EDIT_PROGRESS = '/editprogress';
 }

@@ -42,7 +42,6 @@ class _PageAdminState extends State<PageAdmin> {
               child:
                 Column(
                   children: [
-                    WidgetProgressList().setExpanded(true),
                     WidgetTaskList().setExpanded(false),
                     WidgetUserList().setExpanded(false),
                     WidgetTeamList().setExpanded(false),
