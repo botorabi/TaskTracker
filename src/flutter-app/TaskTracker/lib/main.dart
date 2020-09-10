@@ -55,25 +55,25 @@ class AppTaskTracker extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return MaterialApp(
-      title: 'Task Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      routes: {
-        NavigationLinks.NAV_HOME          : (context) => PageHome(title: 'Task Tracker'),
-        NavigationLinks.NAV_PROFILE       : (context) => PageLogin(title: 'User Profile'),
-        NavigationLinks.NAV_ADMIN         : (context) => PageAdmin(title: 'Administration'),
-        NavigationLinks.NAV_NEW_USER      : (context) => PageNewUser(title: 'Create New User'),
-        NavigationLinks.NAV_EDIT_USER     : (context) => PageEditUser(title: 'Edit User'),
-        NavigationLinks.NAV_NEW_TEAM      : (context) => PageNewTeam(title: 'Create New Team'),
-        NavigationLinks.NAV_EDIT_TEAM     : (context) => PageEditTeam(title: 'Edit Team'),
-        NavigationLinks.NAV_NEW_TASK      : (context) => PageNewTask(title: 'Create New Task'),
-        NavigationLinks.NAV_EDIT_TASK     : (context) => PageEditTask(title: 'Edit Task'),
-        NavigationLinks.NAV_VIEW_PROGRESS : (context) => PageViewProgress(title: 'View Progress'),
-        NavigationLinks.NAV_NEW_PROGRESS  : (context) => PageNewProgress(title: 'Create New Progress Entry'),
-        NavigationLinks.NAV_EDIT_PROGRESS : (context) => PageEditProgress(title: 'Edit Progress Entry'),
-      },
-    );
+        title: 'Task Tracker',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        routes: {
+          NavigationLinks.NAV_HOME          : (context) => PageHome(title: 'Task Tracker'),
+          NavigationLinks.NAV_PROFILE       : (context) => PageLogin(title: 'User Profile'),
+          NavigationLinks.NAV_ADMIN         : (context) => PageAdmin(title: 'Administration'),
+          NavigationLinks.NAV_NEW_USER      : (context) => PageNewUser(title: 'Create New User'),
+          NavigationLinks.NAV_EDIT_USER     : (context) => PageEditUser(title: 'Edit User'),
+          NavigationLinks.NAV_NEW_TEAM      : (context) => PageNewTeam(title: 'Create New Team'),
+          NavigationLinks.NAV_EDIT_TEAM     : (context) => PageEditTeam(title: 'Edit Team'),
+          NavigationLinks.NAV_NEW_TASK      : (context) => PageNewTask(title: 'Create New Task'),
+          NavigationLinks.NAV_EDIT_TASK     : (context) => PageEditTask(title: 'Edit Task'),
+          NavigationLinks.NAV_VIEW_PROGRESS : (context) => PageViewProgress(title: 'View Progress'),
+          NavigationLinks.NAV_NEW_PROGRESS  : (context) => PageNewProgress(title: 'Create New Progress Entry'),
+          NavigationLinks.NAV_EDIT_PROGRESS : (context) => PageEditProgress(title: 'Edit Progress Entry'),
+        },
+      );
   }
 }

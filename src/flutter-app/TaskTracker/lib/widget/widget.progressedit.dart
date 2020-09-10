@@ -33,9 +33,13 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   bool  _newProgress;
   Progress  _currentProgress;
-  DropdownButton _userTaskDropdownButton;
+  DropdownButton _userTaskDropdownButton = DropdownButton();
   List<DropdownMenuItem<int>> _userTaskDropdownItems = List();
   int _userTaskDropdownSelection = 0;
+
+  DropdownButton _calendarWeekDropdownButton = DropdownButton();
+  List<DropdownMenuItem<int>> _calendarWeekDropdownItems = List();
+  int _calendarWeekDropdownSelection = 0;
 
   final _serviceProgress = ServiceProgress();
   final _serviceUser = ServiceUser();
@@ -49,6 +53,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   @override
   void initState() {
     super.initState();
+
+    _setupCalendarWeekChooser();
 
     if (!_newProgress) {
       _retrieveProgress();
@@ -124,12 +130,33 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                               double w = constraints.maxWidth < 535 ? 350 : 180;
                               return ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: w),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      top: _newProgress ? 40.0 : 20.0, right: 10, left: 10
-                                  ),
-                                  child: _userTaskDropdownButton,
-                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 40.0, right: 10, left: 10),
+                                      child:
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Task'),
+                                            _userTaskDropdownButton,
+                                          ],
+                                        ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(top: 20.0, right: 10, left: 10),
+                                      child:
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Calendar Week'),
+                                            _calendarWeekDropdownButton,
+                                          ],
+                                      ),
+                                    ),
+                                  ],
+                                )
                               );
                             }
                         ),
@@ -181,6 +208,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
+    progress.calendarWeek = _calendarWeekDropdownSelection;
+
 //TODO    progress.tags = _widgetTags.getTags();
 
     _serviceProgress
@@ -213,6 +242,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
+    progress.calendarWeek = _calendarWeekDropdownSelection;
+
 //TODO    progress.tags = _widgetTags.getTags();
 
     _serviceProgress
@@ -252,6 +283,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           _textEditingControllerTitle.text = _currentProgress.title;
           _textEditingControllerText.text = _currentProgress.text;
           _retrieveUserTasksAndSelect(_currentProgress.task);
+          _updateCalendarWeekChooser(_currentProgress.calendarWeek?? 0);
+
 //TODO          _widgetTags.setTags(_currentProgress.tags);
 
           setState(() {});
@@ -268,6 +301,29 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
       value: _userTaskDropdownSelection,
       items: _userTaskDropdownItems,
       onChanged: (newValue) => _updateTaskChooser(newValue),
+    );
+    setState(() {});
+  }
+
+  void _setupCalendarWeekChooser() {
+    for (int i = 1; i < 54; i++) {
+      _calendarWeekDropdownItems.add(DropdownMenuItem<int>(value: i, child: Text(i.toString())));
+    }
+  }
+
+  void _updateCalendarWeekChooser(int calendarWeek) {
+    if (calendarWeek == 0) {
+      final now = DateTime.now();
+      final days = now.difference(DateTime(now.year, 1, 1, 0, 0)).inDays;
+      calendarWeek = 1 + ((days - 1) / 7).floor();
+    }
+    print("Current calendar week: " + calendarWeek.toString());
+
+    _calendarWeekDropdownSelection = calendarWeek;
+    _calendarWeekDropdownButton = DropdownButton(
+      value: _calendarWeekDropdownSelection,
+      items: _calendarWeekDropdownItems,
+      onChanged: (newValue) => _updateCalendarWeekChooser(newValue),
     );
     setState(() {});
   }

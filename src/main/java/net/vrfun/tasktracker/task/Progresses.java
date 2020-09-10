@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.user.Role;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
@@ -26,6 +27,8 @@ import java.util.*;
 public class Progresses {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
+    private static final int MAX_CALENDAR_WEEK_DISTANCE = 4;
 
     private final ProgressRepository progressRepository;
 
@@ -101,6 +104,11 @@ public class Progresses {
             throw new IllegalArgumentException("Cannot create progress entry, invalid progress title!");
         }
 
+        if (reqProgressEdit.getCalendarWeek() == null) {
+            LOGGER.debug("Cannot create progress entry, invalid calendar week!");
+            throw new IllegalArgumentException("Cannot create progress entry, calendar week!");
+        }
+
         newProgress.setTitle(reqProgressEdit.getTitle());
 
         if (!StringUtils.isEmpty(reqProgressEdit.getText())) {
@@ -109,7 +117,33 @@ public class Progresses {
 
         setProgressTaskAndTags(newProgress, reqProgressEdit);
 
+        setCalendarWeek(newProgress, reqProgressEdit.getCalendarWeek());
+
         return progressRepository.save(newProgress);
+    }
+
+    private void setCalendarWeek(@NonNull final Progress newProgress, int calendarWeek) {
+        if (calendarWeek <= 0 || calendarWeek > 53) {
+            LOGGER.debug("Invalid calendar week {}", calendarWeek);
+            throw new IllegalArgumentException("Invalid calendar week " + calendarWeek);
+        }
+
+        if (userAuthenticator.getUserRoles().contains(Role.ROLE_ADMIN) ||
+            userAuthenticator.getUserRoles().contains(Role.ROLE_TEAM_LEAD)) {
+            newProgress.setCalenderWeek(calendarWeek);
+        }
+        else {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(new Date());
+            int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+            if (Math.abs(calendarWeek - currentWeek) > MAX_CALENDAR_WEEK_DISTANCE) {
+                newProgress.setCalenderWeek(calendarWeek);
+            }
+            else {
+                LOGGER.debug("Invalid calendar week! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
+                throw new IllegalArgumentException("Invalid calendar week! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
+            }
+        }
     }
 
     private void setProgressTaskAndTags(@NonNull final Progress newProgress, @NonNull final ReqProgressEdit reqProgressEdit) {
@@ -154,6 +188,10 @@ public class Progresses {
 
         if (reqProgressEdit.getTags() != null) {
             updateProgressEntryTags(foundProgress.get(), reqProgressEdit.getTags());
+        }
+
+        if (reqProgressEdit.getCalendarWeek() != null) {
+            setCalendarWeek(foundProgress.get(), reqProgressEdit.getCalendarWeek());
         }
 
         return progressRepository.save(foundProgress.get());

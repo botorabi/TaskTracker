@@ -14,6 +14,7 @@ class Progress {
   int ownerId;
   String ownerName = '';
   DateTime dateCreation;
+  int calendarWeek;
   String title = '';
   String text = '';
   List<String> tags = [];
@@ -28,6 +29,7 @@ class Progress {
     progress.ownerName = fields['ownerName'];
     progress.title = fields['title'];
     progress.text = fields['text'];
+    progress.calendarWeek = fields['calendarWeek'];
 
     if (fields['dateCreation'] != null) {
       progress.dateCreation = DateTime.parse(fields['dateCreation'].toString());
@@ -62,6 +64,7 @@ class Progress {
       'title' : title,
       'tags' : tags?.toList(),
       'task' : task,
+      'calendarWeek' : calendarWeek
     };
   }
 }

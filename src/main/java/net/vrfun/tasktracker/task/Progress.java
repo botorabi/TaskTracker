@@ -13,7 +13,8 @@ import org.springframework.lang.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Collection;
+import java.time.temporal.TemporalField;
+import java.util.*;
 
 @Entity
 public class Progress extends BaseEntity implements Serializable {
@@ -38,6 +39,9 @@ public class Progress extends BaseEntity implements Serializable {
 
     @Column(nullable=false)
     private Instant dateCreation;
+
+    @Column(nullable=false)
+    private Integer calenderWeek = 0;
 
     @Column(nullable=false)
     private String title;
@@ -106,6 +110,15 @@ public class Progress extends BaseEntity implements Serializable {
 
     public void setDateCreation(@NonNull final Instant dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    @NonNull
+    public Integer getCalenderWeek() {
+        return calenderWeek;
+    }
+
+    public void setCalenderWeek(@NonNull final Integer calenderWeek) {
+        this.calenderWeek = calenderWeek;
     }
 
     @NonNull

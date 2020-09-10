@@ -29,6 +29,8 @@ public class ReqProgressEdit {
 
     private String text;
 
+    private Integer calendarWeek = 0;
+
     public ReqProgressEdit() {}
 
     public long getId() {
@@ -74,5 +76,14 @@ public class ReqProgressEdit {
     @JsonProperty("text")
     public void setText(String text) {
         this.text = text;
+    }
+
+    public Integer getCalendarWeek() {
+        return calendarWeek;
+    }
+
+    @JsonProperty("calendarWeek")
+    public void setCalendarWeek(Integer calendarWeek) {
+        this.calendarWeek = calendarWeek;
     }
 }

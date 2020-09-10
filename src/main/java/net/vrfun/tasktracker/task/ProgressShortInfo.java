@@ -32,6 +32,8 @@ public class ProgressShortInfo {
 
     private Instant dateCreation;
 
+    private Integer calendarWeek;
+
     private Collection<String> tags;
 
     private Long task;
@@ -43,6 +45,7 @@ public class ProgressShortInfo {
         this.title = progress.getTitle();
         this.text = progress.getText();
         this.dateCreation = progress.getDateCreation();
+        this.calendarWeek = progress.getCalenderWeek();
         this.ownerId = progress.getOwnerId();
         this.ownerName = progress.getOwnerName();
         if (progress.getTask() != null) {
@@ -60,6 +63,7 @@ public class ProgressShortInfo {
                              final Long ownerId,
                              final String ownerName,
                              final Instant dateCreation,
+                             final Integer calendarWeek,
                              final Collection<String> tags,
                              final Long taskId) {
 
@@ -67,6 +71,7 @@ public class ProgressShortInfo {
         this.title = title;
         this.text = text;
         this.dateCreation = dateCreation;
+        this.calendarWeek = calendarWeek;
         this.ownerId = ownerId;
         this.ownerName = ownerName;
         this.tags = tags;
@@ -119,6 +124,14 @@ public class ProgressShortInfo {
 
     public void setDateCreation(Instant dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public Integer getCalendarWeek() {
+        return calendarWeek;
+    }
+
+    public void setCalendarWeek(Integer calendarWeek) {
+        this.calendarWeek = calendarWeek;
     }
 
     public Collection<String> getTags() {

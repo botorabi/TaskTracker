@@ -8,7 +8,6 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
-import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
@@ -32,7 +31,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   final _serviceProgress = ServiceProgress();
   PaginatedDataTable _dataTable;
   List<Progress> _progresses = [];
-  bool _sortAscending = true;
+  bool _sortAscending = false;
 
   @override
   void initState() {
@@ -96,7 +95,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   void _sortProgress(bool ascending) {
-    _progresses.sort((progressA, progressB) => progressA.dateCreation?.compareTo(progressB?.dateCreation));
+    _progresses.sort((progressA, progressB) => progressA.calendarWeek?.compareTo(progressB?.calendarWeek));
     if (!ascending) {
       _progresses = _progresses.reversed.toList();
     }
@@ -127,7 +126,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
         ),
         DataColumn(
           label: Text(
-            'Creation Date',
+            'Calendar Week',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -168,7 +167,7 @@ class _DataProvider extends DataTableSource {
       index: index,
       cells: [
         DataCell(Text(parent._progresses[index].title)),
-        DataCell(Text(parent._progresses[index].dateCreation.toIso8601String())),
+        DataCell(Text(parent._progresses[index].calendarWeek.toString())),
         DataCell(
           Row(
             children: [
