@@ -194,7 +194,7 @@ class DialogChooseTeams {
           child:
           ListTile(
             title: Text(team.name, style: TextStyle(fontWeight: FontWeight.w600)),
-            trailing: CircleButton.create(16, Icons.arrow_right, 12, () {
+            trailing: CircleButton.create(16, Icons.arrow_right, () {
               if (_addNewChosenTeam(team)) {
                 _updateChosenTeamsUI();
                 _scrollToLastChosenTeam();
@@ -214,7 +214,7 @@ class DialogChooseTeams {
           child:
           ListTile(
               title: Text(team.name, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.remove, 12, () {
+              trailing: CircleButton.create(16, Icons.remove, () {
                 _chosenTeams.remove(team);
                 _updateChosenTeamsUI();
               }),

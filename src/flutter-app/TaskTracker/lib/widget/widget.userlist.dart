@@ -178,7 +178,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addUser()),
+        CircleButton.create(24, Icons.add, () => _addUser()),
       ],
     );
 
@@ -213,7 +213,7 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.edit, 16, () {
+                  CircleButton.create(24, Icons.edit, () {
                     Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
@@ -227,7 +227,7 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.delete, 16,
+                  CircleButton.create(24, Icons.delete,
                     (parent._users[index].id == Config.authStatus.userId) ?
                     null : () => parent._deleteUser(parent._users[index].id, parent._users[index].realName)
                 ),

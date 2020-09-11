@@ -147,7 +147,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addProgress()),
+        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), "Add New Progress"),
       ],
     );
 
@@ -174,7 +174,7 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.edit, 16, () {
+                  CircleButton.create(24, Icons.edit, () {
                     Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: parent._progresses[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
@@ -182,14 +182,16 @@ class _DataProvider extends DataTableSource {
                             }
                           }
                         );
-                  }
+                    },
+                    "Edit Progress"
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.delete, 16,
-                          () => parent._deleteProgress(parent._progresses[index].id)
+                  CircleButton.create(24, Icons.delete,
+                    () => parent._deleteProgress(parent._progresses[index].id),
+                    "Delete Progress"
                 ),
               ),
             ],

@@ -165,7 +165,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addTask()),
+        CircleButton.create(24, Icons.add, () => _addTask()),
       ],
     );
 
@@ -192,7 +192,7 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.edit, 16, () {
+                  CircleButton.create(24, Icons.edit, () {
                     Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_TASK, arguments: parent._tasks[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
@@ -206,7 +206,7 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.delete, 16,
+                  CircleButton.create(24, Icons.delete,
                           () => parent._deleteTask(parent._tasks[index].id, parent._tasks[index].title)
                 ),
               ),

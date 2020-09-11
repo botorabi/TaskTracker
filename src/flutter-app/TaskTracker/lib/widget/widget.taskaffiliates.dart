@@ -147,7 +147,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                       Padding(
                         padding: const EdgeInsets.only(top: 0.0),
                         child:
-                        CircleButton.create(20, Icons.add, 16, () {
+                        CircleButton.create(20, Icons.add, () {
                           DialogChooseTeams(context).show('Teams', 'Add teams.')
                               .then((chosenTeams) {
                                 if (chosenTeams != null && chosenTeams.length > 0) {
@@ -208,7 +208,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                       Padding(
                         padding: const EdgeInsets.only(top: 15.0),
                         child:
-                        CircleButton.create(20, Icons.add, 16, () {
+                        CircleButton.create(20, Icons.add, () {
                           DialogChooseUsers(context).show('Users', 'Add users.')
                               .then((chosenUsers) {
                                 if (chosenUsers != null && chosenUsers.length > 0) {
@@ -265,7 +265,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(userInfo.realName),
-                CircleButton.create(16, Icons.remove, 12, () {
+                CircleButton.create(16, Icons.remove, () {
                   _users.remove(userInfo);
                   _createUsersUI();
                 }),
@@ -288,7 +288,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(team.name),
-                CircleButton.create(16, Icons.remove, 12, () {
+                CircleButton.create(16, Icons.remove, () {
                   _teams.remove(team);
                   _createTeamsUI();
                 }),

@@ -194,7 +194,7 @@ class DialogChooseUsers {
           child:
             ListTile(
               title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.arrow_right, 12, () {
+              trailing: CircleButton.create(16, Icons.arrow_right, () {
                 if (_addNewChosenUser(userInfo)) {
                   _updateChosenUsersUI();
                   _scrollToLastChosenUser();
@@ -214,7 +214,7 @@ class DialogChooseUsers {
           child:
           ListTile(
               title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.remove, 12, () {
+              trailing: CircleButton.create(16, Icons.remove, () {
                 _chosenUsers.remove(userInfo);
                 _updateChosenUsersUI();
               }),

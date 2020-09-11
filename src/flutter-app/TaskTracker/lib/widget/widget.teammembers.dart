@@ -109,7 +109,7 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                       Padding(
                         padding: const EdgeInsets.all(0.0),
                         child:
-                        CircleButton.create(20, Icons.add, 16, () {
+                        CircleButton.create(20, Icons.add, () {
                           DialogChooseUsers(context).show('Team Members', 'Add new team members.')
                               .then((chosenUsers) {
                               if (chosenUsers != null && chosenUsers.length > 0) {
@@ -166,7 +166,7 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(userInfo.realName),
-                CircleButton.create(16, Icons.remove, 12, () {
+                CircleButton.create(16, Icons.remove, () {
                   _members.remove(userInfo);
                   _createUI();
                 }),
