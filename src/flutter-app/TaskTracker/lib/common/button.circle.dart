@@ -14,6 +14,7 @@ abstract class CircleButton {
 
     return IconButton(
       iconSize: size,
+      splashRadius: size,
       icon: Icon(iconData, color: (cbOnTab != null) ? Colors.blue : Colors.grey),
       onPressed: cbOnTab,
       tooltip: toolTip != "" ? toolTip : null,

@@ -49,22 +49,18 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   @override
   Widget build(BuildContext context) {
     _dataTable = _createDataTable();
-    return Card(
-      elevation: 5,
-      margin: EdgeInsets.all(10.0),
-      child:
-      SizedBox(
-        child:
-        Padding(
-          padding: const EdgeInsets.all(0.0),
-          child:
-            Column(
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Card(
+          elevation: 0,
+          margin: EdgeInsets.all(10.0),
+          child: Column(
             children: [
               Text(widget.title),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
+              SizedBox(
+                width: constraints.maxWidth,
                 child: _dataTable,
-              )
+              ),
             ],
           ),
         ),
@@ -180,6 +176,7 @@ class _DataProvider extends DataTableSource {
         DataCell(
           Row(
             children: [
+              Spacer(),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:

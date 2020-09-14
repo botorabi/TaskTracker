@@ -19,9 +19,9 @@ class Config {
 
   static AuthStatus authStatus = AuthStatus();
 
-  static final double defaultPanelWidth = 750;
+  static final double defaultPanelWidth = 800;
 
-  static final double defaultEditorWidth = 540;
+  static final double defaultEditorWidth = 600;
 
   static final Color listBackgroundColor = Color.fromARGB(255, 250, 250, 250);
 

@@ -133,7 +133,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(top: 0.0, left: 0.0),
+                      padding: const EdgeInsets.only(top: 15.0, left: 0.0),
                       child: Text(
                         "Affiliate Teams",
                         style: TextStyle(fontWeight: FontWeight.w600),
@@ -194,7 +194,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(top: 15.0, left: 0.0),
+                      padding: const EdgeInsets.only(top: 30.0, left: 0.0),
                       child: Text(
                         "Affiliate Users",
                         style: TextStyle(fontWeight: FontWeight.w600),

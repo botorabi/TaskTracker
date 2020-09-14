@@ -148,7 +148,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                         ),
                         LayoutBuilder(
                             builder: (BuildContext context, BoxConstraints constraints) {
-                              double w = constraints.maxWidth < 535 ? 350 : 180;
+                              double w = constraints.maxWidth < 535 ? 350 : 200;
                               return ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: w),
                                 child: Padding(

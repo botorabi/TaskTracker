@@ -63,22 +63,22 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
     }
     else {
       _dataTable = _createDataTable();
-      return Card(
-        elevation: 5,
-        margin: EdgeInsets.all(10.0),
-        child:
-        SizedBox(
-          child:
-          Padding(
-            padding: const EdgeInsets.all(0.0),
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: Card(
+            elevation: 5,
+            margin: EdgeInsets.all(10.0),
             child:
-            ExpansionTile(
+              ExpansionTile(
                 title: Text(widget.title),
                 initiallyExpanded: _expanded,
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: _dataTable,
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: _dataTable,
+                    ),
                   )
                 ]
             ),
@@ -189,6 +189,7 @@ class _DataProvider extends DataTableSource {
         DataCell(
           Row(
             children: [
+              Spacer(),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
