@@ -20,6 +20,10 @@ class AuthStatus {
     return ((roles != null) && roles.contains("ROLE_ADMIN"));
   }
 
+  bool isTeamLead() {
+    return ((roles != null) && roles.contains("ROLE_TEAM_LEAD"));
+  }
+
   factory AuthStatus.fromJsonString(final String jsonString) {
     AuthStatus status = AuthStatus();
     Map<String, dynamic> fields = jsonDecode(jsonString);

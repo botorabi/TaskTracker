@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/calendar.utils.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
@@ -41,6 +42,10 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   List<DropdownMenuItem<int>> _calendarWeekDropdownItems = List();
   int _calendarWeekDropdownSelection = 0;
 
+  DropdownButton _calendarYearDropdownButton = DropdownButton();
+  List<DropdownMenuItem<int>> _calendarYearDropdownItems = List();
+  int _calendarYearDropdownSelection = 0;
+
   final _serviceProgress = ServiceProgress();
   final _serviceUser = ServiceUser();
   final _textEditingControllerTitle = TextEditingController();
@@ -55,12 +60,15 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     super.initState();
 
     _setupCalendarWeekChooser();
+    _setupCalendarYearChooser();
 
     if (!_newProgress) {
       _retrieveProgress();
     }
     else {
       _retrieveUserTasksAndSelect();
+      _updateCalendarWeekChooser(0);
+      _updateCalendarYearChooser(0);
     }
   }
 
@@ -151,7 +159,13 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text('Calendar Week'),
-                                            _calendarWeekDropdownButton,
+                                            Row(
+                                              children: [
+                                                _calendarWeekDropdownButton,
+                                                SizedBox(width: 10.0),
+                                                _calendarYearDropdownButton,
+                                              ],
+                                            )
                                           ],
                                       ),
                                     ),
@@ -208,7 +222,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
-    progress.calendarWeek = _calendarWeekDropdownSelection;
+    progress.reportWeek = _calendarWeekDropdownSelection;
+    progress.reportYear = _calendarYearDropdownSelection;
 
 //TODO    progress.tags = _widgetTags.getTags();
 
@@ -221,7 +236,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = "Could not create new progress entry!\nPlease choose a task.";
+            text = "Could not create new progress entry!\nPlease choose a task and proper calendar week.\n"
+              "A maximal calendar week distance of 4 is allowed.";
           }
           else {
             text = "Could not create new progress entry!\nReason:" + err.toString();
@@ -242,7 +258,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
-    progress.calendarWeek = _calendarWeekDropdownSelection;
+    progress.reportWeek = _calendarWeekDropdownSelection;
+    progress.reportYear = _calendarYearDropdownSelection;
 
 //TODO    progress.tags = _widgetTags.getTags();
 
@@ -255,7 +272,10 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           }
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not apply changes! Reason:" + err.toString(), true);
+          String text = "Could not apply changes to progress entry!\nPlease choose a task and proper calendar week.\n"
+              "A maximal calendar week distance of 4 is allowed.";
+
+          DialogModal(context).show("Attention", text, true);
         }
       );
   }
@@ -283,7 +303,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           _textEditingControllerTitle.text = _currentProgress.title;
           _textEditingControllerText.text = _currentProgress.text;
           _retrieveUserTasksAndSelect(_currentProgress.task);
-          _updateCalendarWeekChooser(_currentProgress.calendarWeek?? 0);
+          _updateCalendarWeekChooser(_currentProgress.reportWeek?? 0);
+          _updateCalendarYearChooser(_currentProgress.reportYear?? 0);
 
 //TODO          _widgetTags.setTags(_currentProgress.tags);
 
@@ -311,19 +332,37 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     }
   }
 
+  void _setupCalendarYearChooser() {
+    int currentYear = CalendarUtils.getCurrentCalendarYear();
+    for (int i = currentYear - 10; i < currentYear + 10; i++) {
+      _calendarYearDropdownItems.add(DropdownMenuItem<int>(value: i, child: Text(i.toString())));
+    }
+  }
+
   void _updateCalendarWeekChooser(int calendarWeek) {
     if (calendarWeek == 0) {
-      final now = DateTime.now();
-      final days = now.difference(DateTime(now.year, 1, 1, 0, 0)).inDays;
-      calendarWeek = 1 + ((days - 1) / 7).floor();
+      calendarWeek = CalendarUtils.getCurrentCalendarWeek();
     }
-    print("Current calendar week: " + calendarWeek.toString());
 
     _calendarWeekDropdownSelection = calendarWeek;
     _calendarWeekDropdownButton = DropdownButton(
       value: _calendarWeekDropdownSelection,
       items: _calendarWeekDropdownItems,
       onChanged: (newValue) => _updateCalendarWeekChooser(newValue),
+    );
+    setState(() {});
+  }
+
+  void _updateCalendarYearChooser(int calendarYear) {
+    if (calendarYear == 0) {
+      calendarYear = CalendarUtils.getCurrentCalendarYear();
+    }
+
+    _calendarYearDropdownSelection = calendarYear;
+    _calendarYearDropdownButton = DropdownButton(
+      value: _calendarYearDropdownSelection,
+      items: _calendarYearDropdownItems,
+      onChanged: (newValue) => _updateCalendarYearChooser(newValue),
     );
     setState(() {});
   }

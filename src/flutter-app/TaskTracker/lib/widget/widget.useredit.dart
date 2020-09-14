@@ -153,14 +153,14 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                     ),
                     LayoutBuilder(
                       builder: (BuildContext context, BoxConstraints constraints) {
-                        double topPadding = constraints.maxWidth < 535 ? 0.0 : 30.0;
+                        double topPadding = constraints.maxWidth < 535 ? 0.0 : 50.0;
                         double w = constraints.maxWidth < 535 ? 350 : 180;
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: w),
                           child:
                           Padding(
                             padding: EdgeInsets.only(left: 20, top: topPadding),
-                            child: _widgetRoles,
+                            child: Config.authStatus.isAdmin() ? _widgetRoles : Text('Role: User'),
                           ),
                         );
                       }

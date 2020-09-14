@@ -41,7 +41,7 @@ public class Progress extends BaseEntity implements Serializable {
     private Instant dateCreation;
 
     @Column(nullable=false)
-    private Integer calenderWeek = 0;
+    private Calendar reportWeek;
 
     @Column(nullable=false)
     private String title;
@@ -113,12 +113,12 @@ public class Progress extends BaseEntity implements Serializable {
     }
 
     @NonNull
-    public Integer getCalenderWeek() {
-        return calenderWeek;
+    public Calendar getReportWeek() {
+        return reportWeek;
     }
 
-    public void setCalenderWeek(@NonNull final Integer calenderWeek) {
-        this.calenderWeek = calenderWeek;
+    public void setReportWeek(@NonNull final Calendar reportWeek) {
+        this.reportWeek = reportWeek;
     }
 
     @NonNull

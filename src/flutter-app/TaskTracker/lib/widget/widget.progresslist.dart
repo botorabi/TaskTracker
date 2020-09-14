@@ -8,6 +8,8 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/calendar.utils.dart';
+import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
@@ -95,7 +97,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   void _sortProgress(bool ascending) {
-    _progresses.sort((progressA, progressB) => progressA.calendarWeek?.compareTo(progressB?.calendarWeek));
+    _progresses.sort((progressA, progressB) => progressA.reportWeek?.compareTo(progressB?.reportWeek));
     if (!ascending) {
       _progresses = _progresses.reversed.toList();
     }
@@ -115,8 +117,10 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   PaginatedDataTable _createDataTable() {
+    String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
+    String currentYear = CalendarUtils.getCurrentCalendarYear().toString();
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text(''),
+      header: Text('Calendar Week ' + currentYear + ' / ' + currentWeek),
       columns: <DataColumn>[
         DataColumn(
           label: Text(
@@ -163,35 +167,48 @@ class _DataProvider extends DataTableSource {
 
   @override
   DataRow getRow(int index) {
+    bool modifiable = Config.authStatus.isAdmin() ||
+        CalendarUtils.checkWeekDistance(parent._progresses[index].reportWeek, parent._progresses[index].reportYear);
+
+    String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + parent._progresses[index].ownerName + ']') : '';
+
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._progresses[index].title)),
-        DataCell(Text(parent._progresses[index].calendarWeek.toString())),
+        DataCell(Text(parent._progresses[index].title + userName)),
+        DataCell(Text(parent._progresses[index].reportYear.toString() + ' / ' + parent._progresses[index].reportWeek.toString())),
         DataCell(
           Row(
             children: [
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.edit, () {
+                  CircleButton.create(24, Icons.visibility, () {
+                    _showProgressEntry(parent._progresses[index]);
+                  },
+                  'View Progress'),
+              ),
+              Padding(
+                padding: EdgeInsets.all(4.0),
+                child:
+                  CircleButton.create(24, Icons.edit, !modifiable ? null : () {
                     Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: parent._progresses[index].id)
                         .then((value) {
-                            if (value != ButtonID.CANCEL) {
-                              parent._retrieveProgresses();
-                            }
-                          }
-                        );
-                    },
-                    "Edit Progress"
+                      if (value != ButtonID.CANCEL) {
+                        parent._retrieveProgresses();
+                      }
+                     }
+                    );
+                  },
+                  'Edit Progress'
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.delete,
-                    () => parent._deleteProgress(parent._progresses[index].id),
-                    "Delete Progress"
+                    !modifiable ? null :  () => parent._deleteProgress(parent._progresses[index].id),
+                    'Delete Progress'
                 ),
               ),
             ],
@@ -209,4 +226,11 @@ class _DataProvider extends DataTableSource {
 
   @override
   int get selectedRowCount => 0;
+
+  void _showProgressEntry(Progress progress) {
+    String text = 'Report Week ' + progress.reportWeek.toString() + ' / ' + progress.reportYear.toString() + '\n';
+    text += '\nUser: ' + progress.ownerName + '\n';
+    text += '\nText:\n\n' + progress.text;
+    DialogModal(parent.context).show( progress.title, text, false);
+  }
 }

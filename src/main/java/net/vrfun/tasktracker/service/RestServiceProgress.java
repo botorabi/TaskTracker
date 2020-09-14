@@ -73,7 +73,6 @@ public class RestServiceProgress {
     }
 
     @GetMapping("/progress/all")
-    @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<List<ProgressShortInfo>> getProgressAll() {
         return new ResponseEntity<>(progresses.getAll(), HttpStatus.OK);
     }

@@ -47,7 +47,7 @@ class _PageHomeState extends State<PageHome> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 20.0, bottom: 30),
+                  padding: EdgeInsets.only(top: 10.0, bottom: 30),
                   child: Text(
                       'Track and report your project activities.'
                   ),

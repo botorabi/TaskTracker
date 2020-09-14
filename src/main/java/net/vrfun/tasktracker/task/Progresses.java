@@ -8,7 +8,6 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.user.Role;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
@@ -28,7 +27,9 @@ public class Progresses {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private static final int MAX_CALENDAR_WEEK_DISTANCE = 4;
+    public static final int MAX_CALENDAR_WEEK_DISTANCE = 4;
+
+    private static final int MAX_CALENDAR_WEEKS = 53;
 
     private final ProgressRepository progressRepository;
 
@@ -56,20 +57,37 @@ public class Progresses {
 
     @NonNull
     public List<ProgressShortInfo> getAll() {
-        List<ProgressShortInfo> progs = new ArrayList<>();
-        progressRepository.findAll()
-                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+        if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
 
-        return progs;
+            List<ProgressShortInfo> progs = new ArrayList<>();
+            progressRepository.findAll()
+                    .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+
+            return progs;
+        }
+        else {
+            return getUserProgress();
+        }
     }
 
     @Nullable
     public ProgressShortInfo get(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
-        if (progress.isPresent()) {
-            return new ProgressShortInfo(progress.get());
+        if (!progress.isPresent()) {
+            return null;
         }
-        return null;
+
+        if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead()) {
+
+            if (!progress.get().getOwnerId().equals(userAuthenticator.getUserId())) {
+                LOGGER.warn("Attempt to access an unauthorized progress ({}) by user {}",
+                        progress.get().getId(), userAuthenticator.getUserLogin());
+
+                return null;
+            }
+        }
+
+        return new ProgressShortInfo(progress.get());
     }
 
     @NonNull
@@ -104,7 +122,7 @@ public class Progresses {
             throw new IllegalArgumentException("Cannot create progress entry, invalid progress title!");
         }
 
-        if (reqProgressEdit.getCalendarWeek() == null) {
+        if ((reqProgressEdit.getReportWeek() == null) || (reqProgressEdit.getReportYear() == null)) {
             LOGGER.debug("Cannot create progress entry, invalid calendar week!");
             throw new IllegalArgumentException("Cannot create progress entry, calendar week!");
         }
@@ -117,36 +135,53 @@ public class Progresses {
 
         setProgressTaskAndTags(newProgress, reqProgressEdit);
 
-        setCalendarWeek(newProgress, reqProgressEdit.getCalendarWeek());
+        setReportWeek(newProgress, reqProgressEdit.getReportWeek(), reqProgressEdit.getReportYear());
 
         return progressRepository.save(newProgress);
     }
 
-    private void setCalendarWeek(@NonNull final Progress newProgress, int calendarWeek) {
-        if (calendarWeek <= 0 || calendarWeek > 53) {
-            LOGGER.debug("Invalid calendar week {}", calendarWeek);
-            throw new IllegalArgumentException("Invalid calendar week " + calendarWeek);
+    protected void setReportWeek(@NonNull final Progress newProgress, int reportWeek, int reportYear) {
+        if (reportWeek <= 0 || reportWeek > 53) {
+            LOGGER.debug("Invalid calendar week {}", reportWeek);
+            throw new IllegalArgumentException("Invalid calendar week " + reportWeek);
         }
 
-        if (userAuthenticator.getUserRoles().contains(Role.ROLE_ADMIN) ||
-            userAuthenticator.getUserRoles().contains(Role.ROLE_TEAM_LEAD)) {
-            newProgress.setCalenderWeek(calendarWeek);
+        if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead() &&
+                !checkWeekDistance(reportWeek, reportYear)) {
+
+            LOGGER.debug("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
+            throw new IllegalArgumentException("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
         }
-        else {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date());
-            int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-            if (Math.abs(calendarWeek - currentWeek) > MAX_CALENDAR_WEEK_DISTANCE) {
-                newProgress.setCalenderWeek(calendarWeek);
-            }
-            else {
-                LOGGER.debug("Invalid calendar week! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
-                throw new IllegalArgumentException("Invalid calendar week! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
-            }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.WEEK_OF_YEAR, reportWeek);
+        calendar.set(Calendar.YEAR, reportYear);
+        newProgress.setReportWeek(calendar);
+    }
+
+    protected boolean checkWeekDistance(int reportWeek, int reportYear) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+
+        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
+        int currentYear = calendar.get(Calendar.YEAR);
+
+        if (Math.abs(currentYear - reportYear) > 1) {
+            return false;
+        }
+
+        if (currentYear == reportYear) {
+            return (Math.abs(reportWeek - currentWeek) <= MAX_CALENDAR_WEEK_DISTANCE);
+        }
+        else if (currentYear < reportYear) {
+            return (MAX_CALENDAR_WEEKS - currentWeek + reportWeek) <= MAX_CALENDAR_WEEK_DISTANCE;
+        }
+        else { // currentYear > reportYear
+            return (MAX_CALENDAR_WEEKS + currentWeek - reportWeek) <= MAX_CALENDAR_WEEK_DISTANCE;
         }
     }
 
-    private void setProgressTaskAndTags(@NonNull final Progress newProgress, @NonNull final ReqProgressEdit reqProgressEdit) {
+    protected void setProgressTaskAndTags(@NonNull final Progress newProgress, @NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
         if (!task.isPresent()) {
             LOGGER.debug("Cannot set progress task. Task with given ID does not exist!");
@@ -170,6 +205,16 @@ public class Progresses {
             throw new IllegalArgumentException("A progress entry with given ID does not exist!");
         }
 
+        if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead()) {
+            if (!foundProgress.get().getOwnerId().equals(userAuthenticator.getUserId())) {
+
+                LOGGER.warn("Attempt to access an unauthorized progress ({}) by user {}",
+                        foundProgress.get().getId(), userAuthenticator.getUserLogin());
+
+                throw new IllegalArgumentException("Attempt to access an unauthorized progress entry!");
+            }
+        }
+
         if (!StringUtils.isEmpty(reqProgressEdit.getTitle())) {
             foundProgress.get().setTitle(reqProgressEdit.getTitle());
         }
@@ -190,14 +235,14 @@ public class Progresses {
             updateProgressEntryTags(foundProgress.get(), reqProgressEdit.getTags());
         }
 
-        if (reqProgressEdit.getCalendarWeek() != null) {
-            setCalendarWeek(foundProgress.get(), reqProgressEdit.getCalendarWeek());
+        if (reqProgressEdit.getReportWeek() != null && reqProgressEdit.getReportYear() != null) {
+            setReportWeek(foundProgress.get(), reqProgressEdit.getReportWeek(), reqProgressEdit.getReportYear());
         }
 
         return progressRepository.save(foundProgress.get());
     }
 
-    private void updateProgressEntryTags(@NonNull final Progress progress, @NonNull final Collection<String> tags) {
+    protected void updateProgressEntryTags(@NonNull final Progress progress, @NonNull final Collection<String> tags) {
         List<Tag> progressTags = new ArrayList<>();
         tags.forEach((tagName) -> {
             Optional<Tag> foundTag = tagRepository.findTagByName(tagName);
@@ -215,13 +260,19 @@ public class Progresses {
     public void delete(long id) throws IllegalArgumentException {
         Optional<Progress> progress = progressRepository.findById(id);
         if (progress.isPresent()) {
-            if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead() ||
-                    userAuthenticator.getUserId() == progress.get().getOwnerId()) {
+            int reportYear = progress.get().getReportWeek().get(Calendar.YEAR);
+            int reportWeek = progress.get().getReportWeek().get(Calendar.WEEK_OF_YEAR);
 
-                progressRepository.delete(progress.get());
+            if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead() &&
+                !checkWeekDistance(reportWeek, reportYear)) {
+
+                LOGGER.warn("Attempt to delete a progress ({}) by user {} with invalid max week distance",
+                        progress.get().getId(), userAuthenticator.getUserLogin());
+
+                throw new IllegalArgumentException("Cannot delete progress entry, invalid max week distance.");
             }
             else {
-                throw new IllegalArgumentException("Cannot delete progress entry, permission denied.");
+                progressRepository.delete(progress.get());
             }
         }
         else {

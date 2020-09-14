@@ -32,7 +32,7 @@ public class ProgressShortInfo {
 
     private Instant dateCreation;
 
-    private Integer calendarWeek;
+    private Calendar reportWeek;
 
     private Collection<String> tags;
 
@@ -45,7 +45,7 @@ public class ProgressShortInfo {
         this.title = progress.getTitle();
         this.text = progress.getText();
         this.dateCreation = progress.getDateCreation();
-        this.calendarWeek = progress.getCalenderWeek();
+        this.reportWeek = progress.getReportWeek();
         this.ownerId = progress.getOwnerId();
         this.ownerName = progress.getOwnerName();
         if (progress.getTask() != null) {
@@ -63,7 +63,7 @@ public class ProgressShortInfo {
                              final Long ownerId,
                              final String ownerName,
                              final Instant dateCreation,
-                             final Integer calendarWeek,
+                             final Calendar reportWeek,
                              final Collection<String> tags,
                              final Long taskId) {
 
@@ -71,7 +71,7 @@ public class ProgressShortInfo {
         this.title = title;
         this.text = text;
         this.dateCreation = dateCreation;
-        this.calendarWeek = calendarWeek;
+        this.reportWeek = reportWeek;
         this.ownerId = ownerId;
         this.ownerName = ownerName;
         this.tags = tags;
@@ -126,12 +126,20 @@ public class ProgressShortInfo {
         this.dateCreation = dateCreation;
     }
 
-    public Integer getCalendarWeek() {
-        return calendarWeek;
+    public Integer getReportWeek() {
+        return reportWeek.get(Calendar.WEEK_OF_YEAR);
     }
 
-    public void setCalendarWeek(Integer calendarWeek) {
-        this.calendarWeek = calendarWeek;
+    public void setReportWeek(Integer calendarWeek) {
+        this.reportWeek.set(Calendar.WEEK_OF_YEAR, calendarWeek);
+    }
+
+    public Integer getReportYear() {
+        return reportWeek.get(Calendar.YEAR);
+    }
+
+    public void setReportYear(Integer calendarYear) {
+        this.reportWeek.set(Calendar.YEAR, calendarYear);
     }
 
     public Collection<String> getTags() {
