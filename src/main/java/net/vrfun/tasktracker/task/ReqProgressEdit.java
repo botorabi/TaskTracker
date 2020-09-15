@@ -29,9 +29,9 @@ public class ReqProgressEdit {
 
     private String text;
 
-    private Integer reportWeek = 0;
+    private Integer reportWeek;
 
-    private Integer reportYear = 0;
+    private Integer reportYear;
 
     public ReqProgressEdit() {}
 

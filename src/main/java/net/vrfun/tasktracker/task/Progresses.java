@@ -29,7 +29,7 @@ public class Progresses {
 
     public static final int MAX_CALENDAR_WEEK_DISTANCE = 4;
 
-    private static final int MAX_CALENDAR_WEEKS = 53;
+    public static final int MAX_CALENDAR_WEEKS = 53;
 
     private final ProgressRepository progressRepository;
 
@@ -141,7 +141,7 @@ public class Progresses {
     }
 
     protected void setReportWeek(@NonNull final Progress newProgress, int reportWeek, int reportYear) {
-        if (reportWeek <= 0 || reportWeek > 53) {
+        if (reportWeek <= 0 || reportWeek > MAX_CALENDAR_WEEKS) {
             LOGGER.debug("Invalid calendar week {}", reportWeek);
             throw new IllegalArgumentException("Invalid calendar week " + reportWeek);
         }
@@ -199,7 +199,7 @@ public class Progresses {
     }
 
     @NonNull
-    public Progress editProgress(@NonNull final ReqProgressEdit reqProgressEdit) throws IllegalAccessException {
+    public Progress editProgress(@NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Progress> foundProgress = progressRepository.findById(reqProgressEdit.getId());
         if (!foundProgress.isPresent()) {
             throw new IllegalArgumentException("A progress entry with given ID does not exist!");
@@ -227,7 +227,7 @@ public class Progresses {
                 (foundProgress.get().getTask().getId() != reqProgressEdit.getTask())) {
 
             Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
-            task.orElseThrow(() -> new IllegalAccessException("Task with given ID does not exist!"));
+            task.orElseThrow(() -> new IllegalArgumentException("Task with given ID does not exist!"));
             foundProgress.get().setTask(task.get());
         }
 
@@ -257,26 +257,33 @@ public class Progresses {
         progress.setTags(progressTags);
     }
 
-    public void delete(long id) throws IllegalArgumentException {
+    public void delete(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
-        if (progress.isPresent()) {
-            int reportYear = progress.get().getReportWeek().get(Calendar.YEAR);
-            int reportWeek = progress.get().getReportWeek().get(Calendar.WEEK_OF_YEAR);
+        progress.orElseThrow(() ->new IllegalArgumentException("Task progress does not exists."));
 
-            if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead() &&
-                !checkWeekDistance(reportWeek, reportYear)) {
+        if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
+            progressRepository.delete(progress.get());
+            return;
+        }
 
-                LOGGER.warn("Attempt to delete a progress ({}) by user {} with invalid max week distance",
-                        progress.get().getId(), userAuthenticator.getUserLogin());
+        if (userAuthenticator.getUserId() != progress.get().getOwnerId()) {
+            LOGGER.warn("Attempt to delete a progress ({}) by unauthorized user {}",
+                    progress.get().getId(), userAuthenticator.getUserLogin());
 
-                throw new IllegalArgumentException("Cannot delete progress entry, invalid max week distance.");
-            }
-            else {
-                progressRepository.delete(progress.get());
-            }
+            throw new IllegalArgumentException("Cannot delete progress entry, unauthorized access.");
+        }
+
+        int reportYear = progress.get().getReportWeek().get(Calendar.YEAR);
+        int reportWeek = progress.get().getReportWeek().get(Calendar.WEEK_OF_YEAR);
+
+        if (!checkWeekDistance(reportWeek, reportYear)) {
+            LOGGER.warn("Attempt to delete a progress ({}) by user {} with invalid max week distance",
+                    progress.get().getId(), userAuthenticator.getUserLogin());
+
+            throw new IllegalArgumentException("Cannot delete progress entry, invalid max week distance.");
         }
         else {
-            throw new IllegalArgumentException("Task progress does not exists.");
+            progressRepository.delete(progress.get());
         }
     }
 }
