@@ -7,34 +7,30 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
-import 'package:TaskTracker/common/button.id.dart';
-import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
-import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
-import 'package:TaskTracker/navigation.links.dart';
-import 'package:TaskTracker/service/service.team.dart';
+import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/team.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetTeamList extends StatefulWidget {
-  WidgetTeamList({Key key, this.title = 'Teams'}) : super(key: key);
+class WidgetTeamReport extends StatefulWidget {
+  WidgetTeamReport({Key key, this.title = 'Team Report'}) : super(key: key);
 
   final String title;
-  final _WidgetTeamListState _widgetTeamListState = _WidgetTeamListState();
+  final _WidgetTeamReportState _widgetTeamReportState = _WidgetTeamReportState();
 
   @override
-  _WidgetTeamListState createState() => _widgetTeamListState;
+  _WidgetTeamReportState createState() => _widgetTeamReportState;
 
-  WidgetTeamList setExpanded(bool expanded) {
-    _widgetTeamListState.setExpanded(expanded);
+  WidgetTeamReport setExpanded(bool expanded) {
+    _widgetTeamReportState.setExpanded(expanded);
     return this;
   }
 }
 
-class _WidgetTeamListState extends State<WidgetTeamList> {
+class _WidgetTeamReportState extends State<WidgetTeamReport> {
 
-  final _serviceTeam = ServiceTeam();
+  final _serviceUser = ServiceUser();
   PaginatedDataTable _dataTable;
   List<Team> _teams = [];
   bool _expanded = false;
@@ -57,59 +53,29 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
-      return Column();
-    }
-    else {
-      _dataTable = _createDataTable();
-      return LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10.0),
-            child:
-            ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: _dataTable,
-                    ),
-                  )
-                ]
-            ),
+    _dataTable = _createDataTable();
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Card(
+          elevation: 5,
+          margin: EdgeInsets.all(10.0),
+          child:
+          ExpansionTile(
+              title: Text(widget.title),
+              initiallyExpanded: _expanded,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: _dataTable,
+                  ),
+                )
+              ]
           ),
         ),
-      );
-    }
-  }
-
-  void _addTeam() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_TEAM);
-    _retrieveTeams();
-  }
-
-  void _deleteTeam(int id, String name) async {
-    var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete team '$name'?", ButtonID.YES, ButtonID.NO);
-
-    if (button != ButtonID.YES) {
-      return;
-    }
-
-    _serviceTeam
-      .deleteTeam(id)
-      .then((status) {
-          DialogModal(context).show('Team Deletion', 'Team was successfully deleted.', false);
-          _retrieveTeams();
-        },
-        onError: (err) {
-          print('Failed to delete team, reason: ' + err.toString());
-      });
+      ),
+    );
   }
 
   void _sortTeams(bool ascending) {
@@ -120,10 +86,15 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
   }
 
   void _retrieveTeams() {
-    _serviceTeam
-        .getTeams()
+    _serviceUser
+        .getUserTeams()
         .then((listTeam) {
-            _teams = listTeam;
+            _teams = List<Team>();
+            listTeam.forEach((team) {
+              if (team.active) {
+                _teams.add(team);
+              }
+            });
             _sortTeams(_sortAscending);
             setState(() {});
           },
@@ -157,12 +128,6 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         ),
         DataColumn(
           label: Text(
-            'Active',
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),
-        ),
-        DataColumn(
-          label: Text(
             'Team Lead',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
@@ -176,9 +141,6 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       source: _DataProvider(this),
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
-      actions: [
-        CircleButton.create(24, Icons.add, () => _addTeam(), 'Add New Team'),
-      ],
     );
 
     return dataTable;
@@ -187,7 +149,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
 class _DataProvider extends DataTableSource {
 
-  _WidgetTeamListState parent;
+  _WidgetTeamReportState parent;
 
   _DataProvider(this.parent);
 
@@ -203,7 +165,6 @@ class _DataProvider extends DataTableSource {
       cells: [
         DataCell(Text(parent._teams[index].name)),
         DataCell(Text(parent._teams[index].description)),
-        DataCell(Text(parent._teams[index].active ? 'Yes' : 'No')),
         DataCell(Text(teamLeadNames)),
         DataCell(
           Row(
@@ -212,22 +173,10 @@ class _DataProvider extends DataTableSource {
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(20, Icons.edit, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_TEAM, arguments: parent._teams[index].id)
-                        .then((value) {
-                            if (value != ButtonID.CANCEL) {
-                              parent._retrieveTeams();
-                            }
-                          }
-                        );
+                  CircleButton.create(24, Icons.file_download, () {
+                    //! TODO
+                    DialogModal(parent.context).show("Attention", "Under Construction!", false);
                   }
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(4.0),
-                child:
-                  CircleButton.create(20, Icons.delete,
-                          () => parent._deleteTeam(parent._teams[index].id, parent._teams[index].name)
                 ),
               ),
             ],

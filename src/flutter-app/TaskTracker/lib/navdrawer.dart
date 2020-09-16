@@ -86,6 +86,14 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 ListTile(
+                  leading: Icon(Icons.insert_chart),
+                  title: Text('Progress Report'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, NavigationLinks.NAV_REPORT);
+                  },
+                ),
+                ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text('Logout'),
                   onTap: () => {

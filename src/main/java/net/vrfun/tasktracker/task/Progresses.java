@@ -14,6 +14,8 @@ import org.springframework.lang.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.*;
 
 /**
@@ -124,7 +126,7 @@ public class Progresses {
 
         if ((reqProgressEdit.getReportWeek() == null) || (reqProgressEdit.getReportYear() == null)) {
             LOGGER.debug("Cannot create progress entry, invalid calendar week!");
-            throw new IllegalArgumentException("Cannot create progress entry, calendar week!");
+            throw new IllegalArgumentException("Cannot create progress entry, missing calendar week!");
         }
 
         newProgress.setTitle(reqProgressEdit.getTitle());
@@ -147,24 +149,26 @@ public class Progresses {
         }
 
         if (!userAuthenticator.isRoleAdmin() && !userAuthenticator.isRoleTeamLead() &&
-                !checkWeekDistance(reportWeek, reportYear)) {
+                !checkWeekDistance(getLocalDate(), reportWeek, reportYear)) {
 
             LOGGER.debug("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
             throw new IllegalArgumentException("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.WEEK_OF_YEAR, reportWeek);
-        calendar.set(Calendar.YEAR, reportYear);
-        newProgress.setReportWeek(calendar);
+        LocalDate date = LocalDate.of(reportYear, 1, 1);
+        date = date.plusWeeks(reportWeek - 1);
+
+        newProgress.setReportWeek(date);
     }
 
-    protected boolean checkWeekDistance(int reportWeek, int reportYear) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
+    @NonNull
+    protected LocalDate getLocalDate() {
+        return LocalDate.now();
+    }
 
-        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        int currentYear = calendar.get(Calendar.YEAR);
+    protected boolean checkWeekDistance(@NonNull final LocalDate localDate, int reportWeek, int reportYear) {
+        int currentWeek = localDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int currentYear = localDate.get(IsoFields.WEEK_BASED_YEAR);
 
         if (Math.abs(currentYear - reportYear) > 1) {
             return false;
@@ -224,7 +228,7 @@ public class Progresses {
         }
 
         if ((reqProgressEdit.getTask() != null) &&
-                (foundProgress.get().getTask().getId() != reqProgressEdit.getTask())) {
+                (!foundProgress.get().getTask().getId().equals(reqProgressEdit.getTask()))) {
 
             Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
             task.orElseThrow(() -> new IllegalArgumentException("Task with given ID does not exist!"));
@@ -266,17 +270,17 @@ public class Progresses {
             return;
         }
 
-        if (userAuthenticator.getUserId() != progress.get().getOwnerId()) {
+        if (!progress.get().getOwnerId().equals(userAuthenticator.getUserId())) {
             LOGGER.warn("Attempt to delete a progress ({}) by unauthorized user {}",
                     progress.get().getId(), userAuthenticator.getUserLogin());
 
             throw new IllegalArgumentException("Cannot delete progress entry, unauthorized access.");
         }
 
-        int reportYear = progress.get().getReportWeek().get(Calendar.YEAR);
-        int reportWeek = progress.get().getReportWeek().get(Calendar.WEEK_OF_YEAR);
+        int reportYear = progress.get().getReportWeek().get(IsoFields.WEEK_BASED_YEAR);
+        int reportWeek = progress.get().getReportWeek().get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
 
-        if (!checkWeekDistance(reportWeek, reportYear)) {
+        if (!checkWeekDistance(getLocalDate(), reportWeek, reportYear)) {
             LOGGER.warn("Attempt to delete a progress ({}) by user {} with invalid max week distance",
                     progress.get().getId(), userAuthenticator.getUserLogin());
 

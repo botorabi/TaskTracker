@@ -10,8 +10,8 @@ abstract class CalendarUtils {
 
   static int getCurrentCalendarWeek() {
     final now = DateTime.now();
-    final days = now.difference(DateTime(now.year, 1, 1, 0, 0)).inDays;
-    return 1 + ((days - 1) / 7).floor();
+    final days = now.difference(DateTime(now.year)).inDays;
+    return ((days + 1) / 7).ceil();
   }
 
   static int getCurrentCalendarYear() {

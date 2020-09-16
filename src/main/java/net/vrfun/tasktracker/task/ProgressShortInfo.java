@@ -9,7 +9,8 @@ package net.vrfun.tasktracker.task;
 
 import org.springframework.lang.NonNull;
 
-import java.time.Instant;
+import java.time.*;
+import java.time.temporal.IsoFields;
 import java.util.*;
 
 /**
@@ -32,7 +33,7 @@ public class ProgressShortInfo {
 
     private Instant dateCreation;
 
-    private Calendar reportWeek;
+    private LocalDate reportWeek;
 
     private Collection<String> tags;
 
@@ -63,7 +64,7 @@ public class ProgressShortInfo {
                              final Long ownerId,
                              final String ownerName,
                              final Instant dateCreation,
-                             final Calendar reportWeek,
+                             final LocalDate reportWeek,
                              final Collection<String> tags,
                              final Long taskId) {
 
@@ -126,20 +127,17 @@ public class ProgressShortInfo {
         this.dateCreation = dateCreation;
     }
 
-    public Integer getReportWeek() {
-        return reportWeek.get(Calendar.WEEK_OF_YEAR);
+    public void setReportWeek(int calendarYear, int calendarWeek) {
+        reportWeek = LocalDate.of(calendarYear, 1, 1);
+        reportWeek = reportWeek.plusWeeks(calendarWeek);
     }
 
-    public void setReportWeek(Integer calendarWeek) {
-        this.reportWeek.set(Calendar.WEEK_OF_YEAR, calendarWeek);
+    public Integer getReportWeek() {
+        return reportWeek == null ? null : reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
     }
 
     public Integer getReportYear() {
-        return reportWeek.get(Calendar.YEAR);
-    }
-
-    public void setReportYear(Integer calendarYear) {
-        this.reportWeek.set(Calendar.YEAR, calendarYear);
+        return reportWeek == null ? null : reportWeek.get(IsoFields.WEEK_BASED_YEAR);
     }
 
     public Collection<String> getTags() {

@@ -14,6 +14,8 @@ import org.mockito.*;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -194,7 +196,6 @@ public class ProgressesTest {
     public void createValidateInput() {
         ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
 
-        mockUser("MyLogin", 42L);
         mockUserAsAdmin();
 
         assertThatThrownBy(() -> progresses.create(reqProgressEdit)).as("Did not recognized invalid input").isInstanceOf(IllegalArgumentException.class);
@@ -215,7 +216,6 @@ public class ProgressesTest {
 
         reqProgressEdit.setReportYear(2020);
         reqProgressEdit.setReportWeek(50);
-        reqProgressEdit.setText("My Progress Text");
 
         doReturn(Optional.of(new Task())).when(taskRepository).findById(anyLong());
 
@@ -226,6 +226,35 @@ public class ProgressesTest {
         verify(tags, times(2)).getOrCreate(anyString());
 
         verify(progressRepository, times(1)).save(any());
+    }
+
+    @Test
+    public void createWithoutTags() {
+        LocalDate date = LocalDate.now();
+        int currentWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int currentYear = date.get(IsoFields.WEEK_BASED_YEAR);
+
+        ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
+        reqProgressEdit.setTask(45L);
+        reqProgressEdit.setTitle("My Title");
+        reqProgressEdit.setText("My Progress Text");
+        reqProgressEdit.setReportYear(currentYear);
+        reqProgressEdit.setReportWeek(currentWeek);
+
+        mockUser("MyLogin", 42L);
+
+        doReturn(Optional.of(new Task())).when(taskRepository).findById(anyLong());
+        doAnswer((invocationOnMock) -> invocationOnMock.getArgument(0))
+                .when(progressRepository).save(any());
+
+        Progress progress = progresses.create(reqProgressEdit);
+
+        LocalDate reportWeek = progress.getReportWeek();
+
+        assertThat(progress.getTitle()).isEqualTo("My Title");
+        assertThat(progress.getText()).isEqualTo("My Progress Text");
+        assertThat(reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)).isEqualTo(currentWeek);
+        assertThat(reportWeek.get(IsoFields.WEEK_BASED_YEAR)).isEqualTo(currentYear);
     }
 
     @Test
@@ -242,11 +271,36 @@ public class ProgressesTest {
     }
 
     @Test
+    public void checkWeekDistance() {
+        int currentYear = 2020;
+        int currentWeek = 1;
+        LocalDate date = LocalDate.of(currentYear, 1, currentWeek);
+
+        assertThat(progresses.checkWeekDistance(date, currentWeek, currentYear)).isTrue();
+        assertThat(progresses.checkWeekDistance(date, currentWeek, currentYear + 2)).isFalse();
+
+        // future date, same year
+        assertThat(progresses.checkWeekDistance(date, currentWeek + Progresses.MAX_CALENDAR_WEEK_DISTANCE, currentYear)).isTrue();
+        assertThat(progresses.checkWeekDistance(date, currentWeek + Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1, currentYear)).isFalse();
+
+        // past date, previous year
+        assertThat(progresses.checkWeekDistance(date, currentWeek - Progresses.MAX_CALENDAR_WEEK_DISTANCE + Progresses.MAX_CALENDAR_WEEKS, currentYear - 1)).isTrue();
+        assertThat(progresses.checkWeekDistance(date, currentWeek - Progresses.MAX_CALENDAR_WEEK_DISTANCE - 1 + Progresses.MAX_CALENDAR_WEEKS, currentYear - 1)).isFalse();
+
+        // future date, next year
+        date = LocalDate.of(currentYear, 12, 29);
+
+        assertThat(progresses.checkWeekDistance(date, Progresses.MAX_CALENDAR_WEEK_DISTANCE, currentYear + 1)).isTrue();
+        assertThat(progresses.checkWeekDistance(date, Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1, currentYear + 1)).isFalse();
+    }
+
+    @Test
     public void setReportWeekTooFarInFuture() {
         Progress progress = new Progress();
-        Calendar calendar = Calendar.getInstance();
-        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        int currentYear = calendar.get(Calendar.YEAR);
+
+        LocalDate date = LocalDate.now();
+        int currentWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int currentYear = date.get(IsoFields.WEEK_BASED_YEAR);
 
         currentWeek += Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1;
         if (currentWeek > Progresses.MAX_CALENDAR_WEEKS) {
@@ -267,9 +321,10 @@ public class ProgressesTest {
     @Test
     public void setReportWeekTooFarInPast() {
         Progress progress = new Progress();
-        Calendar calendar = Calendar.getInstance();
-        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        int currentYear = calendar.get(Calendar.YEAR);
+
+        LocalDate date = LocalDate.now();
+        int currentWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int currentYear = date.get(IsoFields.WEEK_BASED_YEAR);
 
         currentWeek -= (Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
         if (currentWeek <= 0) {
@@ -290,9 +345,10 @@ public class ProgressesTest {
     @Test
     public void setReportWeekAsAdmin() {
         Progress progress = new Progress();
-        Calendar calendar = Calendar.getInstance();
-        int currentWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        int currentYear = calendar.get(Calendar.YEAR);
+
+        LocalDate date = LocalDate.now();
+        int currentWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+        int currentYear = date.get(IsoFields.WEEK_BASED_YEAR);
 
         currentWeek -= (Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
         if (currentWeek <= 0) {
@@ -308,10 +364,10 @@ public class ProgressesTest {
 
         progresses.setReportWeek(progress, setWeek, setYear);
 
-        Calendar reportCalendar = progress.getReportWeek();
+        LocalDate reportWeek = progress.getReportWeek();
 
-        assertThat(reportCalendar.get(Calendar.WEEK_OF_YEAR)).isEqualTo(setWeek);
-        assertThat(reportCalendar.get(Calendar.YEAR)).isEqualTo(setYear);
+        assertThat(reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)).isEqualTo(setWeek);
+        assertThat(reportWeek.get(IsoFields.WEEK_BASED_YEAR)).isEqualTo(setYear);
     }
 
     @Test
@@ -376,6 +432,33 @@ public class ProgressesTest {
         editedProgress = progresses.editProgress(reqProgressEdit);
 
         assertThat(editedProgress.getReportWeek()).isNull();
+    }
+
+    @Test
+    public void editProgressChangeToSameTaskAsOwner() {
+        ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
+        reqProgressEdit.setId(100L);
+
+        Progress progress = new Progress("Owner", 45L);
+        progress.setId(110L);
+        Task task = new Task("My Task");
+        task.setId(200L);
+        progress.setTask(task);
+
+        mockUser("Owner", 45L);
+
+        doReturn(Optional.of(progress)).when(progressRepository).findById(anyLong());
+        doReturn(Optional.of(task)).when(taskRepository).findById(200L);
+
+        reqProgressEdit.setTask(200L);
+
+        doAnswer((invocationOnMock) -> invocationOnMock.getArguments()[0])
+                .when(progressRepository).save(any());
+
+        Progress editedProgress = progresses.editProgress(reqProgressEdit);
+
+        assertThat(editedProgress.getTask().getId()).isEqualTo(task.getId());
+        assertThat(editedProgress.getTask().getTitle()).isEqualTo(task.getTitle());
     }
 
     @Test
@@ -484,6 +567,54 @@ public class ProgressesTest {
     }
 
     @Test
+    public void setProgressTaskAndTagsNonExistingTask() {
+        Progress progress = new Progress();
+        ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
+        reqProgressEdit.setTask(42L);
+
+        doReturn(Optional.empty()).when(taskRepository).findById(anyLong());
+
+        assertThatThrownBy(() -> progresses.setProgressTaskAndTags(progress, reqProgressEdit))
+                .as("Did not detect non-existing task!")
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void setProgressTaskAndTagsWithTags() {
+        Progress progress = new Progress();
+        ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
+        reqProgressEdit.setTask(42L);
+        reqProgressEdit.setTags(Arrays.asList("tag1", "tag2"));
+
+        doReturn(Optional.of(new Task("My Task"))).when(taskRepository).findById(anyLong());
+        doAnswer((invocationOnMock) -> new Tag(invocationOnMock.getArgument(0)))
+                .when(tags).getOrCreate(any());
+
+        progresses.setProgressTaskAndTags(progress, reqProgressEdit);
+
+        assertThat(progress.getTask().getTitle()).isEqualTo("My Task");
+
+        List<Tag> taskTags = new ArrayList<Tag>(progress.getTags());
+
+        assertThat(taskTags.size()).isEqualTo(2);
+        assertThat(taskTags.get(0).getName()).isEqualTo("tag1");
+        assertThat(taskTags.get(1).getName()).isEqualTo("tag2");
+    }
+
+    @Test
+    public void setProgressTaskAndTagsWithoutTags() {
+        Progress progress = new Progress();
+        ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
+        reqProgressEdit.setTask(42L);
+
+        doReturn(Optional.of(new Task("My Task"))).when(taskRepository).findById(anyLong());
+
+        progresses.setProgressTaskAndTags(progress, reqProgressEdit);
+
+        assertThat(progress.getTags()).isEmpty();
+    }
+
+    @Test
     public void deleteNonExisting() {
         assertThatThrownBy(() -> progresses.delete(0L))
                 .as("Did not detect non-existing progress!")
@@ -549,11 +680,11 @@ public class ProgressesTest {
 
     @Test
     public void deleteAuthorizedUser() {
-        Calendar calendar = Calendar.getInstance();
+        LocalDate date = LocalDate.now();
 
         Progress progress = new Progress("Owner", 45L);
         progress.setId(100L);
-        progress.setReportWeek(calendar);
+        progress.setReportWeek(date);
 
         doReturn(Optional.of(progress)).when(progressRepository).findById(100L);
 
@@ -567,22 +698,13 @@ public class ProgressesTest {
 
     @Test
     public void deleteAuthorizedUserInvalidWeekDistance() {
-        Calendar calendar = Calendar.getInstance();
-        int outOfRangeWeek = calendar.get(Calendar.WEEK_OF_YEAR);
-        int outOfRangeYear = calendar.get(Calendar.YEAR);
+        LocalDate date = LocalDate.now();
 
-        outOfRangeWeek -= (Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
-        if (outOfRangeWeek <= 0) {
-            outOfRangeYear -= 1;
-            outOfRangeWeek += Progresses.MAX_CALENDAR_WEEKS;
-        }
-
-        calendar.set(Calendar.WEEK_OF_YEAR, outOfRangeWeek);
-        calendar.set(Calendar.YEAR, outOfRangeYear);
+        date = date.minusWeeks(Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
 
         Progress progress = new Progress("Owner", 45L);
         progress.setId(100L);
-        progress.setReportWeek(calendar);
+        progress.setReportWeek(date);
 
         doReturn(Optional.of(progress)).when(progressRepository).findById(100L);
 

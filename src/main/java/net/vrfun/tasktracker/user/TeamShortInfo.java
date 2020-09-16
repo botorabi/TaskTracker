@@ -9,7 +9,6 @@ package net.vrfun.tasktracker.user;
 
 import org.springframework.lang.NonNull;
 
-import java.time.Instant;
 import java.util.*;
 
 /**
@@ -28,6 +27,10 @@ public class TeamShortInfo {
 
     private Collection<Long> users;
 
+    private Collection<Long> teamLeaderIDs;
+
+    private Collection<String> teamLeaderNames;
+
     private boolean active;
 
     public TeamShortInfo() {}
@@ -41,19 +44,14 @@ public class TeamShortInfo {
             this.users = new ArrayList<>();
             team.getUsers().stream().forEach((user) -> this.users.add(user.getId()));
         }
-    }
-
-    public TeamShortInfo(long id,
-                         final String name,
-                         final String description,
-                         final boolean active,
-                         final Collection<Long> users) {
-
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.active = active;
-        this.users = users;
+        if (team.getTeamLeaders() != null) {
+            this.teamLeaderIDs = new ArrayList<>();
+            this.teamLeaderNames = new ArrayList<>();
+            team.getTeamLeaders().stream().forEach((teamLeader) -> {
+                this.teamLeaderIDs.add(teamLeader.getId());
+                this.teamLeaderNames.add(teamLeader.getRealName());
+            });
+        }
     }
 
     public long getId() {
@@ -86,6 +84,22 @@ public class TeamShortInfo {
 
     public void setUsers(Collection<Long> users) {
         this.users = users;
+    }
+
+    public Collection<Long> getTeamLeaderIDs() {
+        return teamLeaderIDs;
+    }
+
+    public void setTeamLeaderIDs(Collection<Long> teamLeaderIDs) {
+        this.teamLeaderIDs = teamLeaderIDs;
+    }
+
+    public Collection<String> getTeamLeaderNames() {
+        return teamLeaderNames;
+    }
+
+    public void setTeamLeaderNames(Collection<String> teamLeaderNames) {
+        this.teamLeaderNames = teamLeaderNames;
     }
 
     public boolean isActive() {

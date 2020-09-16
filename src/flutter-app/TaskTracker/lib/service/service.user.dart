@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.common.dart';
 import 'package:TaskTracker/service/task.dart';
+import 'package:TaskTracker/service/team.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:http/http.dart';
 
@@ -118,6 +119,18 @@ class ServiceUser {
     }
     else {
       return Future<List<Task>>.error(response.statusCode);
+    }
+  }
+
+  Future<List<Team>> getUserTeams() async {
+    Response response = await get(Config.baseURL + '/api/user/teams',
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return Team.listFromJsonString(response.body);
+    }
+    else {
+      return Future<List<Team>>.error(response.statusCode);
     }
   }
 }

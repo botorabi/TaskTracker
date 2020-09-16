@@ -7,24 +7,19 @@
  */
 
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/widget/widget.progresslist.dart';
-import 'package:TaskTracker/widget/widget.tasklist.dart';
-import 'package:TaskTracker/widget/widget.teamedit.dart';
-import 'package:TaskTracker/widget/widget.teamlist.dart';
-import 'package:TaskTracker/widget/widget.userlist.dart';
+import 'package:TaskTracker/widget/widget.report.dart';
 import 'package:flutter/material.dart';
 
-
-class PageAdmin extends StatefulWidget {
+class PageReport extends StatefulWidget {
   final String title;
 
-  PageAdmin({Key key, this.title}) : super(key: key);
+  PageReport({Key key, this.title}) : super(key: key);
 
   @override
-  _PageAdminState createState() => _PageAdminState();
+  _PageReportState createState() => _PageReportState();
 }
 
-class _PageAdminState extends State<PageAdmin> {
+class _PageReportState extends State<PageReport> {
 
   @override
   Widget build(BuildContext context) {
@@ -40,17 +35,15 @@ class _PageAdminState extends State<PageAdmin> {
               constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
               padding: const EdgeInsets.all(20.0),
               child:
-                Column(
-                  children: [
-                    WidgetTeamList().setExpanded(true),
-                    WidgetUserList().setExpanded(false),
-                    WidgetTaskList().setExpanded(false),
-                  ],
-                ),
+              Column(
+                children: [
+                  WidgetTeamReport().setExpanded(true),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
     );
   }
 }

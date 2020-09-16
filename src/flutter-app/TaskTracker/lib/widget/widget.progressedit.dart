@@ -98,13 +98,48 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
-                    Wrap(
-                      spacing: 5,
-                      runSpacing: 10,
+                    Column(
                       children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 40.0, right: 20, left: 20, bottom: 20),
+                          child:
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 20.0, right: 10, left: 10),
+                                child:
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Task'),
+                                    _userTaskDropdownButton,
+                                    ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20.0, right: 10, left: 30),
+                                child:
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Calendar Week'),
+                                    Row(
+                                      children: [
+                                        _calendarWeekDropdownButton,
+                                        SizedBox(width: 10.0),
+                                        _calendarYearDropdownButton,
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
                         Form(
                           child: Container(
-                            width: 350,
                             padding: const EdgeInsets.all(10.0),
                             child: Column(
                               children: [
@@ -121,58 +156,20 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                   padding: EdgeInsets.all(10.0),
                                   child: TextFormField(
                                     controller: _textEditingControllerText,
-                                    maxLines: 5,
+                                    textAlignVertical: TextAlignVertical.top,
+                                    expands: false,
+                                    maxLines: 10,
                                     maxLength: 10 * 1024,
                                     showCursor: true,
                                     decoration: InputDecoration(
                                       labelText: 'Text',
+                                      hintText: '\n- Done great things on this\n- Resolved problems on that\n- ...',
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        LayoutBuilder(
-                            builder: (BuildContext context, BoxConstraints constraints) {
-                              double w = constraints.maxWidth < 535 ? 350 : 180;
-                              return ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: w),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 40.0, right: 10, left: 10),
-                                      child:
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Task'),
-                                            _userTaskDropdownButton,
-                                          ],
-                                        ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(top: 20.0, right: 10, left: 10),
-                                      child:
-                                        Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('Calendar Week'),
-                                            Row(
-                                              children: [
-                                                _calendarWeekDropdownButton,
-                                                SizedBox(width: 10.0),
-                                                _calendarYearDropdownButton,
-                                              ],
-                                            )
-                                          ],
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              );
-                            }
                         ),
                       ],
                     ),

@@ -20,6 +20,8 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
 
     Optional<Team> findTeamByName(@NonNull final String name);
 
+    List<Team> findAll();
+
     @Query("select new net.vrfun.tasktracker.user.TeamShortInfo(team) " +
             "from net.vrfun.tasktracker.user.Team team where " +
             "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%'))")

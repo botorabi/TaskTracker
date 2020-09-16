@@ -13,7 +13,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
-import 'package:TaskTracker/widget/widget.teammembers.dart';
+import 'package:TaskTracker/widget/widget.userchooser.dart';
 import 'package:flutter/material.dart';
 
 
@@ -37,7 +37,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   final _serviceTeam = ServiceTeam();
   final _textEditingControllerName = TextEditingController();
   final _textEditingControllerDescription = TextEditingController();
-  final _widgetTeamMembers = WidgetTeamMembers();
+  final _widgetTeamMembers = WidgetUserChooser(title: "Team Members");
+  final _widgetTeamLeaders = WidgetUserChooser(title: "Team Leaders");
 
   _WidgetTeamEditState({this.teamId = 0}) {
     _newTeam = teamId == 0;
@@ -151,12 +152,19 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                               double w = constraints.maxWidth < 535 ? 350 : 200;
                               return ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: w),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      top: _newTeam ? 40.0 : 20.0, right: 10, left: 10
+                                child:
+                                  Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0, right: 10, left: 10),
+                                        child: _widgetTeamMembers,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 20.0, right: 10, left: 10),
+                                        child: _widgetTeamLeaders,
+                                      ),
+                                    ],
                                   ),
-                                  child: _widgetTeamMembers,
-                                ),
                               );
                             }
                         ),
@@ -207,7 +215,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
     Team team = new Team();
     team.name = _textEditingControllerName.text;
     team.description = _textEditingControllerDescription.text;
-    team.users = _widgetTeamMembers.getMemberIDs();
+    team.userIDs = _widgetTeamMembers.getUserIDs();
+    team.teamLeaderIDs = _widgetTeamLeaders.getUserIDs();
 
     _serviceTeam
         .createTeam(team)
@@ -234,7 +243,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
     team.name = _textEditingControllerName.text;
     team.description = _textEditingControllerDescription.text;
     team.active = _active;
-    team.users = _widgetTeamMembers.getMemberIDs();
+    team.userIDs = _widgetTeamMembers.getUserIDs();
+    team.teamLeaderIDs = _widgetTeamLeaders.getUserIDs();
 
     _serviceTeam
       .editTeam(team)
@@ -264,7 +274,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
           _textEditingControllerDescription.text = _currentTeam.description;
           _active = _currentTeam.active;
 
-          _widgetTeamMembers.setMemberIDs(_currentTeam.users);
+          _widgetTeamMembers.setUserIDs(_currentTeam.userIDs);
+          _widgetTeamLeaders.setUserIDs(_currentTeam.teamLeaderIDs);
 
           setState(() {});
         },

@@ -145,6 +145,17 @@ public class RestServiceUser {
         }
     }
 
+    @GetMapping("/user/teams")
+    public ResponseEntity<List<TeamShortInfo>> getUserTeams() {
+        try {
+            return new ResponseEntity<>(users.getUserTeams(), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not get user teams, reason: {}", throwable.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping("/user/search/{filter}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<UserShortInfo>> searchUser(@PathVariable("filter") String filter) {

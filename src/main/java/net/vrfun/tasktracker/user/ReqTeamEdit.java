@@ -28,7 +28,9 @@ public class ReqTeamEdit {
 
     private Boolean active;
 
-    private Set<Long> users;
+    private Set<Long> userIDs;
+
+    private Set<Long> teamLeaderIDs;
 
     public ReqTeamEdit() {}
 
@@ -70,12 +72,22 @@ public class ReqTeamEdit {
     }
 
     @Nullable
-    public Set<Long> getUsers() {
-        return users;
+    public Set<Long> getUserIDs() {
+        return userIDs;
     }
 
-    @JsonProperty("users")
-    public void setUsers(@Nullable final Set<Long> users) {
-        this.users = users;
+    @JsonProperty("userIDs")
+    public void setUserIDs(@Nullable final Set<Long> userIDs) {
+        this.userIDs = userIDs;
+    }
+
+    @Nullable
+    public Set<Long> getTeamLeaderIDs() {
+        return teamLeaderIDs;
+    }
+
+    @JsonProperty("teamLeaderIDs")
+    public void setTeamLeaderIDs(@Nullable final Set<Long> teamLeaderIDs) {
+        this.teamLeaderIDs = teamLeaderIDs;
     }
 }

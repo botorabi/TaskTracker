@@ -38,7 +38,7 @@ public class Teams {
     }
 
     @NonNull
-    public Team createTeam(@NonNull final ReqTeamEdit reqTeamEdit) throws IllegalArgumentException {
+    public Team createTeam(@NonNull final ReqTeamEdit reqTeamEdit) {
         if (StringUtils.isEmpty(reqTeamEdit.getName())) {
             throw new IllegalArgumentException("A team needs at least a name!");
         }
@@ -53,15 +53,19 @@ public class Teams {
                 (reqTeamEdit.getDescription() != null) ? reqTeamEdit.getDescription().trim() : null
         );
 
-        if (reqTeamEdit.getUsers() != null) {
+        if (reqTeamEdit.getUserIDs() != null) {
             setTeamUsers(reqTeamEdit, team);
+        }
+
+        if (reqTeamEdit.getTeamLeaderIDs() != null) {
+            setTeamLeaders(reqTeamEdit, team);
         }
 
         return teamRepository.save(team);
     }
 
     @NonNull
-    public Team editTeam(@NonNull final ReqTeamEdit reqTeamEdit) throws IllegalArgumentException {
+    public Team editTeam(@NonNull final ReqTeamEdit reqTeamEdit) {
         Optional<Team> foundTeam = teamRepository.findTeamByName(reqTeamEdit.getName());
 
         if (!foundTeam.isPresent()) {
@@ -80,16 +84,20 @@ public class Teams {
             foundTeam.get().setActive(reqTeamEdit.getActive());
         }
 
-        if (reqTeamEdit.getUsers() != null) {
+        if (reqTeamEdit.getUserIDs() != null) {
             setTeamUsers(reqTeamEdit, foundTeam.get());
+        }
+
+        if (reqTeamEdit.getTeamLeaderIDs() != null) {
+            setTeamLeaders(reqTeamEdit, foundTeam.get());
         }
 
         return teamRepository.save(foundTeam.get());
     }
 
-    private void setTeamUsers(@NonNull final ReqTeamEdit reqTeamEdit, @NonNull Team team) {
+    protected void setTeamUsers(@NonNull final ReqTeamEdit reqTeamEdit, @NonNull Team team) {
         Collection<User> users = new ArrayList<>();
-        reqTeamEdit.getUsers()
+        reqTeamEdit.getUserIDs()
                 .stream()
                 .forEach((userID) -> {
                     Optional<User> user = userRepository.findById(userID);
@@ -103,7 +111,23 @@ public class Teams {
         team.setUsers(users);
     }
 
-    public void deleteTeam(Long id) throws IllegalArgumentException {
+    protected void setTeamLeaders(@NonNull final ReqTeamEdit reqTeamEdit, @NonNull Team team) {
+        Collection<User> teamLeaders = new ArrayList<>();
+        reqTeamEdit.getTeamLeaderIDs()
+                .stream()
+                .forEach((userID) -> {
+                            Optional<User> user = userRepository.findById(userID);
+                            user.ifPresentOrElse(
+                                    (foundUser) -> teamLeaders.add(foundUser),
+                                    () -> LOGGER.warn("Cannot add team leader with ID '{}' to team '{}', user does not exist!",
+                                            userID, reqTeamEdit.getName()));
+                        }
+                );
+
+        team.setTeamLeaders(teamLeaders);
+    }
+
+    public void deleteTeam(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Invalid ID");
         }
@@ -125,7 +149,7 @@ public class Teams {
     }
 
     @NonNull
-    public TeamShortInfo getTeamById(Long id) throws IllegalArgumentException {
+    public TeamShortInfo getTeamById(Long id) {
         Optional<Team> foundTeam = teamRepository.findById(id);
         if (foundTeam.isEmpty()) {
             throw new IllegalArgumentException("Team with ID '" + id + "' does not exist!");

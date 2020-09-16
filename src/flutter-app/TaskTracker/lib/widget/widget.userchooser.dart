@@ -14,58 +14,58 @@ import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetTeamMembers extends StatefulWidget {
-  WidgetTeamMembers({Key key, this.title = 'Team Members'}) : super(key: key);
+class WidgetUserChooser extends StatefulWidget {
+  WidgetUserChooser({Key key, this.title = 'Users'}) : super(key: key);
 
   final String title;
-  final _WidgetTeamMembersState _widgetTeamMembersState = _WidgetTeamMembersState();
+  final _WidgetUserChooserState _widgetUserChooserState = _WidgetUserChooserState();
 
   @override
-  _WidgetTeamMembersState createState() => _widgetTeamMembersState;
+  _WidgetUserChooserState createState() => _widgetUserChooserState;
 
-  void setMembers(List<UserInfo> members) {
-    _widgetTeamMembersState.setMembers(members);
+  void setUsers(List<UserInfo> users) {
+    _widgetUserChooserState.setUsers(users);
   }
 
-  List<UserInfo> getMembers() {
-    return _widgetTeamMembersState.getMembers();
+  List<UserInfo> getUsers() {
+    return _widgetUserChooserState.getUsers();
   }
 
-  void setMemberIDs(List<int> members) {
-    _widgetTeamMembersState.setMemberIDs(members);
+  void setUserIDs(List<int> users) {
+    _widgetUserChooserState.setUserIDs(users);
   }
 
-  List<int> getMemberIDs() {
-    return _widgetTeamMembersState.getMembers()
-        .map((member) => member.id).toList();
+  List<int> getUserIDs() {
+    return _widgetUserChooserState.getUsers()
+        .map((user) => user.id).toList();
   }
 
   void setReadOnly(bool readOnly) {
-    _widgetTeamMembersState.setReadOnly(readOnly);
+    _widgetUserChooserState.setReadOnly(readOnly);
   }
 }
 
-class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
+class _WidgetUserChooserState extends State<WidgetUserChooser> {
 
   final _serviceUser = ServiceUser();
 
-  List<Container> _membersWidget = List<Container>();
-  List<UserInfo>  _members = List<UserInfo>();
+  List<Container> _usersWidget = List<Container>();
+  List<UserInfo>  _users = List<UserInfo>();
   bool            _readOnly = false;
 
-  void setMembers(List<UserInfo> members) {
-    _members = members;
+  void setUsers(List<UserInfo> users) {
+    _users = users;
   }
 
-  List<UserInfo> getMembers() {
-    return _members;
+  List<UserInfo> getUsers() {
+    return _users;
   }
 
-  void setMemberIDs(List<int> userIDs) {
-    _members.clear();
+  void setUserIDs(List<int> userIDs) {
+    _users.clear();
     userIDs.forEach((userID) {
       _serviceUser.getUser(userID).then((userInfo) {
-        _members.add(userInfo);
+        _users.add(userInfo);
         _createUI();
       });
     });
@@ -110,18 +110,18 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseUsers(context).show('Team Members', 'Add new team members.')
+                          DialogChooseUsers(context).show('Users', 'Add new user.')
                               .then((chosenUsers) {
                               if (chosenUsers != null && chosenUsers.length > 0) {
                                 chosenUsers.forEach((userInfo) {
-                                  bool memberIsInList = false;
-                                  _members.forEach((member) {
-                                    if (member.id == userInfo.id) {
-                                      memberIsInList = true;
+                                  bool userIsInList = false;
+                                  _users.forEach((user) {
+                                    if (user.id == userInfo.id) {
+                                      userIsInList = true;
                                     }
                                   });
-                                  if (!memberIsInList) {
-                                    _members.add(userInfo);
+                                  if (!userIsInList) {
+                                    _users.add(userInfo);
                                   }
                                   _createUI();
                                 });
@@ -144,7 +144,7 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
                     ),
                     child: ListView(
                       children: <Widget>[
-                        Column(children: _membersWidget),
+                        Column(children: _usersWidget),
                       ],
                     ),
                   ),
@@ -157,9 +157,9 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
   }
 
   void _createUI() {
-    _membersWidget = List<Container>();
-    _members.forEach((userInfo) {
-      _membersWidget.add(Container(
+    _usersWidget = List<Container>();
+    _users.forEach((userInfo) {
+      _usersWidget.add(Container(
         child: Padding(
             padding: EdgeInsets.all(5.0),
             child: Row(
@@ -167,7 +167,7 @@ class _WidgetTeamMembersState extends State<WidgetTeamMembers> {
               children: [
                 Text(userInfo.realName),
                 CircleButton.create(16, Icons.remove, () {
-                  _members.remove(userInfo);
+                  _users.remove(userInfo);
                   _createUI();
                 }),
               ]

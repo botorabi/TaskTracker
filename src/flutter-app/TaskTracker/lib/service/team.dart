@@ -14,7 +14,9 @@ class Team {
   String name = '';
   String description = '';
   bool active = false;
-  List<int> users = [];
+  List<int> userIDs = [];
+  List<int> teamLeaderIDs = [];
+  List<String> teamLeaderNames = [];
 
   Team();
 
@@ -26,8 +28,14 @@ class Team {
     if (fields.containsKey('active')) {
       team.active = fields['active'];
     }
-    if (fields.containsKey('users')) {
-      team.users = List.from(fields['users']);
+    if (fields.containsKey('userIDs')) {
+      team.userIDs = List.from(fields['userIDs']);
+    }
+    if (fields.containsKey('teamLeaderIDs')) {
+      team.teamLeaderIDs = List.from(fields['teamLeaderIDs']);
+    }
+    if (fields.containsKey('teamLeaderNames')) {
+      team.teamLeaderNames = List.from(fields['teamLeaderNames']);
     }
     return team;
   }
@@ -52,7 +60,8 @@ class Team {
       'name' : name,
       'description' : description,
       'active' : active,
-      'users' : users?.toList()
+      'userIDs' : userIDs?.toList(),
+      'teamLeaderIDs' : teamLeaderIDs?.toList(),
     };
   }
 }

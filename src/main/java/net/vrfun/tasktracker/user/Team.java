@@ -34,6 +34,8 @@ public class Team extends BaseEntity implements Serializable {
     @ManyToMany(targetEntity = User.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Collection<User> users;
 
+    @ManyToMany(targetEntity = User.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    private Collection<User> teamLeaders;
 
     public Team() {}
 
@@ -86,5 +88,14 @@ public class Team extends BaseEntity implements Serializable {
 
     public void setUsers(@Nullable Collection<User> users) {
         this.users = users;
+    }
+
+    @Nullable
+    public Collection<User> getTeamLeaders() {
+        return teamLeaders;
+    }
+
+    public void setTeamLeaders(@Nullable Collection<User> teamLeaders) {
+        this.teamLeaders = teamLeaders;
     }
 }

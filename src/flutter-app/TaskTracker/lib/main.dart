@@ -12,6 +12,7 @@ import 'package:TaskTracker/page/page.editteam.dart';
 import 'package:TaskTracker/page/page.newprogress.dart';
 import 'package:TaskTracker/page/page.newtask.dart';
 import 'package:TaskTracker/page/page.newteam.dart';
+import 'package:TaskTracker/page/page.report.dart';
 import 'package:TaskTracker/page/page.viewprogress.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +74,7 @@ class AppTaskTracker extends StatelessWidget {
           NavigationLinks.NAV_VIEW_PROGRESS : (context) => PageViewProgress(title: 'View Progress'),
           NavigationLinks.NAV_NEW_PROGRESS  : (context) => PageNewProgress(title: 'Create New Progress Entry'),
           NavigationLinks.NAV_EDIT_PROGRESS : (context) => PageEditProgress(title: 'Edit Progress Entry'),
+          NavigationLinks.NAV_REPORT        : (context) => PageReport(title: 'Progress Report'),
         },
       );
   }

@@ -7,9 +7,11 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.task.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.lang.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,15 +32,17 @@ public class Users {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private TeamRepository teamRepository;
+    private final TeamRepository teamRepository;
 
-    private TaskRepository taskRepository;
+    private final TaskRepository taskRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Users(
@@ -46,13 +50,15 @@ public class Users {
             @NonNull final UserRepository userRepository,
             @NonNull final TeamRepository teamRepository,
             @NonNull final TaskRepository taskRepository,
-            @NonNull final PasswordEncoder passwordEncoder) {
+            @NonNull final PasswordEncoder passwordEncoder,
+            @NonNull final UserAuthenticator userAuthenticator) {
 
         this.userRoleRepository = userRoleRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userAuthenticator = userAuthenticator;
     }
 
     public void setupApplicationRoles() {
@@ -249,6 +255,24 @@ public class Users {
 
         return userTasks.stream()
                 .map((task) -> new TaskShortInfo(task))
+                .collect(Collectors.toList());
+    }
+
+    @NonNull
+    public List<TeamShortInfo> getUserTeams() throws IllegalAccessException {
+        if (userAuthenticator.isRoleAdmin()) {
+            return teamRepository.findAll().stream()
+                    .map((team) -> new TeamShortInfo(team))
+                    .collect(Collectors.toList());
+        }
+
+        Optional<User> user = userRepository.findById(userAuthenticator.getUserId());
+        user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
+
+        List<Team> userTeams = teamRepository.findUserTeams(user.get());
+
+        return userTeams.stream()
+                .map((team) -> new TeamShortInfo(team))
                 .collect(Collectors.toList());
     }
 
