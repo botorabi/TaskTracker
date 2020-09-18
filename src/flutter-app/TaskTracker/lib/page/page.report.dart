@@ -37,7 +37,14 @@ class _PageReportState extends State<PageReport> {
               child:
               Column(
                 children: [
-                  WidgetTeamReport().setExpanded(true),
+                  Visibility(
+                    visible: Config.authStatus.isTeamLead() || Config.authStatus.isAdmin(),
+                    child: WidgetTeamReport(title: 'Progress Report'),
+                  ),
+                  Visibility(
+                    visible: !Config.authStatus.isTeamLead() && !Config.authStatus.isAdmin(),
+                    child: Text('Under Construction!'),
+                  ),
                 ],
               ),
             ),

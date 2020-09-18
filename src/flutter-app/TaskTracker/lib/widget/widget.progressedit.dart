@@ -15,6 +15,7 @@ import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
 import 'package:TaskTracker/service/service.user.dart';
+import 'package:TaskTracker/widget/widget.calendarweek.dart';
 import 'package:flutter/material.dart';
 
 
@@ -38,13 +39,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   List<DropdownMenuItem<int>> _userTaskDropdownItems = List();
   int _userTaskDropdownSelection = 0;
 
-  DropdownButton _calendarWeekDropdownButton = DropdownButton();
-  List<DropdownMenuItem<int>> _calendarWeekDropdownItems = List();
-  int _calendarWeekDropdownSelection = 0;
-
-  DropdownButton _calendarYearDropdownButton = DropdownButton();
-  List<DropdownMenuItem<int>> _calendarYearDropdownItems = List();
-  int _calendarYearDropdownSelection = 0;
+  WidgetCalendarWeek _widgetCalendarWeek = WidgetCalendarWeek(title: 'Calendar Week',);
 
   final _serviceProgress = ServiceProgress();
   final _serviceUser = ServiceUser();
@@ -59,16 +54,11 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   void initState() {
     super.initState();
 
-    _setupCalendarWeekChooser();
-    _setupCalendarYearChooser();
-
     if (!_newProgress) {
       _retrieveProgress();
     }
     else {
       _retrieveUserTasksAndSelect();
-      _updateCalendarWeekChooser(0);
-      _updateCalendarYearChooser(0);
     }
   }
 
@@ -123,14 +113,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Calendar Week'),
-                                    Row(
-                                      children: [
-                                        _calendarWeekDropdownButton,
-                                        SizedBox(width: 10.0),
-                                        _calendarYearDropdownButton,
-                                      ],
-                                    )
+                                    _widgetCalendarWeek,
                                   ],
                                 ),
                               ),
@@ -219,8 +202,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
-    progress.reportWeek = _calendarWeekDropdownSelection;
-    progress.reportYear = _calendarYearDropdownSelection;
+    progress.reportWeek = _widgetCalendarWeek.getWeek();
+    progress.reportYear = _widgetCalendarWeek.getYear();
 
 //TODO    progress.tags = _widgetTags.getTags();
 
@@ -255,8 +238,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.title = _textEditingControllerTitle.text;
     progress.text = _textEditingControllerText.text;
     progress.task = _userTaskDropdownSelection;
-    progress.reportWeek = _calendarWeekDropdownSelection;
-    progress.reportYear = _calendarYearDropdownSelection;
+    progress.reportWeek = _widgetCalendarWeek.getWeek();
+    progress.reportYear = _widgetCalendarWeek.getYear();
 
 //TODO    progress.tags = _widgetTags.getTags();
 
@@ -281,7 +264,12 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     _serviceUser
         .getUserTasks(Config.authStatus.userId)
         .then((tasks) {
-          _userTaskDropdownItems = tasks.map((task) => DropdownMenuItem<int>(value: task.id, child: Text(task.title))).toList();
+          if (tasks.isEmpty == false) {
+            _userTaskDropdownItems = tasks.map((task) => DropdownMenuItem<int>(value: task.id, child: Text(task.title))).toList();
+          }
+          else {
+            _userTaskDropdownItems = List<DropdownMenuItem<int>>();
+          }
           _userTaskDropdownItems.insert(0, DropdownMenuItem<int>(value: 0, child: Text('<Choose a Task>')));
           _updateTaskChooser(selectTaskId);
       });
@@ -300,8 +288,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           _textEditingControllerTitle.text = _currentProgress.title;
           _textEditingControllerText.text = _currentProgress.text;
           _retrieveUserTasksAndSelect(_currentProgress.task);
-          _updateCalendarWeekChooser(_currentProgress.reportWeek?? 0);
-          _updateCalendarYearChooser(_currentProgress.reportYear?? 0);
+          _widgetCalendarWeek.set(_currentProgress.reportYear?? 0, _currentProgress.reportWeek?? 0);
 
 //TODO          _widgetTags.setTags(_currentProgress.tags);
 
@@ -314,7 +301,13 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   }
 
   void _updateTaskChooser(int taskId) {
-    _userTaskDropdownSelection = taskId;
+    if (taskId != 0) {
+      _userTaskDropdownSelection = _checkTaskId(taskId);
+    }
+    else {
+      _userTaskDropdownSelection = taskId;
+    }
+
     _userTaskDropdownButton = DropdownButton(
       value: _userTaskDropdownSelection,
       items: _userTaskDropdownItems,
@@ -323,44 +316,13 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     setState(() {});
   }
 
-  void _setupCalendarWeekChooser() {
-    for (int i = 1; i < 54; i++) {
-      _calendarWeekDropdownItems.add(DropdownMenuItem<int>(value: i, child: Text(i.toString())));
+  int _checkTaskId(int taskId) {
+    for (int i = 0; i < _userTaskDropdownItems.length; i++) {
+      if (_userTaskDropdownItems[i].value == taskId) {
+        return taskId;
+      }
     }
-  }
-
-  void _setupCalendarYearChooser() {
-    int currentYear = CalendarUtils.getCurrentCalendarYear();
-    for (int i = currentYear - 10; i < currentYear + 10; i++) {
-      _calendarYearDropdownItems.add(DropdownMenuItem<int>(value: i, child: Text(i.toString())));
-    }
-  }
-
-  void _updateCalendarWeekChooser(int calendarWeek) {
-    if (calendarWeek == 0) {
-      calendarWeek = CalendarUtils.getCurrentCalendarWeek();
-    }
-
-    _calendarWeekDropdownSelection = calendarWeek;
-    _calendarWeekDropdownButton = DropdownButton(
-      value: _calendarWeekDropdownSelection,
-      items: _calendarWeekDropdownItems,
-      onChanged: (newValue) => _updateCalendarWeekChooser(newValue),
-    );
-    setState(() {});
-  }
-
-  void _updateCalendarYearChooser(int calendarYear) {
-    if (calendarYear == 0) {
-      calendarYear = CalendarUtils.getCurrentCalendarYear();
-    }
-
-    _calendarYearDropdownSelection = calendarYear;
-    _calendarYearDropdownButton = DropdownButton(
-      value: _calendarYearDropdownSelection,
-      items: _calendarYearDropdownItems,
-      onChanged: (newValue) => _updateCalendarYearChooser(newValue),
-    );
-    setState(() {});
+    DialogModal(context).show("Attention", "Progress' task not longer exists!", true);
+    return 0;
   }
 }

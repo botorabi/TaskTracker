@@ -7,43 +7,41 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
+import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
+import 'package:TaskTracker/service/service.report.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/widget/widget.calendarweek.dart';
 import 'package:flutter/material.dart';
 
 
 class WidgetTeamReport extends StatefulWidget {
-  WidgetTeamReport({Key key, this.title = 'Team Report'}) : super(key: key);
+  WidgetTeamReport({Key key, this.title = 'Team Progress Report'}) : super(key: key);
 
   final String title;
   final _WidgetTeamReportState _widgetTeamReportState = _WidgetTeamReportState();
 
   @override
   _WidgetTeamReportState createState() => _widgetTeamReportState;
-
-  WidgetTeamReport setExpanded(bool expanded) {
-    _widgetTeamReportState.setExpanded(expanded);
-    return this;
-  }
 }
 
 class _WidgetTeamReportState extends State<WidgetTeamReport> {
 
   final _serviceUser = ServiceUser();
+  final _serviceReport = ServiceReport();
+
   PaginatedDataTable _dataTable;
   List<Team> _teams = [];
-  bool _expanded = false;
+  List<bool> _selectedTeams = List<bool>();
   bool _sortAscending = true;
+  WidgetCalendarWeek _widgetCalendarWeekFrom = WidgetCalendarWeek(title: 'From');
+  WidgetCalendarWeek _widgetCalendarWeekTo = WidgetCalendarWeek(title: 'To',);
 
   @override
   void initState() {
     super.initState();
     _retrieveTeams();
-  }
-
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
   }
 
   @override
@@ -60,22 +58,93 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
           elevation: 5,
           margin: EdgeInsets.all(10.0),
           child:
-          ExpansionTile(
-              title: Text(widget.title),
-              initiallyExpanded: _expanded,
-              children: <Widget>[
+          Column(
+            children: [
+              Center(
+              child:
+                Padding(
+                  padding: EdgeInsets.only(top: 20.0, bottom: 20),
+                  child:
+                    Text(widget.title,
+                      style: TextStyle(fontSize: 20)
+                    ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 20.0, right: 20, left: 20),
+                child:
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Card(
+                        elevation: 1,
+                        child:
+                        Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child:
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Report Period',
+                                textAlign: TextAlign.left,
+                                style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
+                              ),
+                              SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  _widgetCalendarWeekFrom,
+                                  SizedBox(width: 30),
+                                  _widgetCalendarWeekTo,
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: SizedBox(
                     width: constraints.maxWidth,
                     child: _dataTable,
                   ),
-                )
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 0.0, bottom: 15.0, right: 25.0),
+                  child: Row(
+                    children: [
+                      Spacer(),
+                      RaisedButton(
+                      child: Text(ButtonID.CREATE),
+                        onPressed: () {
+                          _createReport();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ]
           ),
         ),
       ),
     );
+  }
+
+  void _createReport() async {
+    String fileName = "Report.txt";
+    List<int> teamIDs = List<int>();
+    for (int i = 0; i < _selectedTeams.length; i++) {
+      if (_selectedTeams[i]) {
+        teamIDs.add(_teams[i].id);
+      }
+    }
+
+    bool success = await _serviceReport.createReportText(teamIDs, fileName);
+    if (success) {
+      DialogModal(context).show("Report", "Report successfully created.", false);
+    }
   }
 
   void _sortTeams(bool ascending) {
@@ -96,6 +165,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
               }
             });
             _sortTeams(_sortAscending);
+            _selectedTeams = List<bool>.generate(_teams.length, (index) => false);
             setState(() {});
           },
           onError: (err) {
@@ -105,9 +175,9 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
 
   PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text(''),
+      header: Text('Select Teams for Report Creation'),
       columns: <DataColumn>[
-        DataColumn(
+      DataColumn(
           label: Text(
             'Name',
             style: TextStyle(fontStyle: FontStyle.italic),
@@ -145,6 +215,12 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
 
     return dataTable;
   }
+
+  void onRowSelectionChanged(int row, bool state) {
+    setState(() {
+      _selectedTeams[row] = state;
+    });
+  }
 }
 
 class _DataProvider extends DataTableSource {
@@ -167,19 +243,15 @@ class _DataProvider extends DataTableSource {
         DataCell(Text(parent._teams[index].description)),
         DataCell(Text(teamLeadNames)),
         DataCell(
-          Row(
-            children: [
-              Spacer(),
-              Padding(
-                padding: EdgeInsets.all(4.0),
-                child:
-                  CircleButton.create(24, Icons.file_download, () {
-                    //! TODO
-                    DialogModal(parent.context).show("Attention", "Under Construction!", false);
-                  }
-                ),
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.all(4.0),
+            child:
+              Checkbox(
+                value: parent._selectedTeams[index],
+                onChanged: (bool value) {
+                  parent.onRowSelectionChanged(index, value);
+                }
+            ),
           ),
         ),
       ],

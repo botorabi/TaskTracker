@@ -25,7 +25,7 @@ public class TeamShortInfo {
 
     private String description;
 
-    private Collection<Long> users;
+    private Collection<Long> userIDs;
 
     private Collection<Long> teamLeaderIDs;
 
@@ -41,8 +41,8 @@ public class TeamShortInfo {
         this.description = team.getDescription();
         this.active = team.getActive();
         if (team.getUsers() != null) {
-            this.users = new ArrayList<>();
-            team.getUsers().stream().forEach((user) -> this.users.add(user.getId()));
+            this.userIDs = new ArrayList<>();
+            team.getUsers().stream().forEach((user) -> this.userIDs.add(user.getId()));
         }
         if (team.getTeamLeaders() != null) {
             this.teamLeaderIDs = new ArrayList<>();
@@ -78,12 +78,12 @@ public class TeamShortInfo {
         this.description = description;
     }
 
-    public Collection<Long> getUsers() {
-        return users;
+    public Collection<Long> getUserIDs() {
+        return userIDs;
     }
 
-    public void setUsers(Collection<Long> users) {
-        this.users = users;
+    public void setUserIDs(Collection<Long> userIDs) {
+        this.userIDs = userIDs;
     }
 
     public Collection<Long> getTeamLeaderIDs() {

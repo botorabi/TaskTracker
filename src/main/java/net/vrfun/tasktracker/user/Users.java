@@ -11,7 +11,6 @@ import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.task.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.lang.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -251,7 +250,7 @@ public class Users {
 
         List<Task> userTasks = taskRepository.findUserTasks(user.get());
         List<Team> userTeams = teamRepository.findUserTeams(user.get());
-        userTeams.forEach((team) -> taskRepository.findUserTasks(team).forEach(userTasks::add));
+        userTeams.forEach((team) -> taskRepository.findTeamTasks(team).forEach(userTasks::add));
 
         return userTasks.stream()
                 .map((task) -> new TaskShortInfo(task))

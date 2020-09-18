@@ -7,12 +7,11 @@
  */
 package net.vrfun.tasktracker.task;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
 
 @Transactional
 public interface ProgressRepository extends CrudRepository<Progress, Long> {
@@ -21,8 +20,5 @@ public interface ProgressRepository extends CrudRepository<Progress, Long> {
 
     List<Progress> findProgressByOwnerName(@NonNull final String ownerName);
 
-    @Query("select progress " +
-            "from net.vrfun.tasktracker.task.Progress progress " +
-            "where :teamId in (progress.task.teams)")
-    List<Progress> findProgressByTeam(@NonNull final Long teamId);
+    List<Progress> findByTaskId(@NonNull final Long id);
 }

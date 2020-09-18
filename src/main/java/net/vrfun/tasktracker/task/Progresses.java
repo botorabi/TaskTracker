@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.user.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
@@ -37,6 +38,8 @@ public class Progresses {
 
     private final TaskRepository taskRepository;
 
+    private final TeamRepository teamRepository;
+
     private final TagRepository tagRepository;
 
     private final Tags tags;
@@ -46,12 +49,14 @@ public class Progresses {
     @Autowired
     public Progresses(@NonNull final ProgressRepository progressRepository,
                       @NonNull final TaskRepository taskRepository,
+                      @NonNull final TeamRepository teamRepository,
                       @NonNull final TagRepository tagRepository,
                       @NonNull final Tags tags,
                       @NonNull final UserAuthenticator userAuthenticator) {
 
         this.progressRepository = progressRepository;
         this.taskRepository = taskRepository;
+        this.teamRepository = teamRepository;
         this.tagRepository = tagRepository;
         this.tags = tags;
         this.userAuthenticator = userAuthenticator;
@@ -104,7 +109,7 @@ public class Progresses {
     @NonNull
     public List<ProgressShortInfo> getTeamProgress(@NonNull final Long teamId) {
         List<ProgressShortInfo> progs = new ArrayList<>();
-        progressRepository.findProgressByTeam(teamId)
+        progressRepository.findByTaskId(teamId)
                 .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
 
         return progs;
@@ -117,6 +122,14 @@ public class Progresses {
         if (reqProgressEdit.getTask() == null) {
             LOGGER.debug("Cannot create progress entry, invalid task ID!");
             throw new IllegalArgumentException("Cannot create progress entry, invalid task ID!");
+        }
+
+        if (!checkTaskBelongsToUser(userAuthenticator.getUser(), reqProgressEdit.getTask())) {
+            LOGGER.debug("Cannot create progress entry, user {} has no access to task {}!",
+                    reqProgressEdit.getTask(),
+                    userAuthenticator.getUserLogin());
+
+            throw new IllegalArgumentException("Cannot create progress entry, user has no access to task!");
         }
 
         if (StringUtils.isEmpty(reqProgressEdit.getTitle())) {
@@ -140,6 +153,26 @@ public class Progresses {
         setReportWeek(newProgress, reqProgressEdit.getReportWeek(), reqProgressEdit.getReportYear());
 
         return progressRepository.save(newProgress);
+    }
+
+    protected boolean checkTaskBelongsToUser(@NonNull final User user, final long taskId) {
+        List<Task> userTasks = taskRepository.findUserTasks(user);
+        for (Task task: userTasks) {
+            if (task.getId().equals(taskId)) {
+                return true;
+            }
+        }
+
+        List<Team> userTeams = teamRepository.findUserTeams(user);
+        for (Team team: userTeams) {
+            for (Task task : taskRepository.findTeamTasks(team)) {
+                if (task.getId().equals(taskId)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     protected void setReportWeek(@NonNull final Progress newProgress, int reportWeek, int reportYear) {

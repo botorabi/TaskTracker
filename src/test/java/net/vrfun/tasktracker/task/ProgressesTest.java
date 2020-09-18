@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.user.TeamRepository;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -33,6 +34,9 @@ public class ProgressesTest {
     private TaskRepository taskRepository;
 
     @Mock
+    private TeamRepository teamRepository;
+
+    @Mock
     private TagRepository tagRepository;
 
     @Mock
@@ -47,8 +51,10 @@ public class ProgressesTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        progresses = new Progresses(progressRepository,
+        progresses = new Progresses(
+                progressRepository,
                 taskRepository,
+                teamRepository,
                 tagRepository,
                 tags,
                 userAuthenticator);
@@ -187,7 +193,7 @@ public class ProgressesTest {
         Progress progress = new Progress();
         progs.add(progress);
 
-        doReturn(progs).when(progressRepository).findProgressByTeam(anyLong());
+        doReturn(progs).when(progressRepository).findByTaskId(anyLong());
 
         assertThat(progresses.getTeamProgress(anyLong()).size()).isEqualTo(1);
     }

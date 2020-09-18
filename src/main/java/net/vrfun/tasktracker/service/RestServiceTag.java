@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
+import net.vrfun.tasktracker.user.Role;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -43,7 +44,7 @@ public class RestServiceTag {
     }
 
     @DeleteMapping("/tag/{name}")
-    @Secured({"ROLE_ADMIN"})
+    @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<Void> delete(@PathVariable("name") final String name) {
         try {
             tags.delete(name);

@@ -150,6 +150,16 @@ public class UserAuthenticator {
         return "";
     }
 
+    public User getUser() {
+        if (isUserAuthenticated()) {
+            Optional<User> user = userRepository.findById(getUserId());
+            if (user.isPresent()) {
+                return user.get();
+            }
+        }
+        return null;
+    }
+
     public long getUserId() {
         if (isUserAuthenticated()) {
             return (long)getAuthentication().getDetails();
