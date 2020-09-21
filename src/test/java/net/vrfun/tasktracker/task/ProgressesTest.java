@@ -8,13 +8,16 @@
 package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.TeamRepository;
+import net.vrfun.tasktracker.user.User;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.*;
@@ -72,6 +75,26 @@ public class ProgressesTest {
     private void mockUser(@NonNull final String login, @NonNull final Long id) {
         doReturn(id).when(userAuthenticator).getUserId();
         doReturn(login).when(userAuthenticator).getUserLogin();
+    }
+
+    private Task mockTaskBelongingToUser(long taskId) {
+        Task userTask = new Task();
+        userTask.setId(taskId);
+
+        doReturn(Arrays.asList(userTask)).when(taskRepository).findUserTasks(any());
+
+        return userTask;
+    }
+
+
+    private Task mockTaskBelongingToTeam(long taskId) {
+        Task task = new Task();
+        task.setId(taskId);
+
+        doReturn(Arrays.asList(new Team())).when(teamRepository).findUserTeams(any());
+        doReturn(Arrays.asList(task)).when(taskRepository).findTeamTasks(any());
+
+        return task;
     }
 
     @Test
@@ -200,13 +223,16 @@ public class ProgressesTest {
 
     @Test
     public void createValidateInput() {
+        final long TASK_ID = 45L;
+
         ReqProgressEdit reqProgressEdit = new ReqProgressEdit();
 
         mockUserAsAdmin();
+        mockTaskBelongingToUser(TASK_ID);
 
         assertThatThrownBy(() -> progresses.create(reqProgressEdit)).as("Did not recognized invalid input").isInstanceOf(IllegalArgumentException.class);
 
-        reqProgressEdit.setTask(45L);
+        reqProgressEdit.setTask(TASK_ID);
         assertThatThrownBy(() -> progresses.create(reqProgressEdit)).as("Did not recognized invalid input").isInstanceOf(IllegalArgumentException.class);
 
         reqProgressEdit.setTitle("Title");
@@ -247,9 +273,13 @@ public class ProgressesTest {
         reqProgressEdit.setReportYear(currentYear);
         reqProgressEdit.setReportWeek(currentWeek);
 
+        Task userTask = new Task();
+        userTask.setId(reqProgressEdit.getTask());
+
         mockUser("MyLogin", 42L);
 
-        doReturn(Optional.of(new Task())).when(taskRepository).findById(anyLong());
+        doReturn(Arrays.asList(userTask)).when(taskRepository).findUserTasks(any());
+        doReturn(Optional.of(userTask)).when(taskRepository).findById(anyLong());
         doAnswer((invocationOnMock) -> invocationOnMock.getArgument(0))
                 .when(progressRepository).save(any());
 
@@ -261,6 +291,22 @@ public class ProgressesTest {
         assertThat(progress.getText()).isEqualTo("My Progress Text");
         assertThat(reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)).isEqualTo(currentWeek);
         assertThat(reportWeek.get(IsoFields.WEEK_BASED_YEAR)).isEqualTo(currentYear);
+    }
+
+    @Test
+    public void checkTaskBelongsToUserUserTask() {
+        mockTaskBelongingToUser(45L);
+
+        assertThat(progresses.checkTaskBelongsToUser(new User(), 45L)).isTrue();
+        assertThat(progresses.checkTaskBelongsToUser(new User(), 100L)).isFalse();
+    }
+
+    @Test
+    public void checkTaskBelongsToUserTeamTask() {
+        mockTaskBelongingToTeam(45L);
+
+        assertThat(progresses.checkTaskBelongsToUser(new User(), 45L)).isTrue();
+        assertThat(progresses.checkTaskBelongsToUser(new User(), 100L)).isFalse();
     }
 
     @Test
