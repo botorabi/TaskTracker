@@ -110,6 +110,9 @@ public class Users {
         if (StringUtils.isEmpty(reqUser.getLogin())) {
             throw new IllegalArgumentException("Login must not be empty!");
         }
+        if (StringUtils.isEmpty(reqUser.getEmail())) {
+            throw new IllegalArgumentException("E-Mail must not be empty!");
+        }
 
         return createOrUpdateUser(reqUser, new User(), true);
     }
@@ -145,6 +148,9 @@ public class Users {
         }
         if (!StringUtils.isEmpty(reqUser.getPassword())) {
             user.setPassword(passwordEncoder.encode(reqUser.getPassword()));
+        }
+        if (!StringUtils.isEmpty(reqUser.getEmail())) {
+            user.setEmail(reqUser.getEmail().trim());
         }
 
         if (create) {
@@ -252,9 +258,18 @@ public class Users {
         List<Team> userTeams = teamRepository.findUserTeams(user.get());
         userTeams.forEach((team) -> taskRepository.findTeamTasks(team).forEach(userTasks::add));
 
-        return userTasks.stream()
+        List<Task> uniqueUserTasks = removeDuplicateTasks(userTasks);
+        uniqueUserTasks.sort(Comparator.comparing(Task::getTitle));
+
+        return uniqueUserTasks.stream()
                 .map((task) -> new TaskShortInfo(task))
                 .collect(Collectors.toList());
+    }
+
+    private List<Task> removeDuplicateTasks(List<Task> userTasks) {
+        HashMap<Long, Task> uniqueTasks = new HashMap<>();
+        userTasks.forEach((task) -> uniqueTasks.put(task.getId(), task));
+        return new ArrayList<>(uniqueTasks.values());
     }
 
     @NonNull

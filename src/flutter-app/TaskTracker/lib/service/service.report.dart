@@ -16,9 +16,12 @@ import 'package:http/http.dart';
 
 class ServiceReport {
 
-  Future<bool> createReportText(List<int> teamIDs, String fileName) async {
+  Future<bool> createReportText(List<int> teamIDs, DateTime fromDate, DateTime toDate, String fileName) async {
+    String deltaTime = '/' + (fromDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString() +
+                       '/' + (toDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString();
+
     String teamIDsAsString = teamIDs.join(',');
-    Response response = await get(Config.baseURL + '/api/report/team/' + teamIDsAsString,
+    Response response = await get(Config.baseURL + '/api/report/team/' + teamIDsAsString + deltaTime,
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

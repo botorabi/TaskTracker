@@ -75,6 +75,7 @@ public class ReportGeneratorPlainText implements ReportGenerator {
             LocalDate date = progress.getReportWeek();
             int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             int reportYear = date.get(IsoFields.WEEK_BASED_YEAR);
+            text.append("\n\n\n");
             text.append("Author: " + progress.getOwnerName() + "\n");
             String dateString = LocalDateTime.ofInstant(progress.getDateCreation(), ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
             text.append("Created: " + dateString + "\n");
@@ -89,10 +90,9 @@ public class ReportGeneratorPlainText implements ReportGenerator {
                 progress.getTags().forEach((tag) -> text.append(tag.getName() + " "));
                 text.append("\n");
             }
-            text.append("Title: " + progress.getTitle() + "\n");
-            text.append("Text:\n");
+            text.append("\nTitle: " + progress.getTitle() + "\n");
+            text.append("\nText:\n");
             text.append(progress.getText());
-            text.append("\n\n");
         });
 
         byteArrayOutputStream.writeBytes(text.toString().getBytes());

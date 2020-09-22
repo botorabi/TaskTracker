@@ -36,6 +36,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   final _serviceUser = ServiceUser();
   final _textEditingControllerRealName = TextEditingController();
   final _textEditingControllerLoginName = TextEditingController();
+  final _textEditingControllerEMail = TextEditingController();
   final _textEditingControllerPassword = TextEditingController();
   final _textEditingControllerPasswordRepeat = TextEditingController();
 
@@ -130,6 +131,15 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                             Padding(
                               padding: EdgeInsets.all(10.0),
                               child: TextFormField(
+                                controller: _textEditingControllerEMail,
+                                decoration: InputDecoration(
+                                  labelText: 'E-Mail',
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
                                 controller: _textEditingControllerPassword,
                                 obscureText: true,
                                 decoration: InputDecoration(
@@ -215,6 +225,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     UserInfo userInfo = UserInfo();
     userInfo.login = _textEditingControllerLoginName.text;
     userInfo.realName = _textEditingControllerRealName.text;
+    userInfo.email = _textEditingControllerEMail.text;
     userInfo.password = _textEditingControllerPassword.text;
     userInfo.roles = _widgetRoles.getUserRoles();
 
@@ -246,6 +257,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     UserInfo userInfo = UserInfo();
     userInfo.id = _currentUserInfo.id;
     userInfo.login = _currentUserInfo.login;
+    userInfo.email = _textEditingControllerEMail.text;
     userInfo.realName = _textEditingControllerRealName.text;
     if (_textEditingControllerPassword.text.isNotEmpty) {
       userInfo.password = _textEditingControllerPassword.text;
@@ -278,6 +290,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
           _currentUserInfo = userInfo;
           _textEditingControllerRealName.text = _currentUserInfo.realName;
           _textEditingControllerLoginName.text = _currentUserInfo.login;
+          _textEditingControllerEMail.text = _currentUserInfo.email;
           _textEditingControllerPassword.text = '';
           _textEditingControllerPasswordRepeat.text = '';
           _widgetRoles.setUserRoles(_currentUserInfo.roles);

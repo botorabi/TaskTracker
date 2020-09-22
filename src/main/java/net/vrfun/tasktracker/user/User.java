@@ -37,6 +37,8 @@ public class User extends BaseEntity implements Serializable {
     @Column(nullable=false)
     private String password;
 
+    private String email;
+
     private Instant dateCreation;
 
     private Instant lastLogin;
@@ -82,6 +84,14 @@ public class User extends BaseEntity implements Serializable {
 
     public void setPassword(@NonNull final String password) {
         this.password = password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(@NonNull final String email) {
+        this.email = email;
     }
 
     public Instant getDateCreation() {

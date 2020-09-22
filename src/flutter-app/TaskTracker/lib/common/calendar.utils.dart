@@ -8,17 +8,24 @@
 
 abstract class CalendarUtils {
 
-  static int getCurrentCalendarWeek() {
-    final now = DateTime.now();
-    final days = now.difference(DateTime(now.year)).inDays;
+  static int getCalendarWeek(DateTime dateTime) {
+    final days = dateTime.difference(DateTime(dateTime.year)).inDays;
     return ((days + 1) / 7).ceil();
   }
 
-  static int getCurrentCalendarYear() {
-    return DateTime.now().year;
+  static int getCalendarYear(DateTime dateTime) {
+    return dateTime.year;
   }
 
-  static bool checkWeekDistance(int reportWeek, int reportYear) {
+  static int getCurrentCalendarWeek() {
+    return getCalendarWeek(DateTime.now());
+  }
+
+  static int getCurrentCalendarYear() {
+    return getCalendarYear(DateTime.now());
+  }
+
+  static bool checkCurrentWeekDistance(int reportWeek, int reportYear) {
     const MAX_CALENDAR_WEEKS = 53;
     const MAX_CALENDAR_WEEK_DISTANCE = 4;
 

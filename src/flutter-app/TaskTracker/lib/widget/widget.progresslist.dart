@@ -19,7 +19,8 @@ import 'package:flutter/material.dart';
 
 
 class WidgetProgressList extends StatefulWidget {
-  WidgetProgressList({Key key, this.title = 'Progress'}) : super(key: key);
+  WidgetProgressList({Key key, this.title = 'Progress'
+      ''}) : super(key: key);
 
   final String title;
   final _WidgetProgressListState _widgetProgressListState = _WidgetProgressListState();
@@ -164,7 +165,7 @@ class _DataProvider extends DataTableSource {
   @override
   DataRow getRow(int index) {
     bool modifiable = Config.authStatus.isAdmin() ||
-        CalendarUtils.checkWeekDistance(parent._progresses[index].reportWeek, parent._progresses[index].reportYear);
+        CalendarUtils.checkCurrentWeekDistance(parent._progresses[index].reportWeek, parent._progresses[index].reportYear);
 
     String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + parent._progresses[index].ownerName + ']') : '';
 

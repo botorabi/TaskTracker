@@ -18,6 +18,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,13 +42,21 @@ public class RestServiceReport {
         this.reports = reports;
     }
 
-    @GetMapping(value = "/report/team/{teamIDs}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
-    public ResponseEntity<ByteArrayResource> createTeamReportText(@PathVariable("teamIDs") final String teamIDs) throws IOException {
+    public ResponseEntity<ByteArrayResource> createTeamReportText(@PathVariable("teamIDs")            final String teamIDs,
+                                                                  @PathVariable("fromDaysSinceEpoch") final String fromDate,
+                                                                  @PathVariable("toDaysSinceEpoch")   final String toDate) throws IOException {
+
+        LocalDate fromInDaysSinceEpoch = LocalDate.ofEpochDay(Integer.parseInt(fromDate));
+        LocalDate toInDaysSinceEpoch   = LocalDate.ofEpochDay(Integer.parseInt(toDate));
+
+        //! TODO check access permissions: user -> team -> team lead role/admin
+
         List<Long> ids = Arrays.asList(teamIDs.split(",")).stream()
                 .map((idAsString) -> Long.valueOf(idAsString))
                 .collect(Collectors.toList());
 
-        return new ResponseEntity<>(reports.createTeamReportText(ids), HttpStatus.OK);
+        return new ResponseEntity<>(reports.createTeamReportText(ids, fromInDaysSinceEpoch, toInDaysSinceEpoch), HttpStatus.OK);
     }
 }

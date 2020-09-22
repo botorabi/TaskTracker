@@ -11,6 +11,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 
 @Transactional
@@ -21,4 +22,8 @@ public interface ProgressRepository extends CrudRepository<Progress, Long> {
     List<Progress> findProgressByOwnerName(@NonNull final String ownerName);
 
     List<Progress> findByTaskId(@NonNull final Long id);
+
+    List<Progress> findByTaskIdAndReportWeekBetween(@NonNull final Long taskId,
+                                                    @NonNull final LocalDate fromDate,
+                                                    @NonNull final LocalDate toDate);
 }

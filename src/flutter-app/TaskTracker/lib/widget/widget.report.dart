@@ -133,6 +133,17 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
   }
 
   void _createReport() async {
+    DateTime fromDate = DateTime(_widgetCalendarWeekFrom.getYear(), 1,
+        ((_widgetCalendarWeekFrom.getWeek() - 1) * 7));
+
+    DateTime toDate = DateTime(_widgetCalendarWeekTo.getYear(), 1,
+        ((_widgetCalendarWeekTo.getWeek()) * 7));
+
+    if (fromDate.isAfter(toDate)) {
+      DialogModal(context).show("Attention", "Please choose a date for 'From' less than 'To'.", true);
+      return;
+    }
+
     String fileName = "Report.txt";
     List<int> teamIDs = List<int>();
     for (int i = 0; i < _selectedTeams.length; i++) {
@@ -141,7 +152,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
       }
     }
 
-    bool success = await _serviceReport.createReportText(teamIDs, fileName);
+    bool success = await _serviceReport.createReportText(teamIDs, fromDate, toDate, fileName);
     if (success) {
       DialogModal(context).show("Report", "Report successfully created.", false);
     }

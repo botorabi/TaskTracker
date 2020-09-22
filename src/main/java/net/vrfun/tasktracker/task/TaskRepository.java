@@ -26,11 +26,11 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "net.vrfun.tasktracker.task.Task task where task.id = :taskId")
     List<Progress> findProgressEntries(@NonNull final Long taskId);
 
-    @Query("select task " +
+    @Query("select distinct task " +
             "from net.vrfun.tasktracker.task.Task task where :user member of task.users")
     List<Task> findUserTasks(@NonNull final User user);
 
-    @Query("select task " +
+    @Query("select distinct task " +
             "from net.vrfun.tasktracker.task.Task task where :team member of task.teams")
     List<Task> findTeamTasks(@NonNull final Team team);
 

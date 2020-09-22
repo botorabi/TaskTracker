@@ -26,6 +26,8 @@ public class UserShortInfo {
 
     private String login;
 
+    private String email;
+
     private Instant dateCreation;
 
     private Instant lastLogin;
@@ -38,6 +40,7 @@ public class UserShortInfo {
         this.id = user.getId();
         this.realName = user.getRealName();
         this.login = user.getLogin();
+        this.email = user.getEmail();
         this.dateCreation = user.getDateCreation();
         this.lastLogin = user.getLastLogin();
         this.roles = Role.getRolesAsString(user.getRoles());
@@ -46,12 +49,14 @@ public class UserShortInfo {
     public UserShortInfo(long id,
                          final String realName,
                          final String login,
+                         final String email,
                          final Instant dateCreation,
                          final Instant lastLogin) {
 
         this.id = id;
         this.realName = realName;
         this.login = login;
+        this.email = email;
         this.dateCreation = dateCreation;
         this.lastLogin = lastLogin;
     }
@@ -70,6 +75,14 @@ public class UserShortInfo {
 
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getRealName() {

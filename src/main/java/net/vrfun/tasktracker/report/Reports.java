@@ -16,6 +16,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -45,9 +46,14 @@ public class Reports {
         this.taskRepository = taskRepository;
     }
 
-    public ByteArrayResource createTeamReportText(List<Long> teamIDs) throws IOException {
+    public ByteArrayResource createTeamReportTextCurrentWeek(@NonNull final List<Long> teamIDs) throws IOException {
+        LocalDate currentDate = LocalDate.now();
+        return createTeamReportText(teamIDs, currentDate.minusWeeks(1L), currentDate);
+    }
 
-        //! TODO check access permissions
+    public ByteArrayResource createTeamReportText(@NonNull final List<Long> teamIDs,
+                                                  @NonNull final LocalDate fromDate,
+                                                  @NonNull final LocalDate toDate) throws IOException {
 
         List<Team> teamList = new ArrayList<>();
         teamRepository.findAllById(teamIDs).forEach((team -> teamList.add(team)));
@@ -59,6 +65,9 @@ public class Reports {
         try (ByteArrayOutputStream byteArrayOutputStream = reportGeneratorPlainText.begin()) {
 
             reportGeneratorPlainText.generateCoverPage("Team Progress Report", "AVM GmbH, R&D" +
+                    "\n" +
+                    "\nPeriod: " + fromDate.format(DateTimeFormatter.ofPattern("MM.dd.yyyy")) + " - " +
+                                   toDate.format(DateTimeFormatter.ofPattern("MM.dd.yyyy")) +
                     "\nCreated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm")));
 
             teamList.forEach((team -> {
@@ -68,7 +77,8 @@ public class Reports {
 
                 taskRepository.findTeamTasks(team).forEach((task -> {
                     LOGGER.debug(" Generating progress for task: {}", task.getTitle());
-                    List<Progress> progressList = progressRepository.findByTaskId(task.getId());
+
+                    List<Progress> progressList = progressRepository.findByTaskIdAndReportWeekBetween(task.getId(), fromDate, toDate);
 
                     reportGeneratorPlainText.sectionAppend(progressList);
                 }));

@@ -15,6 +15,7 @@ class UserInfo {
   int id;
   String realName = '';
   String login = '';
+  String email = '';
   String password = '';
   DateTime dateCreation;
   DateTime lastLogin;
@@ -31,6 +32,9 @@ class UserInfo {
     userInfo.id = fields['id'];
     userInfo.realName = fields['realName'];
     userInfo.login = fields['login'];
+    if (fields['email'] != null) {
+      userInfo.email = fields['email'];
+    }
     if (fields['dateCreation'] != null) {
       userInfo.dateCreation = DateTime.parse(fields['dateCreation'].toString());
     }
@@ -63,6 +67,7 @@ class UserInfo {
       'id' : id,
       'realName' : realName,
       'login' : login,
+      'email' : email,
       'password': password,
       'roles' : roles?.toList()
     };
