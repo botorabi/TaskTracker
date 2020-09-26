@@ -9,9 +9,11 @@ package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
 import net.vrfun.tasktracker.user.Role;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -62,7 +64,7 @@ public class RestServiceTask {
         }
     }
 
-    @DeleteMapping("/task/{id}")
+    @DeleteMapping("/task/delete/{id}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
@@ -76,13 +78,13 @@ public class RestServiceTask {
     }
 
     @GetMapping("/task")
-    public ResponseEntity<List<TaskShortInfo>> getAllTasks() {
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
         return new ResponseEntity<>(tasks.getTasks(), HttpStatus.OK);
     }
 
     @GetMapping("/task/{id}")
-    public ResponseEntity<TaskShortInfo> getTask(@PathVariable("id") Long id) {
-        TaskShortInfo task = tasks.getTaskById(id);
+    public ResponseEntity<TaskDTO> getTask(@PathVariable("id") Long id) {
+        TaskDTO task = tasks.getTaskById(id);
         if (task == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -91,7 +93,7 @@ public class RestServiceTask {
     }
 
     @GetMapping("/task/search/{filter}")
-    public ResponseEntity<List<TaskShortInfo>> searchTasks(@PathVariable("filter") String filter) {
+    public ResponseEntity<List<TaskDTO>> searchTasks(@PathVariable("filter") String filter) {
         return new ResponseEntity<>(tasks.searchTasks(filter), HttpStatus.OK);
     }
 }

@@ -162,28 +162,28 @@ public class RestServiceUserTest {
     public void getUsersAsAdmin() {
         mockUserAuthenticator("admin", null, true);
 
-        List<UserShortInfo> allUsers = createUserShortInfoList();
+        List<UserDTO> allUsers = createUserDTOList();
 
         when(users.getUsers()).thenReturn(allUsers);
 
-        ResponseEntity<List<UserShortInfo>> response = restServiceUser.getUsers();
+        ResponseEntity<List<UserDTO>> response = restServiceUser.getUsers();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().size()).isEqualTo(allUsers.size());
     }
 
     @NonNull
-    private List<UserShortInfo> createUserShortInfoList() {
+    private List<UserDTO> createUserDTOList() {
         return Arrays.asList(
-                createUserShortInfo(1L, "admin"),
-                createUserShortInfo(11L, "user1"),
-                createUserShortInfo(22L, "user2")
+                createUserDTO(1L, "admin"),
+                createUserDTO(11L, "user1"),
+                createUserDTO(22L, "user2")
         );
     }
 
     @NonNull
-    private UserShortInfo createUserShortInfo(@Nullable final Long id, @Nullable final String login) {
-        UserShortInfo user = new UserShortInfo();
+    private UserDTO createUserDTO(@Nullable final Long id, @Nullable final String login) {
+        UserDTO user = new UserDTO();
         user.setId(id);
         user.setLogin(login);
 
@@ -195,13 +195,13 @@ public class RestServiceUserTest {
         mockUserAuthenticator("someuser", null, false);
 
         try {
-            when(users.getUserByLogin(anyString())).thenReturn(createUserShortInfo(1L, "user"));
+            when(users.getUserByLogin(anyString())).thenReturn(createUserDTO(1L, "user"));
         }
         catch (IllegalAccessException exception) {
             fail("Unexpected exception, reason:", exception.getMessage());
         }
 
-        ResponseEntity<List<UserShortInfo>> response = restServiceUser.getUsers();
+        ResponseEntity<List<UserDTO>> response = restServiceUser.getUsers();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().size()).isEqualTo(1);
@@ -212,13 +212,13 @@ public class RestServiceUserTest {
         mockUserAuthenticator("someuser", null, false);
 
         try {
-            doThrow(new RuntimeException("Test: Cannot get user short info!")).when(users).getUserByLogin(anyString());
+            doThrow(new RuntimeException("Test: Cannot get user DTO!")).when(users).getUserByLogin(anyString());
         }
         catch (IllegalAccessException exception) {
             fail("Unexpected exception, reason:", exception.getMessage());
         }
 
-        ResponseEntity<List<UserShortInfo>> response = restServiceUser.getUsers();
+        ResponseEntity<List<UserDTO>> response = restServiceUser.getUsers();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_ACCEPTABLE);
         assertThat(response.getBody()).isNull();
@@ -227,13 +227,13 @@ public class RestServiceUserTest {
     @Test
     public void getUserSuccess() {
         try {
-            when(users.getUserById(anyLong())).thenReturn(createUserShortInfo(42L, "user"));
+            when(users.getUserById(anyLong())).thenReturn(createUserDTO(42L, "user"));
         }
         catch (IllegalAccessException exception) {
             fail("Unexpected exception, reason:", exception.getMessage());
         }
 
-        ResponseEntity<UserShortInfo> response = restServiceUser.getUser(42L);
+        ResponseEntity<UserDTO> response = restServiceUser.getUser(42L);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody().getId()).isEqualTo(42L);
@@ -248,7 +248,7 @@ public class RestServiceUserTest {
             fail("Unexpected exception, reason:", exception.getMessage());
         }
 
-        ResponseEntity<UserShortInfo> response = restServiceUser.getUser(42L);
+        ResponseEntity<UserDTO> response = restServiceUser.getUser(42L);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNull();

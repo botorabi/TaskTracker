@@ -67,7 +67,7 @@ class ServiceTask {
   }
 
   Future<bool> deleteTask(int id) async {
-    Response response = await delete(Config.baseURL + '/api/task/' + id.toString(),
+    Response response = await delete(Config.baseURL + '/api/task/delete/' + id.toString(),
                                      headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

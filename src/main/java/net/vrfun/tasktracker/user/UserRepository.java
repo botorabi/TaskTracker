@@ -24,23 +24,23 @@ public interface UserRepository extends CrudRepository<User, Long> {
      * NOTE: There some trouble extracting the user roles in following queries! So we omit it and fetch the roles manually.
      */
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user")
-    List<UserShortInfo> getUsers();
+    List<UserDTO> getUsers();
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%')")
-    List<UserShortInfo> searchUser(@NonNull @Param("filter") final String filter);
+    List<UserDTO> searchUser(@NonNull @Param("filter") final String filter);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.id = :id")
-    Optional<UserShortInfo> getUserById(@NonNull @Param("id") final Long id);
+    Optional<UserDTO> getUserById(@NonNull @Param("id") final Long id);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.login = :login")
-    Optional<UserShortInfo> getUserByLogin(@NonNull @Param("login") final String login);
+    Optional<UserDTO> getUserByLogin(@NonNull @Param("login") final String login);
 
-    @Query("select new net.vrfun.tasktracker.user.UserShortInfo(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
+    @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
             "from net.vrfun.tasktracker.user.User user where user.ldapLogin = :ldapLogin")
-    Optional<UserShortInfo> getUserByLdapLogin(@NonNull @Param("ldapLogin") final String ldapLogin);
+    Optional<UserDTO> getUserByLdapLogin(@NonNull @Param("ldapLogin") final String ldapLogin);
 }

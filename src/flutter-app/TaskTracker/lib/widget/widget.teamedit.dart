@@ -122,12 +122,13 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                                   child: Row(
                                     children: [
                                       Padding(
-                                          padding: EdgeInsets.only(left: 10, right: 20.0),
+                                          padding: EdgeInsets.only(left: 10, right: 10.0),
                                           child:
                                           Text('Active',
                                             textAlign: TextAlign.left,
                                           )
                                       ),
+                                      Spacer(),
                                       Padding(
                                         padding: EdgeInsets.only(top: 0.0),
                                         child:
@@ -149,18 +150,18 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                         ),
                         LayoutBuilder(
                             builder: (BuildContext context, BoxConstraints constraints) {
-                              double w = constraints.maxWidth < 535 ? 350 : 200;
+                              double w = constraints.maxWidth < 535 ? 350 : 220;
                               return ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: w),
                                 child:
                                   Column(
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0, right: 10, left: 10),
+                                        padding: EdgeInsets.only(top: _newTeam ? 40.0 : 20.0, right: 10, left: 5),
                                         child: _widgetTeamMembers,
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(top: 20.0, right: 10, left: 10),
+                                        padding: EdgeInsets.only(top: 20.0, right: 10, left: 5),
                                         child: _widgetTeamLeaders,
                                       ),
                                     ],

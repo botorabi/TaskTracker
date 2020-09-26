@@ -142,23 +142,23 @@ public class Teams {
     }
 
     @NonNull
-    public List<TeamShortInfo> getTeams() {
-        List<TeamShortInfo> teams = new ArrayList<>();
-        teamRepository.findAll().forEach((team) -> teams.add(new TeamShortInfo(team)));
+    public List<TeamDTO> getTeams() {
+        List<TeamDTO> teams = new ArrayList<>();
+        teamRepository.findAll().forEach((team) -> teams.add(new TeamDTO(team)));
         return teams;
     }
 
     @NonNull
-    public TeamShortInfo getTeamById(Long id) {
+    public TeamDTO getTeamById(Long id) {
         Optional<Team> foundTeam = teamRepository.findById(id);
         if (foundTeam.isEmpty()) {
             throw new IllegalArgumentException("Team with ID '" + id + "' does not exist!");
         }
-        return new TeamShortInfo(foundTeam.get());
+        return new TeamDTO(foundTeam.get());
     }
 
     @NonNull
-    public List<TeamShortInfo> searchTeams(@NonNull final String filter) {
+    public List<TeamDTO> searchTeams(@NonNull final String filter) {
         return teamRepository.searchTeam(filter);
     }
 }

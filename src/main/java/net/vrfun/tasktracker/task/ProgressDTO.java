@@ -14,34 +14,26 @@ import java.time.temporal.IsoFields;
 import java.util.*;
 
 /**
- * Progress short info.
+ * Progress data transfer object
  *
  * @author          boto
  * Creation Date    August 2020
  */
-public class ProgressShortInfo {
+public class ProgressDTO {
 
     private Long id;
-
     private String title;
-
     private String text;
-
     private Long ownerId;
-
     private String ownerName;
-
     private Instant dateCreation;
-
     private LocalDate reportWeek;
-
     private Collection<String> tags;
-
     private Long task;
 
-    public ProgressShortInfo() {}
+    public ProgressDTO() {}
 
-    public ProgressShortInfo(@NonNull final Progress progress) {
+    public ProgressDTO(@NonNull final Progress progress) {
         this.id = progress.getId();
         this.title = progress.getTitle();
         this.text = progress.getText();
@@ -58,15 +50,15 @@ public class ProgressShortInfo {
         }
     }
 
-    public ProgressShortInfo(long id,
-                             final String title,
-                             final String text,
-                             final Long ownerId,
-                             final String ownerName,
-                             final Instant dateCreation,
-                             final LocalDate reportWeek,
-                             final Collection<String> tags,
-                             final Long taskId) {
+    public ProgressDTO(long id,
+                       final String title,
+                       final String text,
+                       final Long ownerId,
+                       final String ownerName,
+                       final Instant dateCreation,
+                       final LocalDate reportWeek,
+                       final Collection<String> tags,
+                       final Long taskId) {
 
         this.id = id;
         this.title = title;

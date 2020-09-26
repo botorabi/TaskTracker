@@ -241,7 +241,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.reportWeek = _widgetCalendarWeek.getWeek();
     progress.reportYear = _widgetCalendarWeek.getYear();
 
-//TODO    progress.tags = _widgetTags.getTags();
+    //TODO progress.tags = _widgetTags.getTags();
 
     _serviceProgress
       .editProgress(progress)
@@ -261,8 +261,11 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   }
 
   void _retrieveUserTasksAndSelect([int selectTaskId = 0]) {
+    int ownerId = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ?
+                  _currentProgress.ownerId : Config.authStatus.userId;
+
     _serviceUser
-        .getUserTasks(Config.authStatus.userId)
+        .getUserTasks(ownerId)
         .then((tasks) {
           if (tasks.isEmpty == false) {
             _userTaskDropdownItems = tasks.map((task) => DropdownMenuItem<int>(value: task.id, child: Text(task.title))).toList();
@@ -290,7 +293,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           _retrieveUserTasksAndSelect(_currentProgress.task);
           _widgetCalendarWeek.set(_currentProgress.reportYear?? 0, _currentProgress.reportWeek?? 0);
 
-//TODO          _widgetTags.setTags(_currentProgress.tags);
+          //TODO  _widgetTags.setTags(_currentProgress.tags);
 
           setState(() {});
         },

@@ -12,38 +12,40 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
+import 'package:TaskTracker/service/report.configuration.dart';
+import 'package:TaskTracker/service/service.report.configuration.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetTeamList extends StatefulWidget {
-  WidgetTeamList({Key key, this.title = 'Teams'}) : super(key: key);
+class WidgetReportMailConfigurationList extends StatefulWidget {
+  WidgetReportMailConfigurationList({Key key, this.title = 'Report Mail Configuration'}) : super(key: key);
 
   final String title;
-  final _WidgetTeamListState _widgetTeamListState = _WidgetTeamListState();
+  final _WidgetReportMailConfigurationListState _widgetReportConfigurationListState = _WidgetReportMailConfigurationListState();
 
   @override
-  _WidgetTeamListState createState() => _widgetTeamListState;
+  _WidgetReportMailConfigurationListState createState() => _widgetReportConfigurationListState;
 
-  WidgetTeamList setExpanded(bool expanded) {
-    _widgetTeamListState.setExpanded(expanded);
+  WidgetReportMailConfigurationList setExpanded(bool expanded) {
+    _widgetReportConfigurationListState.setExpanded(expanded);
     return this;
   }
 }
 
-class _WidgetTeamListState extends State<WidgetTeamList> {
+class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConfigurationList> {
 
-  final _serviceTeam = ServiceTeam();
+  final _serviceReportConfiguration = ServiceReportConfiguration();
   PaginatedDataTable _dataTable;
-  List<Team> _teams = [];
+  List<ReportMailConfiguration> _reportConfigurations = [];
   bool _expanded = false;
   bool _sortAscending = true;
 
   @override
   void initState() {
     super.initState();
-    _retrieveTeams();
+    _retrieveConfigurations();
   }
 
   void setExpanded(bool expanded) {
@@ -57,8 +59,8 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
+    if (!Config.authStatus.isAdmin() && !Config.authStatus.isTeamLead()) {
+      print("ERROR: admin/team lead corner!");
       return Column();
     }
     else {
@@ -88,47 +90,47 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
     }
   }
 
-  void _addTeam() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_TEAM);
-    _retrieveTeams();
+  void _addConfiguration() async {
+    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_REPORT_CFG);
+    _retrieveConfigurations();
   }
 
-  void _deleteTeam(int id, String name) async {
+  void _deleteConfiguration(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete team '$name'?", ButtonID.YES, ButtonID.NO);
+        .show('Attention', "You really want to delete configuration '$name'?", ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
     }
 
-    _serviceTeam
-      .deleteTeam(id)
+    _serviceReportConfiguration
+      .deleteConfiguration(id)
       .then((status) {
-          DialogModal(context).show('Team Deletion', 'Team was successfully deleted.', false);
-          _retrieveTeams();
+          DialogModal(context).show('Configuration Deletion', 'Report configuration was successfully deleted.', false);
+          _retrieveConfigurations();
         },
         onError: (err) {
-          print('Failed to delete team, reason: ' + err.toString());
+          print('Failed to delete report configuration, reason: ' + err.toString());
       });
   }
 
-  void _sortTeams(bool ascending) {
-    _teams.sort((teamA, teamB) => teamA.name?.compareTo(teamB?.name));
+  void _sortConfigurations(bool ascending) {
+    _reportConfigurations.sort((configA, configB) => configA.name?.compareTo(configB?.name));
     if (!ascending) {
-      _teams = _teams.reversed.toList();
+      _reportConfigurations = _reportConfigurations.reversed.toList();
     }
   }
 
-  void _retrieveTeams() {
-    _serviceTeam
-        .getTeams()
-        .then((listTeam) {
-            _teams = listTeam;
-            _sortTeams(_sortAscending);
+  void _retrieveConfigurations() {
+    _serviceReportConfiguration
+        .getConfigurations()
+        .then((listConfiguration) {
+            _reportConfigurations = listConfiguration;
+            _sortConfigurations(_sortAscending);
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve teams, reason: " + err.toString());
+            print("Failed to retrieve report configuration, reason: " + err.toString());
           });
   }
 
@@ -144,26 +146,14 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
           onSort:(columnIndex, ascending) {
             setState(() {
               _sortAscending = !_sortAscending;
-              _sortTeams(_sortAscending);
+              _sortConfigurations(_sortAscending);
               _dataTable = _createDataTable();
             });
           },
         ),
         DataColumn(
           label: Text(
-            'Description',
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),
-        ),
-        DataColumn(
-          label: Text(
-            'Active',
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),
-        ),
-        DataColumn(
-          label: Text(
-            'Team Lead',
+            'Subject',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -177,7 +167,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addTeam(), 'Add New Team'),
+        CircleButton.create(24, Icons.add, () => _addConfiguration(), 'Add New Report Mail Configuration'),
       ],
     );
 
@@ -187,24 +177,17 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
 class _DataProvider extends DataTableSource {
 
-  _WidgetTeamListState parent;
+  _WidgetReportMailConfigurationListState parent;
 
   _DataProvider(this.parent);
 
   @override
   DataRow getRow(int index) {
-    String teamLeadNames = '';
-    parent._teams[index].teamLeaderNames.forEach((userName) {
-      teamLeadNames += userName + ' ';
-    });
-
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._teams[index].name)),
-        DataCell(Text(parent._teams[index].description)),
-        DataCell(Text(parent._teams[index].active ? 'Yes' : 'No')),
-        DataCell(Text(teamLeadNames)),
+        DataCell(Text(parent._reportConfigurations[index].name)),
+        DataCell(Text(parent._reportConfigurations[index].mailSubject)),
         DataCell(
           Row(
             children: [
@@ -213,21 +196,22 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(20, Icons.edit, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_TEAM, arguments: parent._teams[index].id)
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_REPORT_CFG, arguments: parent._reportConfigurations[index].id)
                         .then((value) {
                             if (value != ButtonID.CANCEL) {
-                              parent._retrieveTeams();
+                              parent._retrieveConfigurations();
                             }
                           }
                         );
-                  }
+                  }, "Edit Report Configuration"
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(20, Icons.delete,
-                          () => parent._deleteTeam(parent._teams[index].id, parent._teams[index].name)
+                          () => parent._deleteConfiguration(parent._reportConfigurations[index].id, parent._reportConfigurations[index].name),
+                          "Delete Report Mail Configuration"
                 ),
               ),
             ],
@@ -241,7 +225,7 @@ class _DataProvider extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => parent._teams.length;
+  int get rowCount => parent._reportConfigurations.length;
 
   @override
   int get selectedRowCount => 0;

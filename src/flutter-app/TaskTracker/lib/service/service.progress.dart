@@ -91,7 +91,7 @@ class ServiceProgress {
   }
 
   Future<bool> deleteProgress(int id) async {
-    Response response = await delete(Config.baseURL + '/api/progress/' + id.toString(),
+    Response response = await delete(Config.baseURL + '/api/progress/delete/' + id.toString(),
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

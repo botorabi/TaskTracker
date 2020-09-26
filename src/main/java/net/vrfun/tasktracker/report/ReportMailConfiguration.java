@@ -10,6 +10,8 @@ package net.vrfun.tasktracker.report;
 import net.vrfun.tasktracker.common.BaseEntity;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.User;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -18,13 +20,16 @@ import java.io.Serializable;
 import java.util.Collection;
 
 @Entity
-public class ReportGeneratorConfiguration extends BaseEntity implements Serializable {
+public class ReportMailConfiguration extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(nullable=false)
+    private String name;
 
     @Column(nullable=false)
     private String mailSenderName;
@@ -47,8 +52,18 @@ public class ReportGeneratorConfiguration extends BaseEntity implements Serializ
     @Column(nullable=false)
     private Boolean reportToTeamMembers = true;
 
+    @Enumerated(EnumType.STRING)
+    private ReportPeriod reportPeriod = ReportPeriod.PERIOD_WEEKLY;
 
-    public ReportGeneratorConfiguration() {}
+    @Enumerated(EnumType.STRING)
+    private ReportWeekDay reportWeekDay = ReportWeekDay.WEEKDAY_FRIDAY;
+
+    private Long reportHour = 18L;
+
+    private Long reportMinute = 0L;
+
+
+    public ReportMailConfiguration() {}
 
     @NonNull
     public Long getId() {
@@ -57,6 +72,15 @@ public class ReportGeneratorConfiguration extends BaseEntity implements Serializ
 
     public void setId(@NonNull final Long id) {
         this.id = id;
+    }
+
+    @NonNull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(@NonNull final String name) {
+        this.name = name;
     }
 
     @NonNull
@@ -120,5 +144,41 @@ public class ReportGeneratorConfiguration extends BaseEntity implements Serializ
 
     public void setReportToTeamMembers(@NonNull final Boolean reportToTeamMembers) {
         this.reportToTeamMembers = reportToTeamMembers;
+    }
+
+    @NonNull
+    public ReportPeriod getReportPeriod() {
+        return reportPeriod;
+    }
+
+    public void setReportPeriod(@NonNull final ReportPeriod reportPeriod) {
+        this.reportPeriod = reportPeriod;
+    }
+
+    @NonNull
+    public ReportWeekDay getReportWeekDay() {
+        return reportWeekDay;
+    }
+
+    public void setReportWeekDay(@NonNull final ReportWeekDay reportWeekDay) {
+        this.reportWeekDay = reportWeekDay;
+    }
+
+    @NonNull
+    public Long getReportHour() {
+        return reportHour;
+    }
+
+    public void setReportHour(@NonNull final Long reportHour) {
+        this.reportHour = reportHour;
+    }
+
+    @NonNull
+    public Long getReportMinute() {
+        return reportMinute;
+    }
+
+    public void setReportMinute(@NonNull final Long reportMinute) {
+        this.reportMinute = reportMinute;
     }
 }

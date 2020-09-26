@@ -128,12 +128,12 @@ public class Tasks {
     }
 
     @NonNull
-    public List<TaskShortInfo> getTasks() {
-        List<TaskShortInfo> tasks = new ArrayList<>();
+    public List<TaskDTO> getTasks() {
+        List<TaskDTO> tasks = new ArrayList<>();
         Iterable<Task> allTasks = taskRepository.findAll();
         if (allTasks != null) {
             allTasks.forEach((task) -> {
-                TaskShortInfo t = new TaskShortInfo(task);
+                TaskDTO t = new TaskDTO(task);
                 tasks.add(t);
             });
         }
@@ -141,16 +141,16 @@ public class Tasks {
     }
 
     @NonNull
-    public TaskShortInfo getTaskById(Long id) throws IllegalArgumentException {
+    public TaskDTO getTaskById(Long id) throws IllegalArgumentException {
         Optional<Task> foundTask = taskRepository.findById(id);
         if (foundTask.isEmpty()) {
             throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
         }
-        return new TaskShortInfo(foundTask.get());
+        return new TaskDTO(foundTask.get());
     }
 
     @NonNull
-    public List<TaskShortInfo> searchTasks(@NonNull final String filter) {
+    public List<TaskDTO> searchTasks(@NonNull final String filter) {
         return taskRepository.searchTask(filter);
     }
 }

@@ -80,6 +80,7 @@ public class UsersTest {
     public void createUserInvalidLogin() {
         ReqUserEdit reqUser = new ReqUserEdit();
         reqUser.setPassword("mypassword");
+        reqUser.setEmail("myemail@mydomain.com");
 
         assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
     }
@@ -87,6 +88,16 @@ public class UsersTest {
     @Test
     public void createUserInvalidPassword() {
         ReqUserEdit reqUser = new ReqUserEdit();
+        reqUser.setLogin("mylogin");
+        reqUser.setEmail("myemail@mydomain.com");
+
+        assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void createUserInvalidEmail() {
+        ReqUserEdit reqUser = new ReqUserEdit();
+        reqUser.setPassword("mypassword");
         reqUser.setLogin("mylogin");
 
         assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
@@ -107,6 +118,7 @@ public class UsersTest {
         ReqUserEdit reqUser = new ReqUserEdit();
         reqUser.setLogin("mylogin");
         reqUser.setPassword("mypassword");
+        reqUser.setEmail("myemail@mydomain.com");
 
         when(userRepository.findUserByLogin("mylogin")).thenReturn(Optional.empty());
 
@@ -217,9 +229,9 @@ public class UsersTest {
 
     @Test
     public void getUsers() {
-        List<UserShortInfo> dummyUsers = new ArrayList<>();
-        dummyUsers.add(new UserShortInfo());
-        dummyUsers.add(new UserShortInfo());
+        List<UserDTO> dummyUsers = new ArrayList<>();
+        dummyUsers.add(new UserDTO());
+        dummyUsers.add(new UserDTO());
 
         doReturn(dummyUsers).when(userRepository).getUsers();
 

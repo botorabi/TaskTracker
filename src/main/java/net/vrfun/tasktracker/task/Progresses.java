@@ -63,12 +63,12 @@ public class Progresses {
     }
 
     @NonNull
-    public List<ProgressShortInfo> getAll() {
+    public List<ProgressDTO> getAll() {
         if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
 
-            List<ProgressShortInfo> progs = new ArrayList<>();
+            List<ProgressDTO> progs = new ArrayList<>();
             progressRepository.findAll()
-                    .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
             return progs;
         }
@@ -78,7 +78,7 @@ public class Progresses {
     }
 
     @Nullable
-    public ProgressShortInfo get(long id) {
+    public ProgressDTO get(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
         if (!progress.isPresent()) {
             return null;
@@ -94,23 +94,23 @@ public class Progresses {
             }
         }
 
-        return new ProgressShortInfo(progress.get());
+        return new ProgressDTO(progress.get());
     }
 
     @NonNull
-    public List<ProgressShortInfo> getUserProgress() {
-        List<ProgressShortInfo> progs = new ArrayList<>();
+    public List<ProgressDTO> getUserProgress() {
+        List<ProgressDTO> progs = new ArrayList<>();
         progressRepository.findProgressByOwnerId(userAuthenticator.getUserId())
-                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+                .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
         return progs;
     }
 
     @NonNull
-    public List<ProgressShortInfo> getTeamProgress(@NonNull final Long teamId) {
-        List<ProgressShortInfo> progs = new ArrayList<>();
+    public List<ProgressDTO> getTeamProgress(@NonNull final Long teamId) {
+        List<ProgressDTO> progs = new ArrayList<>();
         progressRepository.findByTaskId(teamId)
-                .forEach((progress -> progs.add(new ProgressShortInfo(progress))));
+                .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
         return progs;
     }

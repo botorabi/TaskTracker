@@ -8,11 +8,13 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.task.TaskShortInfo;
+import net.vrfun.tasktracker.task.TaskDTO;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.StringUtils;
@@ -83,7 +85,7 @@ public class RestServiceUser {
         }
     }
 
-    @DeleteMapping("/user/{id}")
+    @DeleteMapping("/user/delete/{id}")
     @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
@@ -97,7 +99,7 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserShortInfo>> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         try {
             if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
                 return new ResponseEntity<>(users.getUsers(), HttpStatus.OK);
@@ -114,9 +116,9 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<UserShortInfo> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
         try {
-            UserShortInfo user = users.getUserById(id);
+            UserDTO user = users.getUserById(id);
             //! NOTE don't leak user info to others!
             if (!userAuthenticator.isRoleAdmin() && (id != userAuthenticator.getUserId())) {
                 user.setLastLogin(null);
@@ -131,7 +133,7 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user/tasks/{userId}")
-    public ResponseEntity<List<TaskShortInfo>> getUserTasks(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<TaskDTO>> getUserTasks(@PathVariable("userId") Long userId) {
         try {
             // Normal users have access only to their own tasks!
             if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
@@ -146,7 +148,7 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user/teams")
-    public ResponseEntity<List<TeamShortInfo>> getUserTeams() {
+    public ResponseEntity<List<TeamDTO>> getUserTeams() {
         try {
             return new ResponseEntity<>(users.getUserTeams(), HttpStatus.OK);
         }
@@ -158,7 +160,7 @@ public class RestServiceUser {
 
     @GetMapping("/user/search/{filter}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
-    public ResponseEntity<List<UserShortInfo>> searchUser(@PathVariable("filter") String filter) {
+    public ResponseEntity<List<UserDTO>> searchUser(@PathVariable("filter") String filter) {
         return new ResponseEntity<>(users.searchUsers(filter), HttpStatus.OK);
     }
 

@@ -13,30 +13,24 @@ import java.time.Instant;
 import java.util.*;
 
 /**
- * Task's short info.
+ * Task's data transfer object
  *
  * @author          boto
  * Creation Date    August 2020
  */
-public class TaskShortInfo {
+public class TaskDTO {
 
     private Long id;
-
     private String title;
-
     private String description;
-
     private Instant dateCreation;
-
     private Instant dateClosed;
-
     private Collection<Long> users;
-
     private Collection<Long> teams;
 
-    public TaskShortInfo() {}
+    public TaskDTO() {}
 
-    public TaskShortInfo(@NonNull final Task task) {
+    public TaskDTO(@NonNull final Task task) {
         this.id = task.getId();
         this.title = task.getTitle();
         this.description = task.getDescription();
@@ -52,13 +46,13 @@ public class TaskShortInfo {
         }
     }
 
-    public TaskShortInfo(long id,
-                         final String title,
-                         final String description,
-                         final Instant dateCreation,
-                         final Instant dateClosed,
-                         final Collection<Long> users,
-                         final Collection<Long> teams) {
+    public TaskDTO(long id,
+                   final String title,
+                   final String description,
+                   final Instant dateCreation,
+                   final Instant dateClosed,
+                   final Collection<Long> users,
+                   final Collection<Long> teams) {
 
         this.id = id;
         this.title = title;

@@ -8,64 +8,64 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/dialog/dialog.chooseusers.dart';
-import 'package:TaskTracker/service/service.user.dart';
-import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/dialog/dialog.chooseteams.dart';
+import 'package:TaskTracker/service/service.team.dart';
+import 'package:TaskTracker/service/team.dart';
 import 'package:flutter/material.dart';
 
 
-class WidgetUserChooser extends StatefulWidget {
-  WidgetUserChooser({Key key, this.title = 'Users'}) : super(key: key);
+class WidgetTeamChooser extends StatefulWidget {
+  WidgetTeamChooser({Key key, this.title = 'Teams'}) : super(key: key);
 
   final String title;
-  final _WidgetUserChooserState _widgetUserChooserState = _WidgetUserChooserState();
+  final _WidgetTeamChooserState _widgetTeamChooserState = _WidgetTeamChooserState();
 
   @override
-  _WidgetUserChooserState createState() => _widgetUserChooserState;
+  _WidgetTeamChooserState createState() => _widgetTeamChooserState;
 
-  void setUsers(List<UserInfo> users) {
-    _widgetUserChooserState.setUsers(users);
+  void setTeams(List<Team> teams) {
+    _widgetTeamChooserState.setTeams(teams);
   }
 
-  List<UserInfo> getUsers() {
-    return _widgetUserChooserState.getUsers();
+  List<Team> getTeams() {
+    return _widgetTeamChooserState.getTeams();
   }
 
-  void setUserIDs(List<int> users) {
-    _widgetUserChooserState.setUserIDs(users);
+  void setTeamIDs(List<int> teamIDs) {
+    _widgetTeamChooserState.setTeamIDs(teamIDs);
   }
 
-  List<int> getUserIDs() {
-    return _widgetUserChooserState.getUsers()
-        .map((user) => user.id).toList();
+  List<int> getTeamIDs() {
+    return _widgetTeamChooserState.getTeams()
+        .map((team) => team.id).toList();
   }
 
   void setReadOnly(bool readOnly) {
-    _widgetUserChooserState.setReadOnly(readOnly);
+    _widgetTeamChooserState.setReadOnly(readOnly);
   }
 }
 
-class _WidgetUserChooserState extends State<WidgetUserChooser> {
+class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
 
-  final _serviceUser = ServiceUser();
+  final _serviceTeam = ServiceTeam();
 
-  List<Container> _usersWidget = List<Container>();
-  List<UserInfo>  _users = List<UserInfo>();
+  List<Container> _teamsWidget = List<Container>();
+  List<Team>      _teams = List<Team>();
   bool            _readOnly = false;
 
-  void setUsers(List<UserInfo> users) {
-    _users = users;
+  void setTeams(List<Team> teams) {
+    _teams = teams;
   }
 
-  List<UserInfo> getUsers() {
-    return _users;
+  List<Team> getTeams() {
+    return _teams;
   }
 
-  void setUserIDs(List<int> userIDs) {
-    _users.clear();
-    userIDs.forEach((userID) {
-      _serviceUser.getUser(userID).then((userInfo) {
-        _users.add(userInfo);
+  void setTeamIDs(List<int> teamIDs) {
+    _teams.clear();
+    teamIDs.forEach((teamID) {
+      _serviceTeam.getTeam(teamID).then((team) {
+        _teams.add(team);
         _createUI();
       });
     });
@@ -110,18 +110,18 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseUsers(context).show('Users', 'Add New User')
-                              .then((chosenUsers) {
-                              if (chosenUsers != null && chosenUsers.length > 0) {
-                                chosenUsers.forEach((userInfo) {
-                                  bool userIsInList = false;
-                                  _users.forEach((user) {
-                                    if (user.id == userInfo.id) {
-                                      userIsInList = true;
+                          DialogChooseTeams(context).show('Teams', 'Add New Team')
+                              .then((chosenTeams) {
+                              if (chosenTeams != null && chosenTeams.length > 0) {
+                                chosenTeams.forEach((chosenTeam) {
+                                  bool teamIsInList = false;
+                                  _teams.forEach((team) {
+                                    if (team.id == chosenTeam.id) {
+                                      teamIsInList = true;
                                     }
                                   });
-                                  if (!userIsInList) {
-                                    _users.add(userInfo);
+                                  if (!teamIsInList) {
+                                    _teams.add(chosenTeam);
                                   }
                                   _createUI();
                                 });
@@ -144,7 +144,7 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                     ),
                     child: ListView(
                       children: <Widget>[
-                        Column(children: _usersWidget),
+                        Column(children: _teamsWidget),
                       ],
                     ),
                   ),
@@ -157,17 +157,17 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
   }
 
   void _createUI() {
-    _usersWidget = List<Container>();
-    _users.forEach((userInfo) {
-      _usersWidget.add(Container(
+    _teamsWidget = List<Container>();
+    _teams.forEach((team) {
+      _teamsWidget.add(Container(
         child: Padding(
             padding: EdgeInsets.all(5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(userInfo.realName),
+                Text(team.name),
                 CircleButton.create(16, Icons.remove, () {
-                  _users.remove(userInfo);
+                  _teams.remove(team);
                   _createUI();
                 }),
               ]

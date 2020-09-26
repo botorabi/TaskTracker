@@ -7,9 +7,8 @@
  */
 
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/widget/widget.progresslist.dart';
+import 'package:TaskTracker/widget/widget.reportmail.configurationlist.dart';
 import 'package:TaskTracker/widget/widget.tasklist.dart';
-import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
 import 'package:TaskTracker/widget/widget.userlist.dart';
 import 'package:flutter/material.dart';
@@ -42,9 +41,10 @@ class _PageAdminState extends State<PageAdmin> {
               child:
                 Column(
                   children: [
-                    WidgetTeamList().setExpanded(true),
+                    WidgetTaskList().setExpanded(true),
+                    WidgetTeamList().setExpanded(false),
                     WidgetUserList().setExpanded(false),
-                    WidgetTaskList().setExpanded(false),
+                    WidgetReportMailConfigurationList().setExpanded(false),
                   ],
                 ),
               ),

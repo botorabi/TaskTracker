@@ -164,7 +164,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                     LayoutBuilder(
                       builder: (BuildContext context, BoxConstraints constraints) {
                         double topPadding = constraints.maxWidth < 535 ? 0.0 : 50.0;
-                        double w = constraints.maxWidth < 535 ? 350 : 180;
+                        double w = constraints.maxWidth < 535 ? 350 : 220;
                         return ConstrainedBox(
                           constraints: BoxConstraints(maxWidth: w),
                           child:

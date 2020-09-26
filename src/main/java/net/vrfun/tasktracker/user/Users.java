@@ -90,6 +90,7 @@ public class Users {
         reqUser.setRealName("Administrator");
         reqUser.setLogin("admin");
         reqUser.setPassword("admin");
+        reqUser.setEmail("no-valid-email");
         Set<String> roleNames = new HashSet<>();
         roleNames.add("ROLE_ADMIN");
         reqUser.setRoles(roleNames);
@@ -168,8 +169,8 @@ public class Users {
     }
 
     @NonNull
-    public UserShortInfo getOrCreateLocalUserFromLdap(@NonNull final ReqLogin reqLogin) {
-        Optional<UserShortInfo> user = userRepository.getUserByLdapLogin(reqLogin.getLogin());
+    public UserDTO getOrCreateLocalUserFromLdap(@NonNull final ReqLogin reqLogin) {
+        Optional<UserDTO> user = userRepository.getUserByLdapLogin(reqLogin.getLogin());
         if (user.isPresent()) {
             fetchUserRoles(user.get());
             return user.get();
@@ -186,7 +187,7 @@ public class Users {
             newUser.setLdapLogin(reqLogin.getLogin());
             userRepository.save(newUser);
 
-            return new UserShortInfo(newUser);
+            return new UserDTO(newUser);
         }
     }
 
@@ -214,15 +215,15 @@ public class Users {
     }
 
     @NonNull
-    public List<UserShortInfo> getUsers() {
-        List<UserShortInfo> users = userRepository.getUsers();
-        for (UserShortInfo user: users) {
+    public List<UserDTO> getUsers() {
+        List<UserDTO> users = userRepository.getUsers();
+        for (UserDTO user: users) {
             fetchUserRoles(user);
         }
         return users;
     }
 
-    protected void fetchUserRoles(@NonNull UserShortInfo user) {
+    protected void fetchUserRoles(@NonNull UserDTO user) {
         Optional<User> foundUser = userRepository.findById(user.getId());
         if (foundUser.isPresent()) {
             user.setRoles(Role.getRolesAsString(foundUser.get().getRoles()));
@@ -230,8 +231,8 @@ public class Users {
     }
 
     @NonNull
-    public UserShortInfo getUserById(long id) throws IllegalAccessException {
-        Optional<UserShortInfo> user = userRepository.getUserById(id);
+    public UserDTO getUserById(long id) throws IllegalAccessException {
+        Optional<UserDTO> user = userRepository.getUserById(id);
         user.orElseThrow(() -> new IllegalAccessException("User with given ID does not exist!"));
 
         fetchUserRoles(user.get());
@@ -240,8 +241,8 @@ public class Users {
     }
 
     @NonNull
-    public UserShortInfo getUserByLogin(@NonNull final String login) throws IllegalAccessException {
-        Optional<UserShortInfo> user = userRepository.getUserByLogin(login);
+    public UserDTO getUserByLogin(@NonNull final String login) throws IllegalAccessException {
+        Optional<UserDTO> user = userRepository.getUserByLogin(login);
         user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
 
         fetchUserRoles(user.get());
@@ -250,7 +251,7 @@ public class Users {
     }
 
     @NonNull
-    public List<TaskShortInfo> getUserTasks(@NonNull final Long userId) throws IllegalAccessException {
+    public List<TaskDTO> getUserTasks(@NonNull final Long userId) throws IllegalAccessException {
         Optional<User> user = userRepository.findById(userId);
         user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
 
@@ -262,7 +263,7 @@ public class Users {
         uniqueUserTasks.sort(Comparator.comparing(Task::getTitle));
 
         return uniqueUserTasks.stream()
-                .map((task) -> new TaskShortInfo(task))
+                .map((task) -> new TaskDTO(task))
                 .collect(Collectors.toList());
     }
 
@@ -273,10 +274,10 @@ public class Users {
     }
 
     @NonNull
-    public List<TeamShortInfo> getUserTeams() throws IllegalAccessException {
+    public List<TeamDTO> getUserTeams() throws IllegalAccessException {
         if (userAuthenticator.isRoleAdmin()) {
             return teamRepository.findAll().stream()
-                    .map((team) -> new TeamShortInfo(team))
+                    .map((team) -> new TeamDTO(team))
                     .collect(Collectors.toList());
         }
 
@@ -286,12 +287,12 @@ public class Users {
         List<Team> userTeams = teamRepository.findUserTeams(user.get());
 
         return userTeams.stream()
-                .map((team) -> new TeamShortInfo(team))
+                .map((team) -> new TeamDTO(team))
                 .collect(Collectors.toList());
     }
 
     @NonNull
-    public List<UserShortInfo> searchUsers(@NonNull final String filter) {
+    public List<UserDTO> searchUsers(@NonNull final String filter) {
         return userRepository.searchUser(filter);
     }
 }

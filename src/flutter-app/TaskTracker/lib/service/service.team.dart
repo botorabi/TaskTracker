@@ -67,7 +67,7 @@ class ServiceTeam {
   }
 
   Future<bool> deleteTeam(int id) async {
-    Response response = await delete(Config.baseURL + '/api/team/' + id.toString(),
+    Response response = await delete(Config.baseURL + '/api/team/delete/' + id.toString(),
                                      headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

@@ -22,12 +22,16 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
 
     List<Team> findAll();
 
-    @Query("select new net.vrfun.tasktracker.user.TeamShortInfo(team) " +
+    @Query("select new net.vrfun.tasktracker.user.TeamDTO(team) " +
             "from net.vrfun.tasktracker.user.Team team where " +
             "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%'))")
-    List<TeamShortInfo> searchTeam(@NonNull @Param("filter") final String filter);
+    List<TeamDTO> searchTeam(@NonNull @Param("filter") final String filter);
 
     @Query("select team " +
             "from net.vrfun.tasktracker.user.Team team where :user member of team.users")
     List<Team> findUserTeams(@NonNull final User user);
+
+    @Query("select team " +
+            "from net.vrfun.tasktracker.user.Team team where :user member of team.teamLeaders")
+    List<Team> findTeamLeadTeams(@NonNull final User user);
 }

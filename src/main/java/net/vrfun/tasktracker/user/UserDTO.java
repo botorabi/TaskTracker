@@ -13,30 +13,24 @@ import java.time.Instant;
 import java.util.Collection;
 
 /**
- * User's short info.
+ * User's data transfer object
  *
  * @author          boto
  * Creation Date    July 2020
  */
-public class UserShortInfo {
+public class UserDTO {
 
     private long id;
-
     private String realName;
-
     private String login;
-
     private String email;
-
     private Instant dateCreation;
-
     private Instant lastLogin;
-
     private Collection<String> roles;
 
-    public UserShortInfo() {}
+    public UserDTO() {}
 
-    public UserShortInfo(@NonNull final User user) {
+    public UserDTO(@NonNull final User user) {
         this.id = user.getId();
         this.realName = user.getRealName();
         this.login = user.getLogin();
@@ -46,12 +40,12 @@ public class UserShortInfo {
         this.roles = Role.getRolesAsString(user.getRoles());
     }
 
-    public UserShortInfo(long id,
-                         final String realName,
-                         final String login,
-                         final String email,
-                         final Instant dateCreation,
-                         final Instant lastLogin) {
+    public UserDTO(long id,
+                   final String realName,
+                   final String login,
+                   final String email,
+                   final Instant dateCreation,
+                   final Instant lastLogin) {
 
         this.id = id;
         this.realName = realName;

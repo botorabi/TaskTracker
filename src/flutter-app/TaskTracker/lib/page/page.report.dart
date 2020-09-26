@@ -43,7 +43,7 @@ class _PageReportState extends State<PageReport> {
                   ),
                   Visibility(
                     visible: !Config.authStatus.isTeamLead() && !Config.authStatus.isAdmin(),
-                    child: Text('Under Construction!'),
+                    child: Text('User Reports are Under Construction!'),
                   ),
                 ],
               ),

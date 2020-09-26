@@ -34,7 +34,7 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
             "from net.vrfun.tasktracker.task.Task task where :team member of task.teams")
     List<Task> findTeamTasks(@NonNull final Team team);
 
-    @Query("select new net.vrfun.tasktracker.task.TaskShortInfo(task) " +
+    @Query("select new net.vrfun.tasktracker.task.TaskDTO(task) " +
             "from net.vrfun.tasktracker.task.Task task where task.title like concat('%',:filter,'%')")
-    List<TaskShortInfo> searchTask(@NonNull @Param("filter") final String filter);
+    List<TaskDTO> searchTask(@NonNull @Param("filter") final String filter);
 }

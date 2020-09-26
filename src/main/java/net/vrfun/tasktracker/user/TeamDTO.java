@@ -10,39 +10,35 @@ package net.vrfun.tasktracker.user;
 import org.springframework.lang.NonNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Team's short info.
+ * Team's data transfer object
  *
  * @author          boto
  * Creation Date    August 2020
  */
-public class TeamShortInfo {
+public class TeamDTO {
 
     private long id;
-
     private String name;
-
     private String description;
-
     private Collection<Long> userIDs;
-
     private Collection<Long> teamLeaderIDs;
-
     private Collection<String> teamLeaderNames;
-
     private boolean active;
 
-    public TeamShortInfo() {}
+    public TeamDTO() {}
 
-    public TeamShortInfo(@NonNull final Team team) {
+    public TeamDTO(@NonNull final Team team) {
         this.id = team.getId();
         this.name = team.getName();
         this.description = team.getDescription();
         this.active = team.getActive();
         if (team.getUsers() != null) {
-            this.userIDs = new ArrayList<>();
-            team.getUsers().stream().forEach((user) -> this.userIDs.add(user.getId()));
+            this.userIDs = team.getUsers().stream().
+                map((user) -> user.getId())
+                .collect(Collectors.toList());
         }
         if (team.getTeamLeaders() != null) {
             this.teamLeaderIDs = new ArrayList<>();

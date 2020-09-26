@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker;
 
+import net.vrfun.tasktracker.report.ReportGeneratorScheduler;
 import net.vrfun.tasktracker.user.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -20,15 +21,18 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class TaskTrackerApplication {
 
-    private Users users;
+    private final Users users;
+    private final ReportGeneratorScheduler reportGeneratorScheduler;
 
     public static void main(String[] args) {
         SpringApplication.run(TaskTrackerApplication.class, args);
     }
 
     @Autowired
-    public TaskTrackerApplication(@NonNull final Users users) {
+    public TaskTrackerApplication(@NonNull final Users users,
+                                  @NonNull final ReportGeneratorScheduler reportGeneratorScheduler) {
         this.users = users;
+        this.reportGeneratorScheduler = reportGeneratorScheduler;
     }
 
     /**
@@ -37,5 +41,6 @@ public class TaskTrackerApplication {
     @EventListener(ApplicationReadyEvent.class)
     public void startup() {
         users.setupApplicationUsers();
+        reportGeneratorScheduler.initializeSchedulers();
     }
 }

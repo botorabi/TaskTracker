@@ -1,28 +1,26 @@
+/*
+ * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * https://github.com/botorabi/TaskTracker
+ *
+ * License: MIT License (MIT), read the LICENSE text in
+ *          main directory for more details.
+ */
 package net.vrfun.tasktracker.report;
 
-import net.vrfun.tasktracker.user.Team;
-import net.vrfun.tasktracker.user.TeamRepository;
-import net.vrfun.tasktracker.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.ScheduledFuture;
+
 
 /**
  * Report job scheduler
@@ -30,114 +28,86 @@ import java.util.stream.Collectors;
  * @author          boto
  * Creation Date    September 2020
  */
-@Component
+@Service
 public class ReportGeneratorScheduler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private final Reports reports;
-    private final JavaMailSender emailSender;
-    private final TeamRepository teamRepository;
-    private final ReportGeneratorConfigurationRepository reportGeneratorConfigurationRepository;
+    private final TaskScheduler taskScheduler;
+    private final ReportGeneratorService reportGeneratorService;
+    private final ReportMailConfigurationRepository reportMailConfigurationRepository;
+
+    private final Map<Long, ScheduledFuture<?>> reportingJobs = new HashMap<>();
 
     @Autowired
-    public ReportGeneratorScheduler(@NonNull final Reports reports,
-                                    @NonNull final JavaMailSender emailSender,
-                                    @NonNull final TeamRepository teamRepository,
-                                    @NonNull final ReportGeneratorConfigurationRepository reportGeneratorConfigurationRepository) {
+    public ReportGeneratorScheduler(@NonNull final TaskScheduler taskScheduler,
+                                    @NonNull final ReportGeneratorService reportGeneratorService,
+                                    @NonNull final ReportMailConfigurationRepository reportMailConfigurationRepository) {
 
-        this.reports = reports;
-        this.emailSender = emailSender;
-        this.teamRepository = teamRepository;
-        this.reportGeneratorConfigurationRepository = reportGeneratorConfigurationRepository;
+        this.taskScheduler = taskScheduler;
+        this.reportGeneratorService = reportGeneratorService;
+        this.reportMailConfigurationRepository = reportMailConfigurationRepository;
     }
 
-    //! TODO the schedule must be a matter of configuration, e.g. once weekly, once monthly etc.
-    //@Scheduled(cron = "0 0 18 * * *")
-    @Scheduled(fixedRate = 10000)
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true, noRollbackFor = Exception.class)
-    public void generateReports() {
-        LOGGER.info("Starting cron Job for generating reports");
-
-        List<ReportGeneratorConfiguration> configs = reportGeneratorConfigurationRepository.findAll();
-        if (configs.isEmpty()) {
-            LOGGER.info(" No report generation configuration exist, skip reporting.");
-            return;
-        }
-
-        configs.forEach((configuration) -> {
-            if (configuration.getReportingTeams() == null &&
-                configuration.getMasterRecipients() == null) {
-                LOGGER.info(" No report recipients configured, skip reporting.");
-            }
-
-            List<Team> reportingTeams = null;
-            List<User> masterRecipients = null;
-
-            if (configuration.getReportingTeams() != null) {
-                reportingTeams = configuration.getReportingTeams().stream().collect(Collectors.toList());
-            }
-            if (configuration.getMasterRecipients() != null) {
-                masterRecipients = configuration.getMasterRecipients().stream().collect(Collectors.toList());
-            }
-
-            sendTeamLeadEMails(configuration, reportingTeams, masterRecipients);
-        });
-    }
-
-    protected void sendTeamLeadEMails(@NonNull final ReportGeneratorConfiguration configuration,
-                                      @Nullable final List<Team> teams,
-                                      @Nullable final List<User> masterRecipients) {
-        teams.forEach((team) -> {
-            try {
-                String recipients = getAllRecipients(team, masterRecipients);
-                ByteArrayResource reportFile = reports.createTeamReportTextCurrentWeek(Arrays.asList(team.getId()));
-                sendMail(configuration.getMailSenderName(),
-                        recipients,
-                        configuration.getMailSubject(),
-                        configuration.getMailText(),
-                        reportFile);
-
-            } catch (IOException | MessagingException exception) {
-                LOGGER.error(" Could not create report, reason: {}", exception.getMessage());
-            }
-        });
+    /**
+     * Call this method on application start.
+     */
+    public void initializeSchedulers() {
+        List<ReportMailConfiguration> configs = reportMailConfigurationRepository.findAll();
+        configs.forEach((configuration) -> addOrUpdateReportingJob(configuration));
     }
 
     @NonNull
-    protected String getAllRecipients(@Nullable final Team team, @Nullable final List<User> masterRecipients) {
-        List<String> allRecipients = new ArrayList<>();
-        if (team != null) {
-            team.getTeamLeaders().stream()
-                    .map((user) -> allRecipients.add(user.getEmail()));
-        }
-        if (masterRecipients != null) {
-            masterRecipients.stream()
-                    .map((user) -> allRecipients.add(user.getEmail()));
-        }
-        if (allRecipients.isEmpty()) {
-            return "";
-        }
-        return String.join(",", allRecipients);
+    public Map<Long, ScheduledFuture<?>> getReportingJobs() {
+        return reportingJobs;
     }
 
-    protected void sendMail(@NonNull  final String from,
-                            @NonNull  final String to,
-                            @NonNull  final String subject,
-                            @Nullable final String text,
-                            @NonNull  final ByteArrayResource attachment) throws MessagingException {
+    public void addOrUpdateReportingJob(@NonNull final ReportMailConfiguration configuration) {
+        if (getReportingJobs().containsKey(configuration.getId())) {
+            removeReportingJob(configuration.getId());
+        }
 
-        MimeMessage message = emailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setFrom(from);
-        helper.setTo(to);
-        helper.setSubject(subject);
+        String cron = createCroneConfiguration(configuration);
 
-        String body = (text != null ? text + "\n\n" : "") + new String(attachment.getByteArray());
-        helper.setText(body);
+        String scheduleTime = configuration.getReportPeriod().name() + ", Weekday: " +
+                configuration.getReportWeekDay().name() + ", Time: " +
+                configuration.getReportHour() + ":" +
+                configuration.getReportMinute();
 
-        helper.addAttachment("Report.txt", attachment);
+        LOGGER.info("(Re-)Scheduling report generation cron job '{}' ({}) at: {} (cron: {})",
+                configuration.getName(), configuration.getId(), scheduleTime, cron);
 
-        emailSender.send(message);
+        ScheduledFuture<?> scheduledTask = taskScheduler.schedule(
+                () -> reportGeneratorService.generateReport(configuration.getId()),
+                new CronTrigger(cron, TimeZone.getTimeZone(TimeZone.getDefault().getID())));
+
+       getReportingJobs().put(configuration.getId(), scheduledTask);
+    }
+
+    public void removeReportingJob(@NonNull final Long configurationID) {
+        ScheduledFuture<?> scheduledTask = getReportingJobs().get(configurationID);
+        if(scheduledTask != null) {
+            scheduledTask.cancel(true);
+            getReportingJobs().remove(configurationID);
+            LOGGER.info("Report generation cron job was removed: {}", configurationID);
+        }
+    }
+
+    protected String createCroneConfiguration(@NonNull final ReportMailConfiguration configuration) {
+        // cron syntax: <second> <minute> <hour> <day-of-month> <month> <day-of-week> <year> <command>
+        String cron = "0 " + configuration.getReportMinute() + " " + configuration.getReportHour();
+
+        if (configuration.getReportPeriod() == ReportPeriod.PERIOD_MONTHLY) {
+            cron += " 1-7 * ";
+        }
+        else if (configuration.getReportPeriod() == ReportPeriod.PERIOD_WEEKLY) {
+            cron += " * * ";
+        }
+        else {
+            LOGGER.error("Unsupported reporting period: {}", configuration.getReportPeriod());
+        }
+
+        cron += configuration.getReportWeekDay().toCronDay();
+        return cron;
     }
 }

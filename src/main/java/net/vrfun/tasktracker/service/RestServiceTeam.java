@@ -9,9 +9,11 @@ package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +73,7 @@ public class RestServiceTeam {
         }
     }
 
-    @DeleteMapping("/team/{id}")
+    @DeleteMapping("/team/delete/{id}")
     @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
@@ -85,12 +87,12 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team/search/{filter}")
-    public ResponseEntity<List<TeamShortInfo>> searchTeam(@PathVariable("filter") String filter) {
+    public ResponseEntity<List<TeamDTO>> searchTeam(@PathVariable("filter") String filter) {
         return new ResponseEntity<>(teams.searchTeams(filter), HttpStatus.OK);
     }
 
     @GetMapping("/team")
-    public ResponseEntity<List<TeamShortInfo>> getTeams() {
+    public ResponseEntity<List<TeamDTO>> getTeams() {
         try {
             return new ResponseEntity<>(teams.getTeams(), HttpStatus.OK);
         }
@@ -101,7 +103,7 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team/{id}")
-    public ResponseEntity<TeamShortInfo> getTeam(@PathVariable("id") Long id) {
+    public ResponseEntity<TeamDTO> getTeam(@PathVariable("id") Long id) {
         try {
             return new ResponseEntity<>(teams.getTeamById(id), HttpStatus.OK);
         }

@@ -7,19 +7,19 @@
  */
 package net.vrfun.tasktracker.report;
 
-import net.vrfun.tasktracker.task.*;
+import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.task.ProgressRepository;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
-import java.io.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for report generation
@@ -33,66 +33,203 @@ public class Reports {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     private final ProgressRepository progressRepository;
+    private final UserRepository userRepository;
     private final TeamRepository teamRepository;
-    private final TaskRepository taskRepository;
+    private final ReportMailConfigurationRepository reportMailConfigurationRepository;
+    private final ReportGeneratorScheduler reportGeneratorScheduler;
+    private final UserAuthenticator userAuthenticator;
+
 
     @Autowired
     public Reports(@NonNull final ProgressRepository progressRepository,
+                   @NonNull final UserRepository userRepository,
                    @NonNull final TeamRepository teamRepository,
-                   @NonNull final TaskRepository taskRepository) {
+                   @NonNull final ReportMailConfigurationRepository reportMailConfigurationRepository,
+                   @NonNull final ReportGeneratorScheduler reportGeneratorScheduler,
+                   @NonNull final UserAuthenticator userAuthenticator) {
 
         this.progressRepository = progressRepository;
+        this.userRepository = userRepository;
         this.teamRepository = teamRepository;
-        this.taskRepository = taskRepository;
+        this.reportMailConfigurationRepository = reportMailConfigurationRepository;
+        this.reportGeneratorScheduler = reportGeneratorScheduler;
+        this.userAuthenticator = userAuthenticator;
     }
 
-    public ByteArrayResource createTeamReportTextCurrentWeek(@NonNull final List<Long> teamIDs) throws IOException {
-        LocalDate currentDate = LocalDate.now();
-        return createTeamReportText(teamIDs, currentDate.minusWeeks(1L), currentDate);
-    }
-
-    public ByteArrayResource createTeamReportText(@NonNull final List<Long> teamIDs,
-                                                  @NonNull final LocalDate fromDate,
-                                                  @NonNull final LocalDate toDate) throws IOException {
-
-        List<Team> teamList = new ArrayList<>();
-        teamRepository.findAllById(teamIDs).forEach((team -> teamList.add(team)));
-        if (teamList.isEmpty()) {
-            throw new IllegalArgumentException("Invalid team IDs!");
+    public boolean validateUserAccess(@NonNull final List<Long> teamIDs) {
+        if (userAuthenticator.isRoleAdmin()) {
+            return true;
         }
 
-        ReportGeneratorPlainText reportGeneratorPlainText = new ReportGeneratorPlainText();
-        try (ByteArrayOutputStream byteArrayOutputStream = reportGeneratorPlainText.begin()) {
+        List<Long> userTeamIDs = teamRepository.findTeamLeadTeams(userAuthenticator.getUser()).stream()
+                .map((user) -> user.getId())
+                .collect(Collectors.toList());
 
-            reportGeneratorPlainText.generateCoverPage("Team Progress Report", "AVM GmbH, R&D" +
-                    "\n" +
-                    "\nPeriod: " + fromDate.format(DateTimeFormatter.ofPattern("MM.dd.yyyy")) + " - " +
-                                   toDate.format(DateTimeFormatter.ofPattern("MM.dd.yyyy")) +
-                    "\nCreated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm")));
+        return userTeamIDs.containsAll(teamIDs);
+    }
 
-            teamList.forEach((team -> {
-                LOGGER.debug("Generating progress for team: {}", team.getName());
+    @NonNull
+    public ReportMailConfiguration createMailConfiguration(@NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+        validateNewReportMailConfiguration(reqReportMailConfiguration);
 
-                reportGeneratorPlainText.sectionBegin("Team '" + team.getName() + "'");
+        ReportMailConfiguration reportMailConfiguration = new ReportMailConfiguration();
 
-                taskRepository.findTeamTasks(team).forEach((task -> {
-                    LOGGER.debug(" Generating progress for task: {}", task.getTitle());
+        reportMailConfiguration.setName(reqReportMailConfiguration.getName());
+        reportMailConfiguration.setMailSenderName(reqReportMailConfiguration.getMailSenderName());
+        reportMailConfiguration.setMailSubject(reqReportMailConfiguration.getMailSubject());
+        reportMailConfiguration.setMailText(reqReportMailConfiguration.getMailText());
+        reportMailConfiguration.setReportToTeamLeads(reqReportMailConfiguration.getReportToTeamLeads());
+        reportMailConfiguration.setReportToTeamMembers(reqReportMailConfiguration.getReportToTeamMembers());
+        reportMailConfiguration.setReportPeriod(ReportPeriod.fromString(reqReportMailConfiguration.getReportPeriod()));
+        reportMailConfiguration.setReportWeekDay(ReportWeekDay.fromString(reqReportMailConfiguration.getReportWeekDay()));
+        reportMailConfiguration.setReportHour(reqReportMailConfiguration.getReportHour());
+        reportMailConfiguration.setReportMinute(reqReportMailConfiguration.getReportMinute());
 
-                    List<Progress> progressList = progressRepository.findByTaskIdAndReportWeekBetween(task.getId(), fromDate, toDate);
+        setReportingTeamsAndMasterRecipients(reportMailConfiguration, reqReportMailConfiguration);
 
-                    reportGeneratorPlainText.sectionAppend(progressList);
-                }));
+        ReportMailConfiguration newReportMailConfiguration = reportMailConfigurationRepository.save(reportMailConfiguration);
 
-                reportGeneratorPlainText.sectionEnd();
-            }));
+        reportGeneratorScheduler.addOrUpdateReportingJob(newReportMailConfiguration);
 
-            reportGeneratorPlainText.end();
+        return newReportMailConfiguration;
+    }
 
-            return new ByteArrayResource(byteArrayOutputStream.toByteArray());
+    protected void validateNewReportMailConfiguration(@NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+        if (StringUtils.isEmpty(reqReportMailConfiguration.getName())) {
+            throw new IllegalArgumentException("Missing Configuration Name");
+        }
+        if (StringUtils.isEmpty(reqReportMailConfiguration.getMailSenderName())) {
+            throw new IllegalArgumentException("Missing Mail Sender Name");
+        }
+        if (StringUtils.isEmpty(reqReportMailConfiguration.getMailSubject())) {
+            throw new IllegalArgumentException("Missing Mail Subject");
+        }
+        if (CollectionUtils.isEmpty(reqReportMailConfiguration.getReportingTeams())) {
+            throw new IllegalArgumentException("Missing Reporting Teams");
+        }
+        if (ReportPeriod.fromString(reqReportMailConfiguration.getReportPeriod()) == ReportPeriod.PERIOD_UNKNOWN) {
+            throw new IllegalArgumentException("Invalid Report Period");
+        }
+        if (ReportWeekDay.fromString(reqReportMailConfiguration.getReportWeekDay()) == ReportWeekDay.WEEKDAY_UNKNOWN) {
+            throw new IllegalArgumentException("Invalid Report Week Day");
+        }
+        Long reportHour = reqReportMailConfiguration.getReportHour();
+        if (reportHour == null || !(reportHour >= 0L && reportHour <= 24L)) {
+            throw new IllegalArgumentException("Invalid Report Hour");
+        }
+        Long reportMinute = reqReportMailConfiguration.getReportMinute();
+        if (reportMinute == null || !(reportMinute >= 0L && reportMinute <= 59L)) {
+            throw new IllegalArgumentException("Invalid Report Minute");
+        }
+    }
 
-        } catch (Throwable throwable) {
-            LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
-            throw throwable;
+    protected void setReportingTeamsAndMasterRecipients(@NonNull final ReportMailConfiguration reportMailConfiguration,
+                                                        @NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+
+        List<Team> reportingTeams = new ArrayList<>();
+        reqReportMailConfiguration.getReportingTeams().forEach((teamID) -> {
+            Optional<Team> foundTeam = teamRepository.findById(teamID);
+            foundTeam.ifPresentOrElse(
+                    (team) -> reportingTeams.add(team),
+                    () -> LOGGER.warn("Cannot setup Team with ID {} for reporting configuration, it does not exist!")
+            );
+        });
+        reportMailConfiguration.setReportingTeams(reportingTeams);
+
+        List<User> masterRecipients = new ArrayList<>();
+        reqReportMailConfiguration.getMasterRecipients().forEach((userID) -> {
+            Optional<User> foundUser = userRepository.findById(userID);
+            foundUser.ifPresentOrElse(
+                    (user) -> masterRecipients.add(user),
+                    () -> LOGGER.warn("Cannot setup master recipient user with ID {} for reporting configuration, it does not exist!")
+            );
+        });
+        reportMailConfiguration.setMasterRecipients(masterRecipients);
+    }
+
+    @NonNull
+    public ReportMailConfiguration editMailConfiguration(@NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+        Optional<ReportMailConfiguration> config = reportMailConfigurationRepository.findById(reqReportMailConfiguration.getId());
+        if (!config.isPresent()) {
+            throw new IllegalArgumentException("Could not find report generation configuration with given ID");
+        }
+
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getMailSenderName())) {
+            config.get().setMailSenderName(reqReportMailConfiguration.getMailSenderName());
+        }
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getMailSubject())) {
+            config.get().setMailSubject(reqReportMailConfiguration.getMailSubject());
+        }
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getMailText())) {
+            config.get().setMailText(reqReportMailConfiguration.getMailText());
+        }
+        if (reqReportMailConfiguration.getReportToTeamLeads() != null) {
+            config.get().setReportToTeamLeads(reqReportMailConfiguration.getReportToTeamLeads());
+        }
+        if (reqReportMailConfiguration.getReportToTeamMembers() != null) {
+            config.get().setReportToTeamMembers(reqReportMailConfiguration.getReportToTeamMembers());
+        }
+
+        if (reqReportMailConfiguration.getReportPeriod() != null) {
+            config.get().setReportPeriod(ReportPeriod.valueOf(reqReportMailConfiguration.getReportPeriod()));
+        }
+        if (reqReportMailConfiguration.getReportWeekDay() != null) {
+            config.get().setReportWeekDay(ReportWeekDay.valueOf(reqReportMailConfiguration.getReportWeekDay()));
+        }
+        if (reqReportMailConfiguration.getReportHour() != null) {
+            config.get().setReportHour(reqReportMailConfiguration.getReportHour());
+        }
+        if (reqReportMailConfiguration.getReportMinute() != null) {
+            config.get().setReportMinute(reqReportMailConfiguration.getReportMinute());
+        }
+
+        setReportingTeamsAndMasterRecipients(config.get(), reqReportMailConfiguration);
+
+        reportGeneratorScheduler.addOrUpdateReportingJob(config.get());
+
+        return reportMailConfigurationRepository.save(config.get());
+    }
+
+    public void deleteMailConfiguration(@NonNull final Long configurationID) {
+        Optional<ReportMailConfiguration> config = reportMailConfigurationRepository.findById(configurationID);
+        if (!config.isPresent()) {
+            throw new IllegalArgumentException("Could not find report generation configuration with given ID");
+        }
+        reportMailConfigurationRepository.delete(config.get());
+
+        reportGeneratorScheduler.removeReportingJob(configurationID);
+    }
+
+    public List<ReportMailConfigurationDTO> getReportMailConfigurations() {
+        if (userAuthenticator.isRoleAdmin()) {
+            return reportMailConfigurationRepository.findAll().stream()
+                    .map((config) -> new ReportMailConfigurationDTO((config)))
+                    .collect(Collectors.toList());
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            return reportMailConfigurationRepository.findTeamLeadConfigurations(userAuthenticator.getUser()).stream()
+                    .map((config) -> new ReportMailConfigurationDTO((config)))
+                    .collect(Collectors.toList());
+        }
+        else {
+            throw new IllegalArgumentException("Unauthorized access to report mail configurations");
+        }
+    }
+
+    public ReportMailConfigurationDTO getReportMailConfiguration(@NonNull final Long id) {
+        Optional<ReportMailConfiguration> configuration;
+        if (userAuthenticator.isRoleAdmin()) {
+            configuration = reportMailConfigurationRepository.findById(id);
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            configuration = reportMailConfigurationRepository.findTeamLeadConfiguration(userAuthenticator.getUser(), id);
+        }
+        else {
+            throw new IllegalArgumentException("Unauthorized access to report mail configuration");
+        }
+
+        if (configuration.isPresent()) {
+            return new ReportMailConfigurationDTO(configuration.get());
+        } else {
+            throw new IllegalArgumentException("Report mail configuration with ID " + id + " does not exist.");
         }
     }
 }

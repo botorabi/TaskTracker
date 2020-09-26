@@ -9,9 +9,11 @@ package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
 import net.vrfun.tasktracker.user.Role;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +62,7 @@ public class RestServiceProgress {
         }
     }
 
-    @DeleteMapping("/progress/{id}")
+    @DeleteMapping("/progress/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long progressID) {
         try {
             progresses.delete(progressID);
@@ -73,24 +75,24 @@ public class RestServiceProgress {
     }
 
     @GetMapping("/progress/all")
-    public ResponseEntity<List<ProgressShortInfo>> getProgressAll() {
+    public ResponseEntity<List<ProgressDTO>> getProgressAll() {
         return new ResponseEntity<>(progresses.getAll(), HttpStatus.OK);
     }
 
     @GetMapping("/progress/team/{id}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
-    public ResponseEntity<List<ProgressShortInfo>> getTeamProgress(@PathVariable("id") final Long id) {
+    public ResponseEntity<List<ProgressDTO>> getTeamProgress(@PathVariable("id") final Long id) {
         return new ResponseEntity<>(progresses.getTeamProgress(id), HttpStatus.OK);
     }
 
     @GetMapping("/progress")
-    public ResponseEntity<List<ProgressShortInfo>> getUserProgress() {
+    public ResponseEntity<List<ProgressDTO>> getUserProgress() {
         return new ResponseEntity<>(progresses.getUserProgress(), HttpStatus.OK);
     }
 
     @GetMapping("/progress/{id}")
-    public ResponseEntity<ProgressShortInfo> getProgress(@PathVariable("id") final Long id) {
-        ProgressShortInfo progress = progresses.get(id);
+    public ResponseEntity<ProgressDTO> getProgress(@PathVariable("id") final Long id) {
+        ProgressDTO progress = progresses.get(id);
         if (progress == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
