@@ -144,7 +144,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
       return;
     }
 
-    String fileName = "Report.txt";
+    String fileName = "Report.pdf";
     List<int> teamIDs = List<int>();
     for (int i = 0; i < _selectedTeams.length; i++) {
       if (_selectedTeams[i]) {
@@ -152,9 +152,9 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
       }
     }
 
-    bool success = await _serviceReport.createReportText(teamIDs, fromDate, toDate, fileName);
-    if (success) {
-      DialogModal(context).show("Report", "Report successfully created.", false);
+    bool success = await _serviceReport.createReportDocument(teamIDs, fromDate, toDate, fileName);
+    if (!success) {
+      DialogModal(context).show("Attention", "Report document could not be created!", true);
     }
   }
 

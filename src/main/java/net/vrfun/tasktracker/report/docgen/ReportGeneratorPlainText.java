@@ -5,7 +5,7 @@
  * License: MIT License (MIT), read the LICENSE text in
  *          main directory for more details.
  */
-package net.vrfun.tasktracker.report;
+package net.vrfun.tasktracker.report.docgen;
 
 import net.vrfun.tasktracker.task.Progress;
 import org.springframework.lang.NonNull;
@@ -18,10 +18,12 @@ import java.util.*;
 
 public class ReportGeneratorPlainText implements ReportGenerator {
 
-    ByteArrayOutputStream byteArrayOutputStream;
+    private ByteArrayOutputStream byteArrayOutputStream;
+
+    protected ReportGeneratorPlainText() {}
 
     @Override
-    public ByteArrayOutputStream begin() {
+    public void begin() {
         if (byteArrayOutputStream != null) {
             try {
                 byteArrayOutputStream.close();
@@ -29,7 +31,6 @@ public class ReportGeneratorPlainText implements ReportGenerator {
         }
 
         byteArrayOutputStream = new ByteArrayOutputStream();
-        return byteArrayOutputStream;
     }
 
     @Override
@@ -96,27 +97,6 @@ public class ReportGeneratorPlainText implements ReportGenerator {
         });
 
         byteArrayOutputStream.writeBytes(text.toString().getBytes());
-    }
-
-    private List<Progress> sortByOwnerAndCalendarWeek(@NonNull final List<Progress> progressList) {
-        List<Progress> sortedProgressList = new ArrayList<>();
-        HashMap<String /*owner*/, List<Progress>> sortedMap = new HashMap<>();
-        List<String> owners = new ArrayList<>();
-
-        progressList.sort(Comparator.comparing(Progress::getOwnerName));
-        progressList.forEach((progress -> {
-            if (!sortedMap.containsKey(progress.getOwnerName())) {
-                sortedMap.put(progress.getOwnerName(), new ArrayList<>());
-                owners.add(progress.getOwnerName());
-            }
-            sortedMap.get(progress.getOwnerName()).add(progress);
-        }));
-
-        owners.forEach((ownerName) -> sortedMap.get(ownerName).sort(Comparator.comparing(Progress::getReportWeek).reversed()));
-        owners.sort(Comparator.comparing(String::toUpperCase));
-        owners.forEach((ownerName) -> sortedProgressList.addAll(sortedMap.get(ownerName)));
-
-        return sortedProgressList;
     }
 
     @Override

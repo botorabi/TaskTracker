@@ -16,7 +16,7 @@ import 'package:http/http.dart';
 
 class ServiceReport {
 
-  Future<bool> createReportText(List<int> teamIDs, DateTime fromDate, DateTime toDate, String fileName) async {
+  Future<bool> createReportDocument(List<int> teamIDs, DateTime fromDate, DateTime toDate, String fileName) async {
     String deltaTime = '/' + (fromDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString() +
                        '/' + (toDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString();
 

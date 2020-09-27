@@ -15,7 +15,7 @@ class Config {
   /// Adapt the base URL if e.g. your server is behind a reverse proxy, or
   /// during the development set it to 'http://localhost:8080' in order to
   /// use Flutter's devtools server.
-  static final String baseURL = 'http://localhost:8080';
+  static final String baseURL = '';
 
   static AuthStatus authStatus = AuthStatus();
 

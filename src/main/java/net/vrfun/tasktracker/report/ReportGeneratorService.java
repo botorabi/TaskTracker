@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.report;
 
+import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.User;
 import org.slf4j.Logger;
@@ -92,7 +93,7 @@ public class ReportGeneratorService {
             try {
                 recipients = getAllRecipients(team, masterRecipients);
                 if (!recipients.isEmpty()) {
-                    ByteArrayResource reportFile = reportComposer.createTeamReportTextCurrentWeek(Arrays.asList(team.getId()));
+                    ByteArrayResource reportFile = reportComposer.createTeamReportTextCurrentWeek(Arrays.asList(team.getId()), ReportFormat.PDF);
                     String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
                     cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
                     sendMail(cleanMailSender,
@@ -149,7 +150,7 @@ public class ReportGeneratorService {
         String body = (text != null ? text + "\n\n" : "") + new String(attachment.getByteArray());
         helper.setText(body);
 
-        helper.addAttachment("Report.txt", attachment);
+        helper.addAttachment("Report.pdf", attachment);
 
         try {
             emailSender.send(message);

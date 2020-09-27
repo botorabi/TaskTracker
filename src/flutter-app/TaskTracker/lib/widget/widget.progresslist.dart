@@ -53,14 +53,17 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: Card(
-          elevation: 0,
+          elevation: 5,
           margin: EdgeInsets.all(10.0),
           child: Column(
             children: [
               Text(widget.title),
-              SizedBox(
-                width: constraints.maxWidth,
-                child: _dataTable,
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: _dataTable,
+                ),
               ),
             ],
           ),
@@ -142,7 +145,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
           label: Text(''),
         ),
       ],
-      rowsPerPage: 5,
+      rowsPerPage: 10,
       onRowsPerPageChanged: null,
       source: _DataProvider(this),
       sortColumnIndex: 0,

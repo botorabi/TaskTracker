@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.report.*;
+import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.Role;
 import org.slf4j.Logger;
@@ -116,7 +117,7 @@ public class RestServiceReport {
     @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}",
                 produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
-    public ResponseEntity<ByteArrayResource> createTeamReportText(@PathVariable("teamIDs")            final String teamIDs,
+    public ResponseEntity<ByteArrayResource> createTeamReport(@PathVariable("teamIDs")            final String teamIDs,
                                                                   @PathVariable("fromDaysSinceEpoch") final String fromDate,
                                                                   @PathVariable("toDaysSinceEpoch")   final String toDate) throws IOException {
 
@@ -133,10 +134,11 @@ public class RestServiceReport {
         LocalDate toInDaysSinceEpoch   = LocalDate.ofEpochDay(Integer.parseInt(toDate));
 
         try {
-            return new ResponseEntity<>(reportComposer.createTeamReportText(ids, fromInDaysSinceEpoch, toInDaysSinceEpoch), HttpStatus.OK);
+            return new ResponseEntity<>(reportComposer.createTeamReportText(ids, fromInDaysSinceEpoch, toInDaysSinceEpoch, ReportFormat.PDF), HttpStatus.OK);
         }
         catch(Throwable throwable) {
-            LOGGER.info("Could not get report generation configuration, reason: {}", throwable.getMessage());
+            LOGGER.info("Could not create report, reason: {}", throwable.getMessage());
+            throwable.printStackTrace();
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
     }

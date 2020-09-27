@@ -7,7 +7,12 @@
  */
 package net.vrfun.tasktracker.report;
 
-import net.vrfun.tasktracker.task.*;
+import net.vrfun.tasktracker.report.docgen.ReportFormat;
+import net.vrfun.tasktracker.report.docgen.ReportGenerator;
+import net.vrfun.tasktracker.report.docgen.ReportGeneratorFactory;
+import net.vrfun.tasktracker.task.Progress;
+import net.vrfun.tasktracker.task.ProgressRepository;
+import net.vrfun.tasktracker.task.TaskRepository;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.TeamRepository;
 import org.slf4j.Logger;
@@ -46,22 +51,23 @@ public class ReportComposer {
 
     @Autowired
     public ReportComposer(@NonNull final ProgressRepository progressRepository,
-                   @NonNull final TeamRepository teamRepository,
-                   @NonNull final TaskRepository taskRepository) {
+                          @NonNull final TeamRepository teamRepository,
+                          @NonNull final TaskRepository taskRepository) {
 
         this.progressRepository = progressRepository;
         this.teamRepository = teamRepository;
         this.taskRepository = taskRepository;
     }
 
-    public ByteArrayResource createTeamReportTextCurrentWeek(@NonNull final List<Long> teamIDs) throws IOException {
+    public ByteArrayResource createTeamReportTextCurrentWeek(@NonNull final List<Long> teamIDs, @NonNull final ReportFormat reportFormat) throws IOException {
         LocalDate currentDate = LocalDate.now();
-        return createTeamReportText(teamIDs, currentDate.minusWeeks(1L), currentDate);
+        return createTeamReportText(teamIDs, currentDate.minusWeeks(1L), currentDate, reportFormat);
     }
 
     public ByteArrayResource createTeamReportText(@NonNull final List<Long> teamIDs,
                                                   @NonNull final LocalDate fromDate,
-                                                  @NonNull final LocalDate toDate) throws IOException {
+                                                  @NonNull final LocalDate toDate,
+                                                  @NonNull final ReportFormat reportFormat) throws IOException {
 
         List<Team> teamList = new ArrayList<>();
         teamRepository.findAllById(teamIDs).forEach((team -> teamList.add(team)));
@@ -69,9 +75,10 @@ public class ReportComposer {
             throw new IllegalArgumentException("Invalid team IDs!");
         }
 
-        ReportGeneratorPlainText reportGeneratorPlainText = new ReportGeneratorPlainText();
-        try (ByteArrayOutputStream byteArrayOutputStream = reportGeneratorPlainText.begin()) {
-
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        ReportGenerator reportGeneratorPlainText = ReportGeneratorFactory.buildGenerator(reportFormat);
+        try {
+            reportGeneratorPlainText.begin();
             reportGeneratorPlainText.generateCoverPage("Team Progress Report", "AVM GmbH, R&D" +
                     "\n" +
                     "\nPeriod: " + fromDate.format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT)) + " - " +
@@ -94,12 +101,14 @@ public class ReportComposer {
                 reportGeneratorPlainText.sectionEnd();
             }));
 
-            reportGeneratorPlainText.end();
-
+            byteArrayOutputStream = reportGeneratorPlainText.end();
             return new ByteArrayResource(byteArrayOutputStream.toByteArray());
 
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
+            if (byteArrayOutputStream != null) {
+                byteArrayOutputStream.close();
+            }
             throw throwable;
         }
     }
