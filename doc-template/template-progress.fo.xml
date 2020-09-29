@@ -1,0 +1,24 @@
+            <fo:block space-after="20pt" text-align="left">
+                <fo:inline font-weight="bold">@TITLE@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Author: @AUTHOR@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Created: @DATE@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Calendar Week: @WEEK@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Task: @TASK@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Tags: @TAGS@</fo:inline>
+            </fo:block>
+            <fo:block space-after="15pt" text-align="left">
+                <fo:inline>@TEXTTITLE@</fo:inline>
+            </fo:block>
+            <fo:block space-after="30pt" text-align="left">
+                <fo:inline>@TEXT@</fo:inline>
+            </fo:block>

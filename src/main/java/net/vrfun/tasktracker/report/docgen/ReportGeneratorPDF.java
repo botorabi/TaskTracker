@@ -8,19 +8,19 @@
 package net.vrfun.tasktracker.report.docgen;
 
 import net.vrfun.tasktracker.task.Progress;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.fop.apps.*;
+import org.apache.tools.ant.filters.StringInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.web.util.HtmlUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import javax.xml.transform.*;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.*;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
 import java.util.List;
@@ -29,161 +29,159 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private PDDocument document;
-    private PDPageContentStream contentStream;
+    final String FOP_INPUT_FILE_DOCUMENT = "doc-template/template-document.fo.xml";
+    final String FOP_INPUT_FILE_CONTENT  = "doc-template/template-progress.fo.xml";
+
+    private FopFactory fopFactory;
+    private Fop fop;
+
+    private ByteArrayOutputStream outputStream;
+    private String progressTemplate;
+    private String documentTemplate;
+    private String documentContentFo = "";
+
+    private String documentTitle;
+    private String documentSubTitle;
+    private String documentCreationDate;
+    private String currentSectionTitle;
+
 
     protected ReportGeneratorPDF() {}
 
     @Override
     public void begin() {
-        if (document != null) {
-            try {
-                contentStream.close();
-                document.close();
-            } catch (IOException ignore) {}
+        if (fop != null) {
+            throw new IllegalStateException("Call end() before beginning a new PDF generation!");
         }
 
-        document = new PDDocument();
-        PDPage page = new PDPage();
-        document.addPage(page);
+        try (FileInputStream documentInputStream = new FileInputStream(new File(FOP_INPUT_FILE_DOCUMENT));
+             FileInputStream progressInputStream = new FileInputStream(new File(FOP_INPUT_FILE_CONTENT))) {
 
-        try {
-            contentStream = new PDPageContentStream(document, page);
+            fopFactory = FopFactory.newInstance(new File(".").toURI());
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
-        } catch (IOException exception) {
-            LOGGER.error("Could not create PDF page content stream, reason: {}", exception.getMessage());
+            outputStream = new ByteArrayOutputStream();
+            fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, outputStream);
+
+            documentTemplate = new String(documentInputStream.readAllBytes());
+            progressTemplate = new String(progressInputStream.readAllBytes());
+
+        } catch (FOPException | IOException exception) {
+            LOGGER.error("Could not create a FOP instance, reason {}", exception.getMessage());
+            throw new IllegalStateException("Could not create a FOP instance, reason " + exception.getMessage());
         }
     }
 
     @Override
     public void generateCoverPage(@NonNull final String title, String subTitle) {
-        if (contentStream == null) {
+        if (fop == null) {
             throw new IllegalStateException("Generator was not initialized by calling begin()");
         }
 
-        try {
-            contentStream.setFont(PDType1Font.HELVETICA, 16);
-            contentStream.beginText();
-            contentStream.newLine();
-            contentStream.newLine();
-            addText(title);
-            contentStream.newLine();
-            addText(subTitle);
-            contentStream.endText();
-
-        } catch (IOException exception) {
-            LOGGER.error("Could not create PDF cover page, reason: {}", exception.getMessage());
-            throw new IllegalStateException(exception.getMessage());
-        }
-    }
-
-    protected void addText(@NonNull final String text) {
-        String textLines[] = text.split("\n");
-        for (String line: textLines) {
-            try {
-                contentStream.showText(line);
-                contentStream.newLine();
-
-            } catch (IOException exception) {
-                LOGGER.error("Could not add text to PDF report, reason: {}", exception.getMessage());
-                throw new IllegalStateException(exception.getMessage());
-            }
-        }
+        documentTitle = title;
+        documentSubTitle = subTitle;
+        documentCreationDate = LocalDateTime.ofInstant(Instant.now(),
+                ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
     }
 
     @Override
     public void sectionBegin(@NonNull final String title) {
-        document.addPage(new PDPage());
-
-        try {
-            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
-            contentStream.beginText();
-            addText(title);
-            contentStream.endText();
-
-        } catch (IOException exception) {
-            LOGGER.error("Could not create new section, reason: {}", exception.getMessage());
-            throw new IllegalStateException(exception.getMessage());
-        }
+        currentSectionTitle = title;
     }
 
     @Override
     public void sectionAppend(@NonNull final List<Progress> progressList) {
-        if (contentStream == null) {
+        if (fop == null) {
             throw new IllegalStateException("Generator was not initialized by calling begin()");
         }
 
         List<Progress> sortedProgressByOwnerAndCalendarWeek = sortByOwnerAndCalendarWeek(progressList);
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
-            try {
-                LocalDate date = progress.getReportWeek();
-                int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
-                int reportYear = date.get(IsoFields.WEEK_BASED_YEAR);
 
-                contentStream.setFont(PDType1Font.HELVETICA, 12);
-                contentStream.beginText();
+            String progressSection = progressTemplate.replace("@TITLE@", encodeHtml(currentSectionTitle));
+            progressSection = progressSection.replace("@AUTHOR@", encodeHtml(progress.getOwnerName()));
 
-                addText("Author: " + progress.getOwnerName());
-                contentStream.newLine();
-                String dateString = LocalDateTime.ofInstant(progress.getDateCreation(), ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
-                addText("Created: " + dateString);
-                contentStream.newLine();
-                addText("Calendar Week: " + reportYear + "/" + reportWeek);
-                contentStream.newLine();
+            String dateString = LocalDateTime.ofInstant(progress.getDateCreation(),
+                    ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
+            progressSection = progressSection.replace("@DATE@", encodeHtml(dateString));
 
-                if (progress.getTask() != null) {
-                    addText("Task: " + progress.getTask().getTitle());
-                    contentStream.newLine();
-                }
-                if (progress.getTags() != null && !progress.getTags().isEmpty()) {
-                    StringBuffer tags = new StringBuffer();
-                    progress.getTags().forEach((tag) -> tags.append(tag.getName() + " "));
-                    addText("Tags: " + tags.toString());
-                    contentStream.newLine();
-                }
-                contentStream.newLine();
-                addText("Title: " + progress.getTitle());
-                contentStream.newLine();
-                addText("Text:");
-                contentStream.newLine();
-                addText(progress.getText());
-                contentStream.endText();
+            LocalDate date = progress.getReportWeek();
+            int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+            int reportYear = date.get(IsoFields.WEEK_BASED_YEAR);
+            progressSection = progressSection.replace("@WEEK@", encodeHtml("" + reportYear + "/" + reportWeek));
 
-            } catch (IOException exception) {
-                LOGGER.error("Could not create new section, reason: {}", exception.getMessage());
-                throw new IllegalStateException(exception.getMessage());
+            progressSection = progressSection.replace("@TASK@", encodeHtml(progress.getTask().getTitle()));
+
+            StringBuffer tags = new StringBuffer();
+            if (progress.getTags() != null && !progress.getTags().isEmpty()) {
+                progress.getTags().forEach((tag) -> tags.append(tag.getName() + " "));
             }
+            progressSection = progressSection.replace("@TAGS@", encodeHtml(tags.toString()));
+
+            progressSection = progressSection.replace("@TEXTTITLE@", encodeHtml(progress.getTitle()));
+            progressSection = progressSection.replace("@TEXT@", encodeHtml(addMultiLineText(progress.getText())));
+
+            documentContentFo += progressSection;
         });
+    }
+
+    @Nullable
+    protected String encodeHtml(@Nullable final String text) {
+        return (text == null) ? "" : HtmlUtils.htmlEscape(text);
+    }
+
+    @NonNull
+    protected String addMultiLineText(@Nullable final String text) {
+        if (text == null) {
+            return "";
+        }
+        String multiLineText = "";
+        String textLines[] = text.split("\n");
+        for (String line: textLines) {
+            multiLineText += "o " + line + "\n";
+        }
+        return multiLineText;
     }
 
     @Override
     public void sectionEnd() {
-        try {
-            contentStream.beginText();
-            contentStream.newLine();
-            contentStream.newLine();
-            contentStream.endText();
-
-        } catch (IOException exception) {
-            throw new IllegalStateException(exception.getMessage());
-        }
+        documentContentFo += "<fo:block page-break-before=\"always\"></fo:block>\n";
     }
 
     @Override
     public ByteArrayOutputStream end() {
-        if (contentStream == null) {
+        if (fop == null) {
             throw new IllegalStateException("Generator was not initialized by calling begin()");
         }
 
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            contentStream.close();
-            document.save(byteArrayOutputStream);
-            document.close();
-            return byteArrayOutputStream;
+        String totalDocument = documentTemplate.replace("@TITLE@", encodeHtml(documentTitle));
+        totalDocument = totalDocument.replace("@SUBTITLE@", encodeHtml(documentSubTitle));
+        totalDocument = totalDocument.replace("@DATE@", encodeHtml(documentCreationDate));
+        totalDocument = totalDocument.replace("@__CONTENT__@", documentContentFo);
 
-        } catch (IOException exception) {
+        TransformerFactory factory = TransformerFactory.newInstance();
+        InputStream inputStreamFo = null;
+        try {
+            Transformer transformer = factory.newTransformer();
+            inputStreamFo = new StringInputStream(totalDocument);
+            Source src = new StreamSource(inputStreamFo);
+            Result res = new SAXResult(fop.getDefaultHandler());
+            transformer.transform(src, res);
+
+            return outputStream;
+
+        } catch (TransformerConfigurationException | FOPException exception) {
             LOGGER.error("Could not finalize PDF document generation, reason: {}", exception.getMessage());
             throw new IllegalStateException(exception.getMessage());
+        } catch (TransformerException exception) {
+            LOGGER.error("Could not finalize PDF document generation, reason: {}", exception.getMessage());
+            throw new IllegalStateException(exception.getMessage());
+        } finally {
+            try {
+                inputStreamFo.close();
+            } catch (IOException ignored) {
+            }
+            documentContentFo = "";
         }
     }
 }

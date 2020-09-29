@@ -1,0 +1,32 @@
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg">
+    <fo:layout-master-set>
+        <fo:simple-page-master master-name="one">
+            <fo:region-body margin-top="40pt" margin-bottom="50pt" margin-left="40pt" margin-right="40pt" />
+        </fo:simple-page-master>
+    </fo:layout-master-set>
+    <fo:page-sequence master-reference="one">
+        <fo:flow flow-name="xsl-region-body">
+            <fo:block space-after="20pt" text-align="left">
+                <fo:inline font-weight="bold">@TITLE@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Author: @AUTHOR@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Created: @DATE@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Calendar Week: @WEEK@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Task: @TASK@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>Tags: @TAGS@</fo:inline>
+            </fo:block>
+            <fo:block space-after="10pt" text-align="left">
+                <fo:inline>@TEXT@</fo:inline>
+            </fo:block>
+        </fo:flow>
+    </fo:page-sequence>
+</fo:root>
