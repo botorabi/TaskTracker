@@ -84,6 +84,8 @@ public class Reports {
         reportMailConfiguration.setReportWeekDay(ReportWeekDay.fromString(reqReportMailConfiguration.getReportWeekDay()));
         reportMailConfiguration.setReportHour(reqReportMailConfiguration.getReportHour());
         reportMailConfiguration.setReportMinute(reqReportMailConfiguration.getReportMinute());
+        reportMailConfiguration.setReportTitle(reqReportMailConfiguration.getReportTitle());
+        reportMailConfiguration.setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
 
         setReportingTeamsAndMasterRecipients(reportMailConfiguration, reqReportMailConfiguration);
 
@@ -181,6 +183,12 @@ public class Reports {
         }
         if (reqReportMailConfiguration.getReportMinute() != null) {
             config.get().setReportMinute(reqReportMailConfiguration.getReportMinute());
+        }
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getReportTitle())) {
+            config.get().setReportTitle(reqReportMailConfiguration.getReportTitle());
+        }
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getReportSubTitle())) {
+            config.get().setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
         }
 
         setReportingTeamsAndMasterRecipients(config.get(), reqReportMailConfiguration);

@@ -12,6 +12,8 @@ import org.apache.fop.apps.*;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.web.util.HtmlUtils;
@@ -42,7 +44,6 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
     private String documentTitle;
     private String documentSubTitle;
-    private String documentCreationDate;
     private String currentSectionTitle;
 
 
@@ -54,8 +55,10 @@ public class ReportGeneratorPDF implements ReportGenerator {
             throw new IllegalStateException("Call end() before beginning a new PDF generation!");
         }
 
-        try (FileInputStream documentInputStream = new FileInputStream(new File(FOP_INPUT_FILE_DOCUMENT));
-             FileInputStream progressInputStream = new FileInputStream(new File(FOP_INPUT_FILE_CONTENT))) {
+        Resource resourceDocument = new ClassPathResource(FOP_INPUT_FILE_DOCUMENT);
+        Resource resourceContent = new ClassPathResource(FOP_INPUT_FILE_CONTENT);
+        try (InputStream documentInputStream = resourceDocument.getInputStream();
+             InputStream progressInputStream = resourceContent.getInputStream()) {
 
             fopFactory = FopFactory.newInstance(new File(".").toURI());
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
@@ -67,8 +70,8 @@ public class ReportGeneratorPDF implements ReportGenerator {
             progressTemplate = new String(progressInputStream.readAllBytes());
 
         } catch (FOPException | IOException exception) {
-            LOGGER.error("Could not create a FOP instance, reason {}", exception.getMessage());
-            throw new IllegalStateException("Could not create a FOP instance, reason " + exception.getMessage());
+            LOGGER.error("Could not create a FOP instance, reason: {}", exception.getMessage());
+            throw new IllegalStateException("Could not create a FOP instance, reason: " + exception.getMessage());
         }
     }
 
@@ -80,8 +83,6 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
         documentTitle = title;
         documentSubTitle = subTitle;
-        documentCreationDate = LocalDateTime.ofInstant(Instant.now(),
-                ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
     }
 
     @Override
@@ -96,10 +97,12 @@ public class ReportGeneratorPDF implements ReportGenerator {
         }
 
         List<Progress> sortedProgressByOwnerAndCalendarWeek = sortByOwnerAndCalendarWeek(progressList);
+
+        StringBuffer section = new StringBuffer();
+
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
 
-            String progressSection = progressTemplate.replace("@TITLE@", encodeHtml(currentSectionTitle));
-            progressSection = progressSection.replace("@AUTHOR@", encodeHtml(progress.getOwnerName()));
+            String progressSection = progressTemplate.replace("@AUTHOR@", encodeHtml(progress.getOwnerName()));
 
             String dateString = LocalDateTime.ofInstant(progress.getDateCreation(),
                     ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
@@ -119,10 +122,19 @@ public class ReportGeneratorPDF implements ReportGenerator {
             progressSection = progressSection.replace("@TAGS@", encodeHtml(tags.toString()));
 
             progressSection = progressSection.replace("@TEXTTITLE@", encodeHtml(progress.getTitle()));
-            progressSection = progressSection.replace("@TEXT@", encodeHtml(addMultiLineText(progress.getText())));
+            progressSection = progressSection.replace("@TEXT@", addMultiLineText(progress.getText()));
 
-            documentContentFo += progressSection;
+            section.append(progressSection);
         });
+
+        String sectionContent = section.toString();
+        if (!sectionContent.isEmpty()) {
+            documentContentFo += "\n<fo:block space-after=\"20pt\" text-align=\"left\">\n" +
+                                 "\n  <fo:inline font-weight=\"bold\">" + encodeHtml(currentSectionTitle) + "</fo:inline>\n" +
+                                 "\n</fo:block>\n";
+
+            documentContentFo += sectionContent;
+        }
     }
 
     @Nullable
@@ -138,7 +150,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
         String multiLineText = "";
         String textLines[] = text.split("\n");
         for (String line: textLines) {
-            multiLineText += "o " + line + "\n";
+            multiLineText += "\n<fo:block>" + encodeHtml(line) + "</fo:block>\n";
         }
         return multiLineText;
     }
@@ -154,9 +166,8 @@ public class ReportGeneratorPDF implements ReportGenerator {
             throw new IllegalStateException("Generator was not initialized by calling begin()");
         }
 
-        String totalDocument = documentTemplate.replace("@TITLE@", encodeHtml(documentTitle));
-        totalDocument = totalDocument.replace("@SUBTITLE@", encodeHtml(documentSubTitle));
-        totalDocument = totalDocument.replace("@DATE@", encodeHtml(documentCreationDate));
+        String totalDocument = documentTemplate.replace("@TITLE@", addMultiLineText(documentTitle));
+        totalDocument = totalDocument.replace("@SUBTITLE@", addMultiLineText(documentSubTitle));
         totalDocument = totalDocument.replace("@__CONTENT__@", documentContentFo);
 
         TransformerFactory factory = TransformerFactory.newInstance();

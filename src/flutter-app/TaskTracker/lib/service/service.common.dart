@@ -12,4 +12,9 @@ abstract class ServiceCommon {
     'Content-type': 'application/json',
     'withCredentials': 'true'
   };
+
+  static const Map<String, String> HTTP_HEADERS_REST_PDF = {
+    'Content-type': 'application/pdf',
+    'withCredentials': 'true'
+  };
 }

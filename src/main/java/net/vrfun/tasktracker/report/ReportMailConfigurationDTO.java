@@ -33,6 +33,8 @@ public class ReportMailConfigurationDTO {
     private String reportWeekDay = "";
     private Long reportHour = 0L;
     private Long reportMinute = 0L;
+    private String reportTitle;
+    private String reportSubTitle;
 
 
     public ReportMailConfigurationDTO() {}
@@ -67,6 +69,8 @@ public class ReportMailConfigurationDTO {
         if (reportMailConfiguration.getReportMinute() != null) {
             this.reportMinute = reportMailConfiguration.getReportMinute();
         }
+        this.setReportTitle(reportMailConfiguration.getReportTitle());
+        this.setReportSubTitle(reportMailConfiguration.getReportSubTitle());
     }
 
     public long getId() {
@@ -171,5 +175,21 @@ public class ReportMailConfigurationDTO {
 
     public void setReportMinute(Long reportMinute) {
         this.reportMinute = reportMinute;
+    }
+
+    public String getReportTitle() {
+        return reportTitle;
+    }
+
+    public void setReportTitle(String reportTitle) {
+        this.reportTitle = reportTitle;
+    }
+
+    public String getReportSubTitle() {
+        return reportSubTitle;
+    }
+
+    public void setReportSubTitle(String reportSubTitle) {
+        this.reportSubTitle = reportSubTitle;
     }
 }

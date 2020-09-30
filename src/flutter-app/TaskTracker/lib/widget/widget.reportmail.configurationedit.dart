@@ -41,6 +41,8 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   final _textEditingControllerMailText = TextEditingController();
   final _textEditingControllerReportHour = TextEditingController(text:'18');
   final _textEditingControllerReportMinute = TextEditingController(text:'00');
+  final _textEditingControllerReportTitle = TextEditingController();
+  final _textEditingControllerReportSubTitle = TextEditingController();
   bool _reportToTeamLeads = true;
   bool _reportToTeamMembers = false;
   String _reportPeriod = "PERIOD_WEEKLY";
@@ -141,12 +143,30 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 controller: _textEditingControllerMailText,
                                 textAlignVertical: TextAlignVertical.top,
                                 expands: false,
-                                maxLines: 3,
+                                maxLines: 5,
                                 maxLength: 1024,
                                 showCursor: true,
                                 decoration: InputDecoration(
                                   labelText: 'Optional Mail Body Text',
                                   hintText: '\nThis is an automatically generated report mail...',
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                controller: _textEditingControllerReportTitle,
+                                decoration: InputDecoration(
+                                  labelText: 'Report Title',
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(10.0),
+                              child: TextFormField(
+                                controller: _textEditingControllerReportSubTitle,
+                                decoration: InputDecoration(
+                                  labelText: 'Report Sub-Title',
                                 ),
                               ),
                             ),
@@ -389,19 +409,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
       return;
     }
 
-    final reportConfiguration = ReportMailConfiguration();
-    reportConfiguration.name = _textEditingControllerConfigName.text;
-    reportConfiguration.mailSenderName = _textEditingControllerMailSenderName.text;
-    reportConfiguration.mailSubject = _textEditingControllerMailSubject.text;
-    reportConfiguration.mailText = _textEditingControllerMailText.text;
-    reportConfiguration.reportToTeamLeads = _reportToTeamLeads;
-    reportConfiguration.reportToTeamMembers = _reportToTeamMembers;
-    reportConfiguration.masterRecipients = _widgetMasterRecipients.getUserIDs();
-    reportConfiguration.reportingTeams = _widgetReportingTeams.getTeamIDs();
-    reportConfiguration.reportPeriod = _reportPeriod;
-    reportConfiguration.reportWeekDay = _reportWeekDay;
-    reportConfiguration.reportHour = int.parse(_textEditingControllerReportHour.text);
-    reportConfiguration.reportMinute = int.parse(_textEditingControllerReportMinute.text);
+    final reportConfiguration = _assembleConfiguration();
 
     _serviceReportConfiguration
         .createConfiguration(reportConfiguration)
@@ -443,20 +451,8 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
       return;
     }
 
-    final reportConfiguration = ReportMailConfiguration();
+    final reportConfiguration = _assembleConfiguration();
     reportConfiguration.id = _currentReportConfiguration.id;
-    reportConfiguration.name = _textEditingControllerConfigName.text;
-    reportConfiguration.mailSenderName = _textEditingControllerMailSenderName.text;
-    reportConfiguration.mailSubject = _textEditingControllerMailSubject.text;
-    reportConfiguration.mailText = _textEditingControllerMailText.text;
-    reportConfiguration.reportToTeamLeads = _reportToTeamLeads;
-    reportConfiguration.reportToTeamMembers = _reportToTeamMembers;
-    reportConfiguration.masterRecipients = _widgetMasterRecipients.getUserIDs();
-    reportConfiguration.reportingTeams = _widgetReportingTeams.getTeamIDs();
-    reportConfiguration.reportPeriod = _reportPeriod;
-    reportConfiguration.reportWeekDay = _reportWeekDay;
-    reportConfiguration.reportHour = int.parse(_textEditingControllerReportHour.text);
-    reportConfiguration.reportMinute = int.parse(_textEditingControllerReportMinute.text);
 
     _serviceReportConfiguration
       .editConfiguration(reportConfiguration)
@@ -470,6 +466,25 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           DialogModal(context).show("Attention", "Could not apply changes! Reason:" + err.toString(), true);
         }
       );
+  }
+
+  ReportMailConfiguration _assembleConfiguration() {
+    final reportConfiguration = ReportMailConfiguration();
+    reportConfiguration.name = _textEditingControllerConfigName.text;
+    reportConfiguration.mailSenderName = _textEditingControllerMailSenderName.text;
+    reportConfiguration.mailSubject = _textEditingControllerMailSubject.text;
+    reportConfiguration.mailText = _textEditingControllerMailText.text;
+    reportConfiguration.reportToTeamLeads = _reportToTeamLeads;
+    reportConfiguration.reportToTeamMembers = _reportToTeamMembers;
+    reportConfiguration.masterRecipients = _widgetMasterRecipients.getUserIDs();
+    reportConfiguration.reportingTeams = _widgetReportingTeams.getTeamIDs();
+    reportConfiguration.reportPeriod = _reportPeriod;
+    reportConfiguration.reportWeekDay = _reportWeekDay;
+    reportConfiguration.reportHour = int.parse(_textEditingControllerReportHour.text);
+    reportConfiguration.reportMinute = int.parse(_textEditingControllerReportMinute.text);
+    reportConfiguration.reportTitle = _textEditingControllerReportTitle.text;
+    reportConfiguration.reportSubTitle = _textEditingControllerReportSubTitle.text;
+    return reportConfiguration;
   }
 
   void _retrieveReportConfiguration() {
@@ -486,6 +501,10 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           _textEditingControllerMailSenderName.text = _currentReportConfiguration.mailSenderName;
           _textEditingControllerMailSubject.text = _currentReportConfiguration.mailSubject;
           _textEditingControllerMailText.text = _currentReportConfiguration.mailText;
+
+          _textEditingControllerReportTitle.text = _currentReportConfiguration.reportTitle;
+          _textEditingControllerReportSubTitle.text = _currentReportConfiguration.reportSubTitle;
+
           _reportToTeamLeads = _currentReportConfiguration.reportToTeamLeads;
           _reportToTeamMembers = _currentReportConfiguration.reportToTeamMembers;
 

@@ -18,7 +18,7 @@ import net.vrfun.tasktracker.user.TeamRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
@@ -59,15 +59,23 @@ public class ReportComposer {
         this.taskRepository = taskRepository;
     }
 
-    public ByteArrayResource createTeamReportTextCurrentWeek(@NonNull final List<Long> teamIDs, @NonNull final ReportFormat reportFormat) throws IOException {
+    @NonNull
+    public ByteArrayOutputStream createTeamReportCurrentWeek(@NonNull final List<Long> teamIDs,
+                                                             @NonNull final ReportFormat reportFormat,
+                                                             @NonNull final String title,
+                                                             @NonNull final String subTitle) {
+
         LocalDate currentDate = LocalDate.now();
-        return createTeamReportText(teamIDs, currentDate.minusWeeks(1L), currentDate, reportFormat);
+        return createTeamReport(teamIDs, currentDate.minusWeeks(1L), currentDate, reportFormat, title, subTitle);
     }
 
-    public ByteArrayResource createTeamReportText(@NonNull final List<Long> teamIDs,
+    @NonNull
+    public ByteArrayOutputStream createTeamReport(@NonNull final List<Long> teamIDs,
                                                   @NonNull final LocalDate fromDate,
                                                   @NonNull final LocalDate toDate,
-                                                  @NonNull final ReportFormat reportFormat) throws IOException {
+                                                  @NonNull final ReportFormat reportFormat,
+                                                  @NonNull final String title,
+                                                  @NonNull final String subTitle) {
 
         List<Team> teamList = new ArrayList<>();
         teamRepository.findAllById(teamIDs).forEach((team -> teamList.add(team)));
@@ -75,12 +83,10 @@ public class ReportComposer {
             throw new IllegalArgumentException("Invalid team IDs!");
         }
 
-        ByteArrayOutputStream byteArrayOutputStream = null;
-        ReportGenerator reportGeneratorPlainText = ReportGeneratorFactory.buildGenerator(reportFormat);
+        ReportGenerator reportGenerator = ReportGeneratorFactory.buildGenerator(reportFormat);
         try {
-            reportGeneratorPlainText.begin();
-            reportGeneratorPlainText.generateCoverPage("Team Progress Report", "AVM GmbH, R&D" +
-                    "\n" +
+            reportGenerator.begin();
+            reportGenerator.generateCoverPage(title, subTitle +
                     "\nPeriod: " + fromDate.format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT)) + " - " +
                     toDate.format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT)) +
                     "\nCreated: " + LocalDateTime.now().format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT + " - HH:mm")));
@@ -88,27 +94,23 @@ public class ReportComposer {
             teamList.forEach((team -> {
                 LOGGER.debug("Generating progress for team: {}", team.getName());
 
-                reportGeneratorPlainText.sectionBegin("Team '" + team.getName() + "'");
+                reportGenerator.sectionBegin("Team '" + team.getName() + "'");
 
                 taskRepository.findTeamTasks(team).forEach((task -> {
                     LOGGER.debug(" Generating progress for task: {}", task.getTitle());
 
                     List<Progress> progressList = progressRepository.findByTaskIdAndReportWeekBetween(task.getId(), fromDate, toDate);
 
-                    reportGeneratorPlainText.sectionAppend(progressList);
+                    reportGenerator.sectionAppend(progressList);
                 }));
 
-                reportGeneratorPlainText.sectionEnd();
+                reportGenerator.sectionEnd();
             }));
 
-            byteArrayOutputStream = reportGeneratorPlainText.end();
-            return new ByteArrayResource(byteArrayOutputStream.toByteArray());
+            return reportGenerator.end();
 
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
-            if (byteArrayOutputStream != null) {
-                byteArrayOutputStream.close();
-            }
             throw throwable;
         }
     }

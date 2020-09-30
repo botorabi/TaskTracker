@@ -23,6 +23,8 @@ class ReportMailConfiguration {
   String reportWeekDay = "";
   int reportHour = 0;
   int reportMinute = 0;
+  String reportTitle;
+  String reportSubTitle;
 
   ReportMailConfiguration();
 
@@ -47,6 +49,8 @@ class ReportMailConfiguration {
     configuration.reportWeekDay = fields['reportWeekDay'];
     configuration.reportHour = fields['reportHour'];
     configuration.reportMinute = fields['reportMinute'];
+    configuration.reportTitle = fields['reportTitle'];
+    configuration.reportSubTitle = fields['reportSubTitle'];
 
     return configuration;
   }
@@ -80,6 +84,8 @@ class ReportMailConfiguration {
       'reportWeekDay' : reportWeekDay,
       'reportHour' : reportHour,
       'reportMinute' : reportMinute,
+      'reportTitle' : reportTitle,
+      'reportSubTitle' : reportSubTitle,
     };
   }
 }

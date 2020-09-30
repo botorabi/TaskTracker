@@ -62,6 +62,9 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
 
     private Long reportMinute = 0L;
 
+    private String reportTitle;
+
+    private String reportSubTitle;
 
     public ReportMailConfiguration() {}
 
@@ -180,5 +183,23 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
 
     public void setReportMinute(@NonNull final Long reportMinute) {
         this.reportMinute = reportMinute;
+    }
+
+    @Nullable
+    public String getReportTitle() {
+        return reportTitle;
+    }
+
+    public void setReportTitle(@Nullable final String reportTitle) {
+        this.reportTitle = reportTitle;
+    }
+
+    @Nullable
+    public String getReportSubTitle() {
+        return reportSubTitle;
+    }
+
+    public void setReportSubTitle(@Nullable final String reportSubTitle) {
+        this.reportSubTitle = reportSubTitle;
     }
 }

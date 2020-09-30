@@ -145,14 +145,16 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
     }
 
     String fileName = "Report.pdf";
+    String teamNames = "Teams: ";
     List<int> teamIDs = List<int>();
     for (int i = 0; i < _selectedTeams.length; i++) {
       if (_selectedTeams[i]) {
         teamIDs.add(_teams[i].id);
+        teamNames += "'" + _teams[i].name + "' ";
       }
     }
 
-    bool success = await _serviceReport.createReportDocument(teamIDs, fromDate, toDate, fileName);
+    bool success = await _serviceReport.createReportDocument(teamIDs, fromDate, toDate, 'Progress Report', teamNames, fileName);
     if (!success) {
       DialogModal(context).show("Attention", "Report document could not be created!", true);
     }

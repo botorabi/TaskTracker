@@ -7,13 +7,14 @@
  */
 package net.vrfun.tasktracker.report;
 
+import com.sun.istack.ByteArrayDataSource;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,9 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -93,19 +95,25 @@ public class ReportGeneratorService {
             try {
                 recipients = getAllRecipients(team, masterRecipients);
                 if (!recipients.isEmpty()) {
-                    ByteArrayResource reportFile = reportComposer.createTeamReportTextCurrentWeek(Arrays.asList(team.getId()), ReportFormat.PDF);
+                    ByteArrayOutputStream reportDocument =
+                            reportComposer.createTeamReportCurrentWeek(
+                                    Arrays.asList(team.getId()),
+                                    ReportFormat.PDF,
+                                    configuration.getReportTitle(),
+                                    configuration.getReportSubTitle());
+
                     String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
                     cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
                     sendMail(cleanMailSender,
                             recipients,
                             configuration.getMailSubject(),
                             configuration.getMailText(),
-                            reportFile);
+                            reportDocument);
                 }
                 else {
                     LOGGER.warn(" Could not send report mail, no recipients for configuration {}", configuration.getName());
                 }
-            } catch (IOException | MessagingException exception) {
+            } catch (MessagingException exception) {
                 LOGGER.error(" Could not create report, reason: '{}', recipients: {}", exception.getMessage(), recipients);
             }
         });
@@ -139,7 +147,7 @@ public class ReportGeneratorService {
                             @NonNull  final String to,
                             @NonNull  final String subject,
                             @Nullable final String text,
-                            @NonNull  final ByteArrayResource attachment) throws MessagingException {
+                            @NonNull  final ByteArrayOutputStream attachment) throws MessagingException {
 
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -147,10 +155,11 @@ public class ReportGeneratorService {
         helper.setTo(to);
         helper.setSubject(subject);
 
-        String body = (text != null ? text + "\n\n" : "") + new String(attachment.getByteArray());
+        String body = (text != null ? text + "\n\n" : "");
         helper.setText(body);
 
-        helper.addAttachment("Report.pdf", attachment);
+        DataSource attachmentSource = new ByteArrayDataSource(attachment.toByteArray(), MediaType.APPLICATION_PDF_VALUE);
+        helper.addAttachment("Report.pdf", attachmentSource);
 
         try {
             emailSender.send(message);

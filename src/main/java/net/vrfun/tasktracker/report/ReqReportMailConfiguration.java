@@ -32,6 +32,8 @@ public class ReqReportMailConfiguration {
     private String reportWeekDay;
     private Long reportHour;
     private Long reportMinute;
+    private String reportTitle;
+    private String reportSubTitle;
 
     public ReqReportMailConfiguration() {}
 
@@ -150,5 +152,23 @@ public class ReqReportMailConfiguration {
     @JsonProperty("reportMinute")
     public void setReportMinute(Long reportMinute) {
         this.reportMinute = reportMinute;
+    }
+
+    public String getReportTitle() {
+        return reportTitle;
+    }
+
+    @JsonProperty("reportTitle")
+    public void setReportTitle(String reportTitle) {
+        this.reportTitle = reportTitle;
+    }
+
+    public String getReportSubTitle() {
+        return reportSubTitle;
+    }
+
+    @JsonProperty("reportSubTitle")
+    public void setReportSubTitle(String reportSubTitle) {
+        this.reportSubTitle = reportSubTitle;
     }
 }

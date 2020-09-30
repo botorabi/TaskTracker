@@ -10,11 +10,8 @@
                 <fo:block space-after="30pt" text-align="center">
                     <fo:inline font-weight="bold">@TITLE@</fo:inline>
                 </fo:block>
-                <fo:block space-after="20pt" text-align="center">
+                <fo:block space-after="20pt" line-height="3em" text-align="center">
                     <fo:inline>@SUBTITLE@</fo:inline>
-                </fo:block>
-                <fo:block space-after="20pt" text-align="center">
-                    <fo:inline>@DATE@</fo:inline>
                 </fo:block>
             </fo:block-container>
             <fo:block page-break-before="always">

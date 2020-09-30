@@ -11,6 +11,7 @@ import net.vrfun.tasktracker.report.*;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.Role;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -114,12 +116,15 @@ public class RestServiceReport {
         }
     }
 
-    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}",
-                produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}",
+                produces = MediaType.APPLICATION_PDF_VALUE)
+    @ResponseBody
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<ByteArrayResource> createTeamReport(@PathVariable("teamIDs")            final String teamIDs,
-                                                                  @PathVariable("fromDaysSinceEpoch") final String fromDate,
-                                                                  @PathVariable("toDaysSinceEpoch")   final String toDate) throws IOException {
+                                                              @PathVariable("fromDaysSinceEpoch") final String fromDate,
+                                                              @PathVariable("toDaysSinceEpoch")   final String toDate,
+                                                              @PathVariable("title")              final String title,
+                                                              @PathVariable("subTitle")           final String subTitle) throws IOException {
 
         List<Long> ids = Arrays.asList(teamIDs.split(",")).stream()
                 .map((idAsString) -> Long.valueOf(idAsString))
@@ -133,8 +138,14 @@ public class RestServiceReport {
         LocalDate fromInDaysSinceEpoch = LocalDate.ofEpochDay(Integer.parseInt(fromDate));
         LocalDate toInDaysSinceEpoch   = LocalDate.ofEpochDay(Integer.parseInt(toDate));
 
-        try {
-            return new ResponseEntity<>(reportComposer.createTeamReportText(ids, fromInDaysSinceEpoch, toInDaysSinceEpoch, ReportFormat.PDF), HttpStatus.OK);
+        try (ByteArrayOutputStream report =
+                     reportComposer.createTeamReport(
+                             ids, fromInDaysSinceEpoch, toInDaysSinceEpoch,
+                             ReportFormat.PDF,
+                             StringUtils.isEmpty(title) ? "<Title>" : title,
+                             StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle)) {
+
+            return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not create report, reason: {}", throwable.getMessage());
