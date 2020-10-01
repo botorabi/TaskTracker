@@ -79,6 +79,9 @@ class _WidgetLoginState extends State<WidgetLogin> {
                         controller: _textEditingControllerPassword,
                         focusNode: _focusPassword,
                         obscureText: true,
+                        onFieldSubmitted: (value) {
+                          loginUser(context);
+                        },
                         onEditingComplete: () {
                           _focusButton.requestFocus();
                         },

@@ -1,21 +1,36 @@
 <fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:svg="http://www.w3.org/2000/svg">
     <fo:layout-master-set>
-        <fo:simple-page-master master-name="one">
-            <fo:region-body margin-top="40pt" margin-bottom="50pt" margin-left="40pt" margin-right="40pt" />
+        <fo:simple-page-master master-name="A4"
+                               page-width="210mm" page-height="297mm"
+                               margin-top="1cm"   margin-bottom="1cm"
+                               margin-left="1cm"  margin-right="1cm">
+            <fo:region-body   margin="1.2cm"/>
+            <fo:region-before extent="1cm"/>
+            <fo:region-after  extent="1cm"/>
+            <fo:region-start  extent="0.7cm"/>
+            <fo:region-end    extent="0.7cm"/>
         </fo:simple-page-master>
     </fo:layout-master-set>
-    <fo:page-sequence master-reference="one">
+    <fo:page-sequence master-reference="A4">
         <fo:flow flow-name="xsl-region-body">
             <fo:block-container height="80%" width="100%" display-align="center">
                 <fo:block space-after="30pt" text-align="center">
-                    <fo:inline font-weight="bold">@TITLE@</fo:inline>
+                    <fo:inline font-weight="bold" font-size="18pt">@TITLE@</fo:inline>
                 </fo:block>
                 <fo:block space-after="20pt" line-height="3em" text-align="center">
-                    <fo:inline>@SUBTITLE@</fo:inline>
+                    <fo:inline font-size="16pt">@SUBTITLE@</fo:inline>
                 </fo:block>
             </fo:block-container>
-            <fo:block page-break-before="always">
-            </fo:block>
+        </fo:flow>
+    </fo:page-sequence>
+    <fo:page-sequence master-reference="A4">
+        <fo:static-content flow-name="xsl-region-before">
+            <fo:block font-size="8pt" text-align="right" border-bottom="solid 0.1mm">@PAGE_HEADER@</fo:block>
+        </fo:static-content>
+        <fo:static-content flow-name="xsl-region-after">
+            <fo:block font-size="8pt" text-align="right" border-top="solid 0.1mm">@PAGE_FOOTER@</fo:block>
+        </fo:static-content>
+        <fo:flow flow-name="xsl-region-body">
             @__CONTENT__@
         </fo:flow>
     </fo:page-sequence>

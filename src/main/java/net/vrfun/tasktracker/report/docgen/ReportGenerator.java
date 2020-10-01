@@ -9,6 +9,7 @@ package net.vrfun.tasktracker.report.docgen;
 
 import net.vrfun.tasktracker.task.Progress;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -29,6 +30,11 @@ public interface ReportGenerator {
      * Begin report generation.
      */
     void begin();
+
+    /**
+     * Set the document footer text.
+     */
+    void setFooter(@Nullable final String footer);
 
     /**
      * Generate the cover page.

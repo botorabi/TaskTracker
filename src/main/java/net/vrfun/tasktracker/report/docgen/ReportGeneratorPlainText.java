@@ -9,6 +9,7 @@ package net.vrfun.tasktracker.report.docgen;
 
 import net.vrfun.tasktracker.task.Progress;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.io.*;
 import java.time.*;
@@ -31,6 +32,10 @@ public class ReportGeneratorPlainText implements ReportGenerator {
         }
 
         byteArrayOutputStream = new ByteArrayOutputStream();
+    }
+
+    @Override
+    public void setFooter(@Nullable final String footer) {
     }
 
     @Override

@@ -12,10 +12,13 @@ import org.apache.fop.apps.*;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 import org.springframework.web.util.HtmlUtils;
 
 import javax.xml.transform.*;
@@ -25,7 +28,8 @@ import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReportGeneratorPDF implements ReportGenerator {
 
@@ -45,7 +49,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
     private String documentTitle;
     private String documentSubTitle;
     private String currentSectionTitle;
-
+    private String documentFooter;
 
     protected ReportGeneratorPDF() {}
 
@@ -76,6 +80,11 @@ public class ReportGeneratorPDF implements ReportGenerator {
     }
 
     @Override
+    public void setFooter(@Nullable final String footer) {
+        documentFooter = "" + footer;
+    }
+
+    @Override
     public void generateCoverPage(@NonNull final String title, String subTitle) {
         if (fop == null) {
             throw new IllegalStateException("Generator was not initialized by calling begin()");
@@ -98,7 +107,8 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
         List<Progress> sortedProgressByOwnerAndCalendarWeek = sortByOwnerAndCalendarWeek(progressList);
 
-        StringBuffer section = new StringBuffer();
+        final StringBuffer section = new StringBuffer();
+        final Set<String> taskNames = new HashSet<>();
 
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
 
@@ -124,13 +134,17 @@ public class ReportGeneratorPDF implements ReportGenerator {
             progressSection = progressSection.replace("@TEXTTITLE@", encodeHtml(progress.getTitle()));
             progressSection = progressSection.replace("@TEXT@", addMultiLineText(progress.getText()));
 
+            taskNames.add(progress.getTask().getTitle());
+
             section.append(progressSection);
         });
 
         String sectionContent = section.toString();
         if (!sectionContent.isEmpty()) {
-            documentContentFo += "\n<fo:block space-after=\"20pt\" text-align=\"left\">\n" +
-                                 "\n  <fo:inline font-weight=\"bold\">" + encodeHtml(currentSectionTitle) + "</fo:inline>\n" +
+            documentContentFo += "\n<fo:block space-after=\"12pt\" text-align=\"left\">\n" +
+                                 "\n  <fo:inline font-weight=\"bold\">" +
+                                 encodeHtml(currentSectionTitle) + encodeHtml(" - " + String.join(", ", taskNames)) +
+                                 "</fo:inline>\n" +
                                  "\n</fo:block>\n";
 
             documentContentFo += sectionContent;
@@ -150,14 +164,14 @@ public class ReportGeneratorPDF implements ReportGenerator {
         String multiLineText = "";
         String textLines[] = text.split("\n");
         for (String line: textLines) {
-            multiLineText += "\n<fo:block>" + encodeHtml(line) + "</fo:block>\n";
+            multiLineText += "\n<fo:block space-after=\"6pt\" >" + encodeHtml(line) + "</fo:block>\n";
         }
         return multiLineText;
     }
 
     @Override
     public void sectionEnd() {
-        documentContentFo += "<fo:block page-break-before=\"always\"></fo:block>\n";
+        documentContentFo += "<fo:block page-break-before=\"auto\"></fo:block>\n";
     }
 
     @Override
@@ -169,6 +183,8 @@ public class ReportGeneratorPDF implements ReportGenerator {
         String totalDocument = documentTemplate.replace("@TITLE@", addMultiLineText(documentTitle));
         totalDocument = totalDocument.replace("@SUBTITLE@", addMultiLineText(documentSubTitle));
         totalDocument = totalDocument.replace("@__CONTENT__@", documentContentFo);
+        totalDocument = totalDocument.replace("@PAGE_HEADER@", documentTitle);
+        totalDocument = totalDocument.replace("@PAGE_FOOTER@", StringUtils.isEmpty(documentFooter) ? "" : documentFooter);
 
         TransformerFactory factory = TransformerFactory.newInstance();
         InputStream inputStreamFo = null;

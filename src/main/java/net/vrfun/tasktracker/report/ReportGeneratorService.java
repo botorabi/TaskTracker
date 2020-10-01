@@ -104,6 +104,9 @@ public class ReportGeneratorService {
 
                     String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
                     cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
+
+                    LOGGER.info(" Sending report mail '{}' to recipients: '{}'", configuration.getMailSubject(), recipients);
+
                     sendMail(cleanMailSender,
                             recipients,
                             configuration.getMailSubject(),
