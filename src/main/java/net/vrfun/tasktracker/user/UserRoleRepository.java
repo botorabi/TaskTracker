@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.user;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.NonNull;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -15,5 +16,5 @@ import java.util.Optional;
 @Transactional
 public interface UserRoleRepository extends CrudRepository<UserRole, Long> {
 
-    Optional<UserRole> findUserRoleByRole(Role role);
+    Optional<UserRole> findUserRoleByRole(@NonNull final Role role);
 }

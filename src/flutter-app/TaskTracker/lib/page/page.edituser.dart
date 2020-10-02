@@ -6,14 +6,13 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
 class PageEditUser extends StatefulWidget {
-  PageEditUser({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageEditUser({Key key, this.title}) : super(key: key);
 
   @override
   _PageEditUserState createState() => _PageEditUserState();
@@ -34,13 +33,13 @@ class _PageEditUserState extends State<PageEditUser> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetUserEdit(userId: userId)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetUserEdit(userId: userId),
+          ),
+        ],
       ),
     );
   }

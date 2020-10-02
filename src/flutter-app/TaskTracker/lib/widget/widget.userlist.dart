@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
+import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/common/datetime.formatter.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
@@ -18,22 +19,36 @@ import 'package:flutter/material.dart';
 
 
 class WidgetUserList extends StatefulWidget {
-  WidgetUserList({Key key, this.title}) : super(key: key);
+  WidgetUserList({Key key, this.title = 'Users'}) : super(key: key);
 
   final String title;
+  final _WidgetUserListState _widgetUserListState = _WidgetUserListState();
 
   @override
-  _WidgetUserEditState createState() => _WidgetUserEditState();
+  _WidgetUserListState createState() => _widgetUserListState;
+
+  WidgetUserList setExpanded(bool expanded) {
+    _widgetUserListState.setExpanded(expanded);
+    return this;
+  }
 }
 
-class _WidgetUserEditState extends State<WidgetUserList> {
+class _WidgetUserListState extends State<WidgetUserList> {
 
   final _serviceUser = ServiceUser();
   PaginatedDataTable _dataTable;
   List<UserInfo> _users = [];
+  bool _expanded = false;
+  bool _sortAscending = true;
 
-  _WidgetUserEditState() {
+  @override
+  void initState() {
+    super.initState();
     _retrieveUsers();
+  }
+
+  void setExpanded(bool expanded) {
+    _expanded = expanded;
   }
 
   @override
@@ -48,10 +63,28 @@ class _WidgetUserEditState extends State<WidgetUserList> {
       return Column();
     }
     else {
-      _dataTable = createDataTable();
-      return SizedBox(
-        width: Config.defaultPanelWidth,
-        child: _dataTable,
+      _dataTable = _createDataTable();
+      return LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: Card(
+            elevation: 5,
+            margin: EdgeInsets.all(10.0),
+            child:
+            ExpansionTile(
+                title: Text(widget.title),
+                initiallyExpanded: _expanded,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      child: _dataTable,
+                    ),
+                  )
+                ]
+            ),
+          ),
+        ),
       );
     }
   }
@@ -63,9 +96,9 @@ class _WidgetUserEditState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete user '$realName'?", 'Yes', 'No');
+        .show('Attention', "You really want to delete user '$realName'?", ButtonID.YES, ButtonID.NO);
 
-    if (button != 'Yes') {
+    if (button != ButtonID.YES) {
       return;
     }
 
@@ -80,11 +113,19 @@ class _WidgetUserEditState extends State<WidgetUserList> {
       });
   }
 
+  void _sortUsers(bool ascending) {
+    _users.sort((userInfoA, userInfoB) => userInfoA.realName?.compareTo(userInfoB?.realName));
+    if (!ascending) {
+      _users = _users.reversed.toList();
+    }
+  }
+
   void _retrieveUsers() {
     _serviceUser
         .getUsers()
         .then((listUserInfo) {
             _users = listUserInfo;
+            _sortUsers(_sortAscending);
             setState(() {});
           },
           onError: (err) {
@@ -92,15 +133,22 @@ class _WidgetUserEditState extends State<WidgetUserList> {
           });
   }
 
-  PaginatedDataTable createDataTable() {
+  PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text("Users"),
-      columns: const <DataColumn>[
+      header: Text(''),
+      columns: <DataColumn>[
         DataColumn(
           label: Text(
             'Name',
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
+          onSort:(columnIndex, ascending) {
+            setState(() {
+              _sortAscending = !_sortAscending;
+              _sortUsers(_sortAscending);
+              _dataTable = _createDataTable();
+            });
+          },
         ),
         DataColumn(
           label: Text(
@@ -127,8 +175,10 @@ class _WidgetUserEditState extends State<WidgetUserList> {
       rowsPerPage: 5,
       onRowsPerPageChanged: null,
       source: _DataProvider(this),
+      sortColumnIndex: 0,
+      sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, 16, () => _addUser()),
+        CircleButton.create(24, Icons.add, () => _addUser()),
       ],
     );
 
@@ -138,7 +188,7 @@ class _WidgetUserEditState extends State<WidgetUserList> {
 
 class _DataProvider extends DataTableSource {
 
-  _WidgetUserEditState parent;
+  _WidgetUserListState parent;
 
   _DataProvider(this.parent);
 
@@ -156,22 +206,29 @@ class _DataProvider extends DataTableSource {
             textAlign: TextAlign.center
           ),
         ),
-        DataCell(Text(parent._users[index].roles.join("\n"))),
+        DataCell(Text(parent._users[index].roles.join("\n").replaceAll(UserInfo.ROLE_PREFIX,''))),
         DataCell(
           Row(
             children: [
+              Spacer(),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.edit, 16, () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id);
+                  CircleButton.create(24, Icons.edit, () {
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_USER, arguments: parent._users[index].id)
+                        .then((value) {
+                            if (value != ButtonID.CANCEL) {
+                              parent._retrieveUsers();
+                            }
+                          }
+                        );
                   }
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
-                  CircleButton.create(24, Icons.delete, 16,
+                  CircleButton.create(24, Icons.delete,
                     (parent._users[index].id == Config.authStatus.userId) ?
                     null : () => parent._deleteUser(parent._users[index].id, parent._users[index].realName)
                 ),

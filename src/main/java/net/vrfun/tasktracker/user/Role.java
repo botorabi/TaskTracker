@@ -7,18 +7,22 @@
  */
 package net.vrfun.tasktracker.user;
 
-import org.springframework.lang.NonNull;
+import org.springframework.lang.*;
+
 import java.util.*;
 
 public enum Role {
 
     ROLE_UNKNOWN,
-
     ROLE_ADMIN,
-
     ROLE_TEAM_LEAD,
-
     ROLE_AUTHOR;
+
+    public final static String ROLE_NAME_UNKNOWN   = "ROLE_UNKNOWN";
+    public final static String ROLE_NAME_ADMIN     = "ROLE_ADMIN";
+    public final static String ROLE_NAME_TEAM_LEAD = "ROLE_TEAM_LEAD";
+    public final static String ROLE_NAME_AUTHOR    = "ROLE_AUTHOR";
+
 
     public static Role fromString(@NonNull final String roleName) {
         try {
@@ -35,6 +39,22 @@ public enum Role {
                 createAuthor(),
                 createTeamLead()
         );
+    }
+
+    @NonNull
+    public static Collection<String> getAllRolesAsString() {
+        return getRolesAsString(getAllRoles());
+    }
+
+    @NonNull
+    public static Collection<String> getRolesAsString(@Nullable Collection<UserRole> roles) {
+        List<String> roleStrings = new ArrayList<>();
+        if (roles !=  null) {
+            for (UserRole role : roles) {
+                roleStrings.add(role.getRole().name());
+            }
+        }
+        return roleStrings;
     }
 
     @NonNull

@@ -32,10 +32,14 @@ public class User extends BaseEntity implements Serializable {
     @Column(unique=true, nullable=false)
     private String login;
 
+    private String ldapLogin;
+
     @Column(nullable=false)
     private String password;
 
-    private Instant creationDate;
+    private String email;
+
+    private Instant dateCreation;
 
     private Instant lastLogin;
 
@@ -66,6 +70,14 @@ public class User extends BaseEntity implements Serializable {
         this.login = login;
     }
 
+    public String getLdapLogin() {
+        return ldapLogin;
+    }
+
+    public void setLdapLogin(@NonNull final String ldapLogin) {
+        this.ldapLogin = ldapLogin;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -74,12 +86,20 @@ public class User extends BaseEntity implements Serializable {
         this.password = password;
     }
 
-    public Instant getCreationDate() {
-        return creationDate;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCreationDate(@Nullable Instant creationDate) {
-        this.creationDate = creationDate;
+    public void setEmail(@NonNull final String email) {
+        this.email = email;
+    }
+
+    public Instant getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(@Nullable Instant dateCreation) {
+        this.dateCreation = dateCreation;
     }
 
     public Instant getLastLogin() {

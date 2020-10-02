@@ -7,9 +7,10 @@
  */
 package net.vrfun.tasktracker.task;
 
+import net.vrfun.tasktracker.user.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -25,24 +26,20 @@ import java.util.*;
 @Service
 public class Tasks {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+
     private TaskRepository taskRepository;
+    private UserRepository userRepository;
+    private TeamRepository teamRepository;
 
     @Autowired
-    public Tasks(@NonNull final TaskRepository taskRepository) {
+    public Tasks(@NonNull final TaskRepository taskRepository,
+                 @NonNull final UserRepository userRepository,
+                 @NonNull final TeamRepository teamRepository) {
+
         this.taskRepository = taskRepository;
-    }
-
-    @NonNull
-    public List<Task> getAll() {
-        List<Task> tasks = new ArrayList<>();
-        taskRepository.findAll().forEach(tasks::add);
-        return tasks;
-    }
-
-    @Nullable
-    public Task get(long id) {
-        Optional<Task> task = taskRepository.findById(id);
-        return task.isPresent() ? task.get() : null;
+        this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
     }
 
     @NonNull
@@ -56,6 +53,9 @@ public class Tasks {
         }
         Task newTask = new Task(taskEdit.getTitle());
         newTask.setDescription(taskEdit.getDescription());
+
+        setTaskUsersAndTeams(newTask, taskEdit);
+
         return taskRepository.save(newTask);
     }
 
@@ -85,7 +85,36 @@ public class Tasks {
         if (taskEdit.isClosed()) {
             task.get().setDateClosed(Instant.now());
         }
+
+        setTaskUsersAndTeams(task.get(), taskEdit);
+
         return taskRepository.save(task.get());
+    }
+
+    private void setTaskUsersAndTeams(@NonNull final Task task, @NonNull final ReqTaskEdit taskEdit) {
+        Collection<User> users = new ArrayList<>();
+        Collection<Team> teams = new ArrayList<>();
+
+        if (taskEdit.getUsers() != null) {
+            taskEdit.getUsers().stream().forEach((userID) -> {
+                Optional<User> user = userRepository.findById(userID);
+                user.ifPresentOrElse(
+                        (foundUser) -> users.add(user.get()),
+                        () -> LOGGER.error("User with ID {} does not exist!", userID));
+            });
+        }
+
+        if (taskEdit.getTeams() != null) {
+            taskEdit.getTeams().stream().forEach((teamID) -> {
+                Optional<Team> team = teamRepository.findById(teamID);
+                team.ifPresentOrElse(
+                        (foundTeam) -> teams.add(team.get()),
+                        () -> LOGGER.error("Team with ID {} does not exist!", teamID));
+            });
+        }
+
+        task.setUsers(users);
+        task.setTeams(teams);
     }
 
     public void delete(long id) throws IllegalArgumentException {
@@ -96,5 +125,32 @@ public class Tasks {
         else {
             throw new IllegalArgumentException("Task does not exists.");
         }
+    }
+
+    @NonNull
+    public List<TaskDTO> getTasks() {
+        List<TaskDTO> tasks = new ArrayList<>();
+        Iterable<Task> allTasks = taskRepository.findAll();
+        if (allTasks != null) {
+            allTasks.forEach((task) -> {
+                TaskDTO t = new TaskDTO(task);
+                tasks.add(t);
+            });
+        }
+        return tasks;
+    }
+
+    @NonNull
+    public TaskDTO getTaskById(Long id) throws IllegalArgumentException {
+        Optional<Task> foundTask = taskRepository.findById(id);
+        if (foundTask.isEmpty()) {
+            throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
+        }
+        return new TaskDTO(foundTask.get());
+    }
+
+    @NonNull
+    public List<TaskDTO> searchTasks(@NonNull final String filter) {
+        return taskRepository.searchTask(filter);
     }
 }

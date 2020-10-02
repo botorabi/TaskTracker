@@ -7,15 +7,18 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.task.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of user related services.
@@ -28,21 +31,33 @@ public class Users {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private UserRoleRepository userRoleRepository;
+    private final UserRoleRepository userRoleRepository;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final TeamRepository teamRepository;
+
+    private final TaskRepository taskRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Users(
             @NonNull final UserRoleRepository userRoleRepository,
             @NonNull final UserRepository userRepository,
-            @NonNull final PasswordEncoder passwordEncoder) {
+            @NonNull final TeamRepository teamRepository,
+            @NonNull final TaskRepository taskRepository,
+            @NonNull final PasswordEncoder passwordEncoder,
+            @NonNull final UserAuthenticator userAuthenticator) {
 
         this.userRoleRepository = userRoleRepository;
         this.userRepository = userRepository;
+        this.teamRepository = teamRepository;
+        this.taskRepository = taskRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userAuthenticator = userAuthenticator;
     }
 
     public void setupApplicationRoles() {
@@ -75,6 +90,7 @@ public class Users {
         reqUser.setRealName("Administrator");
         reqUser.setLogin("admin");
         reqUser.setPassword("admin");
+        reqUser.setEmail("no-valid-email");
         Set<String> roleNames = new HashSet<>();
         roleNames.add("ROLE_ADMIN");
         reqUser.setRoles(roleNames);
@@ -94,6 +110,9 @@ public class Users {
         }
         if (StringUtils.isEmpty(reqUser.getLogin())) {
             throw new IllegalArgumentException("Login must not be empty!");
+        }
+        if (StringUtils.isEmpty(reqUser.getEmail())) {
+            throw new IllegalArgumentException("E-Mail must not be empty!");
         }
 
         return createOrUpdateUser(reqUser, new User(), true);
@@ -126,15 +145,18 @@ public class Users {
     @NonNull
     protected User createOrUpdateUser(@NonNull final ReqUserEdit reqUser, @NonNull User user, boolean create) throws IllegalArgumentException {
         if (!StringUtils.isEmpty(reqUser.getRealName())) {
-            user.setRealName(reqUser.getRealName());
+            user.setRealName(reqUser.getRealName().trim());
         }
         if (!StringUtils.isEmpty(reqUser.getPassword())) {
             user.setPassword(passwordEncoder.encode(reqUser.getPassword()));
         }
+        if (!StringUtils.isEmpty(reqUser.getEmail())) {
+            user.setEmail(reqUser.getEmail().trim());
+        }
 
         if (create) {
             user.setLogin(reqUser.getLogin());
-            user.setCreationDate(Instant.now());
+            user.setDateCreation(Instant.now());
         }
 
         if (reqUser.getRoles() != null) {
@@ -144,6 +166,29 @@ public class Users {
         userRepository.save(user);
 
         return user;
+    }
+
+    @NonNull
+    public UserDTO getOrCreateLocalUserFromLdap(@NonNull final ReqLogin reqLogin) {
+        Optional<UserDTO> user = userRepository.getUserByLdapLogin(reqLogin.getLogin());
+        if (user.isPresent()) {
+            fetchUserRoles(user.get());
+            return user.get();
+        }
+        else {
+            User newUser = new User();
+            ReqUserEdit reqUserEdit = new ReqUserEdit();
+            reqUserEdit.setRealName(reqLogin.getLogin());
+            reqUserEdit.setLogin(reqLogin.getLogin());
+            reqUserEdit.setPassword(reqLogin.getPassword());
+
+            createOrUpdateUser(reqUserEdit, newUser, true);
+
+            newUser.setLdapLogin(reqLogin.getLogin());
+            userRepository.save(newUser);
+
+            return new UserDTO(newUser);
+        }
     }
 
     @NonNull
@@ -170,24 +215,24 @@ public class Users {
     }
 
     @NonNull
-    public List<UserShortInfo> getUsers() {
-        List<UserShortInfo> users = userRepository.getUsers();
-        for (UserShortInfo user :users) {
+    public List<UserDTO> getUsers() {
+        List<UserDTO> users = userRepository.getUsers();
+        for (UserDTO user: users) {
             fetchUserRoles(user);
         }
         return users;
     }
 
-    protected void fetchUserRoles(@NonNull UserShortInfo user) {
+    protected void fetchUserRoles(@NonNull UserDTO user) {
         Optional<User> foundUser = userRepository.findById(user.getId());
         if (foundUser.isPresent()) {
-            user.setRoles(UserShortInfo.createRoleStrings(foundUser.get().getRoles()));
+            user.setRoles(Role.getRolesAsString(foundUser.get().getRoles()));
         }
     }
 
     @NonNull
-    public UserShortInfo getUserById(long id) throws IllegalAccessException {
-        Optional<UserShortInfo> user = userRepository.getUserById(id);
+    public UserDTO getUserById(long id) throws IllegalAccessException {
+        Optional<UserDTO> user = userRepository.getUserById(id);
         user.orElseThrow(() -> new IllegalAccessException("User with given ID does not exist!"));
 
         fetchUserRoles(user.get());
@@ -196,12 +241,58 @@ public class Users {
     }
 
     @NonNull
-    public UserShortInfo getUserByLogin(@NonNull final String login) throws IllegalAccessException {
-        Optional<UserShortInfo> user = userRepository.getUserByLogin(login);
+    public UserDTO getUserByLogin(@NonNull final String login) throws IllegalAccessException {
+        Optional<UserDTO> user = userRepository.getUserByLogin(login);
         user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
 
         fetchUserRoles(user.get());
 
         return user.get();
+    }
+
+    @NonNull
+    public List<TaskDTO> getUserTasks(@NonNull final Long userId) throws IllegalAccessException {
+        Optional<User> user = userRepository.findById(userId);
+        user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
+
+        List<Task> userTasks = taskRepository.findUserTasks(user.get());
+        List<Team> userTeams = teamRepository.findUserTeams(user.get());
+        userTeams.forEach((team) -> taskRepository.findTeamTasks(team).forEach(userTasks::add));
+
+        List<Task> uniqueUserTasks = removeDuplicateTasks(userTasks);
+        uniqueUserTasks.sort(Comparator.comparing(Task::getTitle));
+
+        return uniqueUserTasks.stream()
+                .map((task) -> new TaskDTO(task))
+                .collect(Collectors.toList());
+    }
+
+    private List<Task> removeDuplicateTasks(List<Task> userTasks) {
+        HashMap<Long, Task> uniqueTasks = new HashMap<>();
+        userTasks.forEach((task) -> uniqueTasks.put(task.getId(), task));
+        return new ArrayList<>(uniqueTasks.values());
+    }
+
+    @NonNull
+    public List<TeamDTO> getUserTeams() throws IllegalAccessException {
+        if (userAuthenticator.isRoleAdmin()) {
+            return teamRepository.findAll().stream()
+                    .map((team) -> new TeamDTO(team))
+                    .collect(Collectors.toList());
+        }
+
+        Optional<User> user = userRepository.findById(userAuthenticator.getUserId());
+        user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
+
+        List<Team> userTeams = teamRepository.findUserTeams(user.get());
+
+        return userTeams.stream()
+                .map((team) -> new TeamDTO(team))
+                .collect(Collectors.toList());
+    }
+
+    @NonNull
+    public List<UserDTO> searchUsers(@NonNull final String filter) {
+        return userRepository.searchUser(filter);
     }
 }

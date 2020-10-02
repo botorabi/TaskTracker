@@ -8,14 +8,15 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.service.comm.*;
+import net.vrfun.tasktracker.task.TaskDTO;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,18 +40,18 @@ public class RestServiceUser {
 
 
     @Autowired
-    public RestServiceUser(@NonNull UserAuthenticator userAuthenticator,
-                           @NonNull Users users) {
+    public RestServiceUser(@NonNull final UserAuthenticator userAuthenticator,
+                           @NonNull final Users users) {
 
         this.userAuthenticator = userAuthenticator;
         this.users = users;
     }
 
     @PostMapping("/user/create")
-    @Secured({"ROLE_ADMIN"})
-    public ResponseEntity<Long> create(@RequestBody ReqUserEdit userCreate) {
+    @Secured({Role.ROLE_NAME_ADMIN})
+    public ResponseEntity<Long> create(@RequestBody ReqUserEdit reqUserEdit) {
         try {
-            return new ResponseEntity<>(users.createUser(userCreate).getId(), HttpStatus.OK);
+            return new ResponseEntity<>(users.createUser(reqUserEdit).getId(), HttpStatus.OK);
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not create new user, reason: {}", throwable.getMessage());
@@ -59,19 +60,19 @@ public class RestServiceUser {
     }
 
     @PutMapping("/user/edit")
-    public ResponseEntity<Long> edit(@RequestBody ReqUserEdit userEdit) {
+    public ResponseEntity<Long> edit(@RequestBody ReqUserEdit reqUserEdit) {
         try {
-            if (StringUtils.isEmpty(userEdit.getLogin())) {
+            if (StringUtils.isEmpty(reqUserEdit.getLogin())) {
                 LOGGER.info("Could not edit user, missing login name!");
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
             }
-            if (userAuthenticator.getUserLogin().equals(userEdit.getLogin())) {
+            if (userAuthenticator.getUserLogin().equals(reqUserEdit.getLogin())) {
                 // users are not allowed to change their own roles
-                userEdit.setRoles(null);
-                return new ResponseEntity<>(users.editUser(userEdit).getId(), HttpStatus.OK);
+                reqUserEdit.setRoles(null);
+                return new ResponseEntity<>(users.editUser(reqUserEdit).getId(), HttpStatus.OK);
             }
             else if (userAuthenticator.isRoleAdmin()) {
-                return new ResponseEntity<>(users.editUser(userEdit).getId(), HttpStatus.OK);
+                return new ResponseEntity<>(users.editUser(reqUserEdit).getId(), HttpStatus.OK);
             }
             else {
                 LOGGER.info("Could not edit user, missing privilege!");
@@ -84,8 +85,8 @@ public class RestServiceUser {
         }
     }
 
-    @DeleteMapping("/user/{id}")
-    @Secured({"ROLE_ADMIN"})
+    @DeleteMapping("/user/delete/{id}")
+    @Secured({Role.ROLE_NAME_ADMIN})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
             users.deleteUser(id);
@@ -98,9 +99,9 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<UserShortInfo>> getUsers() {
+    public ResponseEntity<List<UserDTO>> getUsers() {
         try {
-            if (userAuthenticator.isRoleAdmin()) {
+            if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
                 return new ResponseEntity<>(users.getUsers(), HttpStatus.OK);
             }
             else {
@@ -115,14 +116,55 @@ public class RestServiceUser {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<UserShortInfo> getUser(@PathVariable("id") Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
         try {
-            return new ResponseEntity<>(users.getUserById(id), HttpStatus.OK);
+            UserDTO user = users.getUserById(id);
+            //! NOTE don't leak user info to others!
+            if (!userAuthenticator.isRoleAdmin() && (id != userAuthenticator.getUserId())) {
+                user.setLastLogin(null);
+                user.setLogin("");
+            }
+            return new ResponseEntity<>(user, HttpStatus.OK);
         }
         catch(Throwable throwable) {
             LOGGER.info("Could not get user, reason: {}", throwable.getMessage());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/user/tasks/{userId}")
+    public ResponseEntity<List<TaskDTO>> getUserTasks(@PathVariable("userId") Long userId) {
+        try {
+            // Normal users have access only to their own tasks!
+            if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
+                return new ResponseEntity<>(users.getUserTasks(userId), HttpStatus.OK);
+            }
+            return new ResponseEntity<>(users.getUserTasks(userAuthenticator.getUserId()), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not get user tasks, reason: {}", throwable.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/user/teams")
+    public ResponseEntity<List<TeamDTO>> getUserTeams() {
+        try {
+            return new ResponseEntity<>(users.getUserTeams(), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not get user teams, reason: {}", throwable.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/user/search/{filter}")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
+    public ResponseEntity<List<UserDTO>> searchUser(@PathVariable("filter") String filter) {
+        if (filter.equals("*")) {
+            return new ResponseEntity<>(users.getUsers(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(users.searchUsers(filter), HttpStatus.OK);
     }
 
     @PostMapping("/user/login")
@@ -136,6 +178,11 @@ public class RestServiceUser {
         }
         else if (userAuthenticator.loginLDAPUser(reqLogin.getLogin(), reqLogin.getPassword())) {
             LOGGER.info("LDAP user {} successfully logged in", reqLogin.getLogin());
+            LOGGER.info("  Creating a local user for ", reqLogin.getLogin());
+            users.getOrCreateLocalUserFromLdap(reqLogin);
+            if (!userAuthenticator.loginLocalUser(reqLogin.getLogin(), reqLogin.getPassword())) {
+                LOGGER.error("  Failed to login local user {}!", reqLogin.getLogin());
+            }
         }
         else {
             LOGGER.info("User login failed, {}", reqLogin.getLogin());
@@ -148,6 +195,11 @@ public class RestServiceUser {
     public ResponseEntity<RespAuthenticationStatus> logoutUser() {
         userAuthenticator.logoutUser();
         return createAuthenticationStatusResponse();
+    }
+
+    @GetMapping("/user/availableroles")
+    public ResponseEntity<Collection<String>> getAvailableRoles() {
+        return new ResponseEntity<>(Role.getAllRolesAsString(), HttpStatus.OK);
     }
 
     @GetMapping("/user/status")

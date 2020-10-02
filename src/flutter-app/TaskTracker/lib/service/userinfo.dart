@@ -8,12 +8,18 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class UserInfo {
+
+  static const String ROLE_PREFIX = 'ROLE_';
+
   int id;
   String realName = '';
   String login = '';
+  String email = '';
   String password = '';
-  DateTime createDate;
+  DateTime dateCreation;
   DateTime lastLogin;
   List<String> roles = [];
 
@@ -26,15 +32,20 @@ class UserInfo {
   factory UserInfo.fromMap(final Map<String, dynamic> fields) {
     UserInfo userInfo = UserInfo();
     userInfo.id = fields['id'];
-    userInfo.realName = fields['realName'];
-    userInfo.login = fields['login'];
-    if (fields['createDate'] != null) {
-      userInfo.createDate = DateTime.parse(fields['createDate'].toString());
+    userInfo.realName = Utf8Utils.fromUtf8(fields['realName']);
+    userInfo.login = Utf8Utils.fromUtf8(fields['login']);
+    if (fields['email'] != null) {
+      userInfo.email = Utf8Utils.fromUtf8(fields['email']);
+    }
+    if (fields['dateCreation'] != null) {
+      userInfo.dateCreation = DateTime.parse(fields['dateCreation'].toString());
     }
     if (fields['lastLogin'] != null) {
       userInfo.lastLogin = DateTime.parse(fields['lastLogin'].toString());
     }
-    userInfo.roles = List.from(fields['roles']);
+    if (fields['roles'] != null) {
+      userInfo.roles = List.from(fields['roles']);
+    }
     userInfo.password = '';
     return userInfo;
   }
@@ -58,8 +69,9 @@ class UserInfo {
       'id' : id,
       'realName' : realName,
       'login' : login,
+      'email' : email,
       'password': password,
-      'roles' : roles.toList()
+      'roles' : roles?.toList()
     };
   }
 }

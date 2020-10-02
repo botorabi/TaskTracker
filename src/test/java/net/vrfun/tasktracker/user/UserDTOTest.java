@@ -16,12 +16,12 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-public class UserShortInfoTest {
+public class UserDTOTest {
 
     @Test
     public void createRoleStrings() {
         List<UserRole> userRoles = Role.getAllRoles();
-        Collection<String> roleStrings = UserShortInfo.createRoleStrings(userRoles);
+        Collection<String> roleStrings = Role.getRolesAsString(userRoles);
 
         assertThat(roleStrings).hasSize(userRoles.size());
         assertThat(roleStrings).contains(Role.ROLE_ADMIN.name());

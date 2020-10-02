@@ -26,6 +26,8 @@ public class ReqUserEdit {
 
     private String login;
 
+    private String email;
+
     private String password;
 
     private Set<String> roles;
@@ -58,6 +60,15 @@ public class ReqUserEdit {
     @JsonProperty("login")
     public void setLogin(@Nullable final String login) {
         this.login = login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    @JsonProperty("email")
+    public void setEmail(@Nullable final String email) {
+        this.email = email;
     }
 
     public String getPassword() {

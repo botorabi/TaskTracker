@@ -7,6 +7,8 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
+import net.vrfun.tasktracker.task.TaskRepository;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.*;
@@ -31,7 +33,16 @@ public class UsersTest {
     private UserRepository userRepository;
 
     @Mock
+    private TeamRepository teamRepository;
+
+    @Mock
+    private TaskRepository taskRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private UserAuthenticator userAuthenticator;
 
     private Users users;
 
@@ -43,7 +54,7 @@ public class UsersTest {
 
         when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        users = new Users(userRoleRepository, userRepository, passwordEncoder);
+        users = new Users(userRoleRepository, userRepository, teamRepository, taskRepository, passwordEncoder, userAuthenticator);
     }
 
     @Test
@@ -69,6 +80,7 @@ public class UsersTest {
     public void createUserInvalidLogin() {
         ReqUserEdit reqUser = new ReqUserEdit();
         reqUser.setPassword("mypassword");
+        reqUser.setEmail("myemail@mydomain.com");
 
         assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
     }
@@ -76,6 +88,16 @@ public class UsersTest {
     @Test
     public void createUserInvalidPassword() {
         ReqUserEdit reqUser = new ReqUserEdit();
+        reqUser.setLogin("mylogin");
+        reqUser.setEmail("myemail@mydomain.com");
+
+        assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void createUserInvalidEmail() {
+        ReqUserEdit reqUser = new ReqUserEdit();
+        reqUser.setPassword("mypassword");
         reqUser.setLogin("mylogin");
 
         assertThatThrownBy(() -> users.createUser(reqUser)).isInstanceOf(IllegalArgumentException.class);
@@ -96,6 +118,7 @@ public class UsersTest {
         ReqUserEdit reqUser = new ReqUserEdit();
         reqUser.setLogin("mylogin");
         reqUser.setPassword("mypassword");
+        reqUser.setEmail("myemail@mydomain.com");
 
         when(userRepository.findUserByLogin("mylogin")).thenReturn(Optional.empty());
 
@@ -154,7 +177,7 @@ public class UsersTest {
         assertThat(user.getRoles()).hasSize(reqUser.getRoles().size());
 
         assertThat(user.getLogin()).isNull();
-        assertThat(user.getCreationDate()).isNull();
+        assertThat(user.getDateCreation()).isNull();
     }
 
     @Test
@@ -169,7 +192,7 @@ public class UsersTest {
         assertThat(user.getRoles()).hasSize(reqUser.getRoles().size());
 
         assertThat(user.getLogin()).isNotNull();
-        assertThat(user.getCreationDate()).isNotNull();
+        assertThat(user.getDateCreation()).isNotNull();
     }
 
     private ReqUserEdit prepareUserCreateOrEdit() {
@@ -206,9 +229,9 @@ public class UsersTest {
 
     @Test
     public void getUsers() {
-        List<UserShortInfo> dummyUsers = new ArrayList<>();
-        dummyUsers.add(new UserShortInfo());
-        dummyUsers.add(new UserShortInfo());
+        List<UserDTO> dummyUsers = new ArrayList<>();
+        dummyUsers.add(new UserDTO());
+        dummyUsers.add(new UserDTO());
 
         doReturn(dummyUsers).when(userRepository).getUsers();
 

@@ -8,9 +8,12 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
-import org.slf4j.*;
+import net.vrfun.tasktracker.user.Role;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +41,7 @@ public class RestServiceTask {
     }
 
     @PostMapping("/task/create")
-    @Secured({"ROLE_TEAM_LEAD"})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> create(@RequestBody ReqTaskEdit taskEdit) {
         try {
             return new ResponseEntity<>(tasks.create(taskEdit).getId(), HttpStatus.OK);
@@ -50,6 +53,7 @@ public class RestServiceTask {
     }
 
     @PutMapping("/task/edit")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> edit(@RequestBody ReqTaskEdit taskEdit) {
         try {
             return new ResponseEntity<>(tasks.update(taskEdit).getId(), HttpStatus.OK);
@@ -60,8 +64,8 @@ public class RestServiceTask {
         }
     }
 
-    @DeleteMapping("/task/{id}")
-    @Secured({"ROLE_TEAM_LEAD"})
+    @DeleteMapping("/task/delete/{id}")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
         try {
             tasks.delete(id);
@@ -74,18 +78,22 @@ public class RestServiceTask {
     }
 
     @GetMapping("/task")
-    public ResponseEntity<List<Task>> getAllTasks() {
-        return new ResponseEntity<>(tasks.getAll(), HttpStatus.OK);
+    public ResponseEntity<List<TaskDTO>> getAllTasks() {
+        return new ResponseEntity<>(tasks.getTasks(), HttpStatus.OK);
     }
 
     @GetMapping("/task/{id}")
-    public ResponseEntity<Task> getTask(@PathVariable("id") Long id) {
-        LOGGER.info("getting task {}", id);
-        Task task = tasks.get(id);
+    public ResponseEntity<TaskDTO> getTask(@PathVariable("id") Long id) {
+        TaskDTO task = tasks.getTaskById(id);
         if (task == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(task, HttpStatus.OK);
+    }
+
+    @GetMapping("/task/search/{filter}")
+    public ResponseEntity<List<TaskDTO>> searchTasks(@PathVariable("filter") String filter) {
+        return new ResponseEntity<>(tasks.searchTasks(filter), HttpStatus.OK);
     }
 }

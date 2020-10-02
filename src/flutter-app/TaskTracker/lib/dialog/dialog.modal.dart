@@ -18,10 +18,9 @@ class DialogModal {
     return showDialog<void>(
         context: _context,
         barrierDismissible: true,
-        builder: (_) =>
-        new AlertDialog(
-          title: new Text(title),
-          content: new Text(
+        builder: (_) => AlertDialog(
+          title: Text(title),
+          content: Text(
             text,
             style: warn ?
                   TextStyle(fontWeight: FontWeight.w300) :

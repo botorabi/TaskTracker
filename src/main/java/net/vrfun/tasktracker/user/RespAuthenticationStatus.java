@@ -5,7 +5,7 @@
  * License: MIT License (MIT), read the LICENSE text in
  *          main directory for more details.
  */
-package net.vrfun.tasktracker.service.comm;
+package net.vrfun.tasktracker.user;
 
 import net.vrfun.tasktracker.user.Role;
 

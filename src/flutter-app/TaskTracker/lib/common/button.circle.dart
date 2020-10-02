@@ -10,24 +10,14 @@ import 'package:flutter/material.dart';
 
 abstract class CircleButton {
 
-  static ClipOval create(
-      double size, IconData iconData, double iconSize,
-      GestureTapCallback cbOnTab) {
+  static IconButton create(double size, IconData iconData, GestureTapCallback cbOnTab, [String toolTip = ""]) {
 
-    return ClipOval(
-      child: Material(
-        color: (cbOnTab != null) ? Colors.blue : Colors.grey,
-        elevation: 2.0,
-        child: InkWell(
-          splashColor: (cbOnTab != null) ? Colors.blueGrey : Colors.grey,
-          child: SizedBox(
-              width: size,
-              height: size,
-              child: Icon(iconData, color: Colors.white, size: iconSize)
-          ),
-          onTap: cbOnTab,
-        ),
-      ),
+    return IconButton(
+      iconSize: size,
+      splashRadius: size,
+      icon: Icon(iconData, color: (cbOnTab != null) ? Colors.blue : Colors.grey),
+      onPressed: cbOnTab,
+      tooltip: toolTip != "" ? toolTip : null,
     );
   }
 }

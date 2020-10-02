@@ -79,6 +79,9 @@ class _WidgetLoginState extends State<WidgetLogin> {
                         controller: _textEditingControllerPassword,
                         focusNode: _focusPassword,
                         obscureText: true,
+                        onFieldSubmitted: (value) {
+                          loginUser(context);
+                        },
                         onEditingComplete: () {
                           _focusButton.requestFocus();
                         },
@@ -107,10 +110,6 @@ class _WidgetLoginState extends State<WidgetLogin> {
     );
   }
 
-  void showModalDialog(String title, String text, bool warn) {
-    DialogModal(context).show(title, text, warn);
-  }
-
   void loginUser(BuildContext context) {
     if (_textEditingControllerLoginName.text.isEmpty || _textEditingControllerPassword.text.isEmpty) {
       return;
@@ -123,11 +122,11 @@ class _WidgetLoginState extends State<WidgetLogin> {
         Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
       }
       else {
-        showModalDialog("Attention", "Could not login. Check your credentials!", true);
+        DialogModal(context).show("Attention", "Could not login. Check your credentials!", true);
       }
     },
     onError: (err) {
-      showModalDialog("Attention", "Could not login! Reason: " + err.toString(), true);
+      DialogModal(context).show("Attention", "Could not login! Reason: " + err.toString(), true);
     });
   }
 }

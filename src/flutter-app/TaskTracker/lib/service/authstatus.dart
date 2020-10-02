@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class AuthStatus {
   bool authenticated = false;
   int userId;
@@ -20,12 +22,16 @@ class AuthStatus {
     return ((roles != null) && roles.contains("ROLE_ADMIN"));
   }
 
+  bool isTeamLead() {
+    return ((roles != null) && roles.contains("ROLE_TEAM_LEAD"));
+  }
+
   factory AuthStatus.fromJsonString(final String jsonString) {
     AuthStatus status = AuthStatus();
     Map<String, dynamic> fields = jsonDecode(jsonString);
     status.userId = fields['id'] as int;
     status.authenticated = fields['authenticated'];
-    status.loginName = fields['name'];
+    status.loginName = Utf8Utils.fromUtf8(fields['name']);
     status.roles = List.from(fields['roles']);
     return status;
   }

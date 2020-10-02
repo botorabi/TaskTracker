@@ -23,7 +23,7 @@ import java.util.*;
 @Service
 public class Tags {
 
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
     @Autowired
     public Tags(@NonNull final TagRepository tagRepository) {

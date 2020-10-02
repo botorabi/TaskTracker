@@ -6,14 +6,13 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
 class PageNewUser extends StatefulWidget {
-  PageNewUser({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  PageNewUser({Key key, this.title}) : super(key: key);
 
   @override
   _PageNewUserState createState() => _PageNewUserState();
@@ -27,13 +26,13 @@ class _PageNewUserState extends State<PageNewUser> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            WidgetUserEdit(userId: 0)
-          ],
-        ),
+      body: ListView(
+        shrinkWrap: true,
+        children: [
+          Center(
+            child: WidgetUserEdit(userId: 0)
+          ),
+        ],
       ),
     );
   }

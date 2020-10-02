@@ -7,44 +7,51 @@
  */
 package net.vrfun.tasktracker.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
 
 /**
- * User's short info.
+ * User's data transfer object
  *
  * @author          boto
  * Creation Date    July 2020
  */
-public class UserShortInfo {
+public class UserDTO {
 
     private long id;
-
     private String realName;
-
     private String login;
-
-    private Instant creationDate;
-
+    private String email;
+    private Instant dateCreation;
     private Instant lastLogin;
-
     private Collection<String> roles;
 
-    public UserShortInfo() {}
+    public UserDTO() {}
 
-    public UserShortInfo(long id,
-                         final String realName,
-                         final String login,
-                         final Instant creationDate,
-                         final Instant lastLogin) {
+    public UserDTO(@NonNull final User user) {
+        this.id = user.getId();
+        this.realName = user.getRealName();
+        this.login = user.getLogin();
+        this.email = user.getEmail();
+        this.dateCreation = user.getDateCreation();
+        this.lastLogin = user.getLastLogin();
+        this.roles = Role.getRolesAsString(user.getRoles());
+    }
+
+    public UserDTO(long id,
+                   final String realName,
+                   final String login,
+                   final String email,
+                   final Instant dateCreation,
+                   final Instant lastLogin) {
 
         this.id = id;
         this.realName = realName;
         this.login = login;
-        this.creationDate = creationDate;
+        this.email = email;
+        this.dateCreation = dateCreation;
         this.lastLogin = lastLogin;
     }
 
@@ -64,6 +71,14 @@ public class UserShortInfo {
         this.login = login;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getRealName() {
         return realName;
     }
@@ -72,12 +87,12 @@ public class UserShortInfo {
         this.realName = realName;
     }
 
-    public Instant getCreationDate() {
-        return creationDate;
+    public Instant getDateCreation() {
+        return dateCreation;
     }
 
-    public void setCreationDate(Instant creationDate) {
-        this.creationDate = creationDate;
+    public void setDateCreation(Instant dateCreation) {
+        this.dateCreation = dateCreation;
     }
 
     public Instant getLastLogin() {
@@ -94,17 +109,5 @@ public class UserShortInfo {
 
     public void setRoles(Collection<String> roles) {
         this.roles = roles;
-    }
-
-    @JsonIgnore
-    @NonNull
-    public static Collection<String> createRoleStrings(@Nullable Collection<UserRole> roles) {
-        List<String> roleStrings = new ArrayList<>();
-        if (roles !=  null) {
-            for (UserRole role : roles) {
-                roleStrings.add(role.getRole().name());
-            }
-        }
-        return roleStrings;
     }
 }
