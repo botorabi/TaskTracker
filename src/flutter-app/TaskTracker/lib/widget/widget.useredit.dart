@@ -221,6 +221,10 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
       DialogModal(context).show("Attention", "Choose a password with at least 8 characters!", true);
       return;
     }
+    if (_textEditingControllerEMail.text.isEmpty) {
+      DialogModal(context).show("Attention", "Choose a valid E-Mail address!", true);
+      return;
+    }
 
     UserInfo userInfo = UserInfo();
     userInfo.login = _textEditingControllerLoginName.text;
@@ -251,6 +255,10 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   void _applyChanges(BuildContext context) {
     if (_textEditingControllerPassword.text != _textEditingControllerPasswordRepeat.text) {
       DialogModal(context).show("Attention", "Passwords mismatch!", true);
+      return;
+    }
+    if (_textEditingControllerEMail.text.isEmpty) {
+      DialogModal(context).show("Attention", "Choose a valid E-Mail address!", true);
       return;
     }
 

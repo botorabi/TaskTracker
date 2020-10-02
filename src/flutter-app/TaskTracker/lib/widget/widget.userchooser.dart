@@ -7,8 +7,10 @@
  */
 
 import 'package:TaskTracker/common/button.circle.dart';
+import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.chooseusers.dart';
+import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +51,7 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
 
   final _serviceUser = ServiceUser();
 
-  List<Container> _usersWidget = List<Container>();
+  List<Widget >   _usersWidget = List<Widget>();
   List<UserInfo>  _users = List<UserInfo>();
   bool            _readOnly = false;
 
@@ -144,7 +146,8 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                     ),
                     child: ListView(
                       children: <Widget>[
-                        Column(children: _usersWidget),
+                        Column(
+                          children: _usersWidget),
                       ],
                     ),
                   ),
@@ -157,23 +160,27 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
   }
 
   void _createUI() {
-    _usersWidget = List<Container>();
+    _usersWidget = List<Widget>();
     _users.forEach((userInfo) {
-      _usersWidget.add(Container(
-        child: Padding(
+      _usersWidget.add(Padding(
             padding: EdgeInsets.all(5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(userInfo.realName),
-                CircleButton.create(16, Icons.remove, () {
-                  _users.remove(userInfo);
-                  _createUI();
+                CircleButton.create(16, Icons.delete, () {
+                  DialogTwoButtonsModal(context)
+                          .show('Attention', "You really want to remove user '" + userInfo.realName + "'?", ButtonID.YES, ButtonID.NO)
+                          .then((button) {
+                                if (button == ButtonID.YES) {
+                                  _users.remove(userInfo);
+                                  _createUI();
+                              }
+                          });
                 }),
               ]
             ),
           ),
-        ),
       );
     });
     setState(() {});

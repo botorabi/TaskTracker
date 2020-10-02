@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class UserInfo {
 
   static const String ROLE_PREFIX = 'ROLE_';
@@ -30,10 +32,10 @@ class UserInfo {
   factory UserInfo.fromMap(final Map<String, dynamic> fields) {
     UserInfo userInfo = UserInfo();
     userInfo.id = fields['id'];
-    userInfo.realName = fields['realName'];
-    userInfo.login = fields['login'];
+    userInfo.realName = Utf8Utils.fromUtf8(fields['realName']);
+    userInfo.login = Utf8Utils.fromUtf8(fields['login']);
     if (fields['email'] != null) {
-      userInfo.email = fields['email'];
+      userInfo.email = Utf8Utils.fromUtf8(fields['email']);
     }
     if (fields['dateCreation'] != null) {
       userInfo.dateCreation = DateTime.parse(fields['dateCreation'].toString());

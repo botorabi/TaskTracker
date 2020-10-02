@@ -265,7 +265,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(userInfo.realName),
-                CircleButton.create(16, Icons.remove, () {
+                CircleButton.create(16, Icons.delete, () {
                   _users.remove(userInfo);
                   _createUsersUI();
                 }),
@@ -288,7 +288,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(team.name),
-                CircleButton.create(16, Icons.remove, () {
+                CircleButton.create(16, Icons.delete, () {
                   _teams.remove(team);
                   _createTeamsUI();
                 }),

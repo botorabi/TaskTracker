@@ -2,7 +2,14 @@
 
 CONFIG_FILE=TaskTracker/lib/config.dart
 BASE_URL_PATCHED=http://localhost:8080
-BASE_URL_ORIGINAL=
+
+if env | grep -q ^TASK_TRACKER_BASE_URL=; then
+  echo "Using base URL from env TASK_TRACKER_BASE_URL: ${TASK_TRACKER_BASE_URL}"
+  BASE_URL_ORIGINAL=${TASK_TRACKER_BASE_URL}
+else
+  echo "env variable TASK_TRACKER_BASE_URL not set, using default base URL"
+  BASE_URL_ORIGINAL=
+fi
 
 echo ""
 

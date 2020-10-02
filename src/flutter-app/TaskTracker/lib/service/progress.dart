@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class Progress {
 
   int id;
@@ -27,9 +29,9 @@ class Progress {
     Progress progress = Progress();
     progress.id = fields['id'];
     progress.ownerId = fields['ownerId'];
-    progress.ownerName = fields['ownerName'];
-    progress.title = fields['title'];
-    progress.text = fields['text'];
+    progress.ownerName = Utf8Utils.fromUtf8(fields['ownerName']);
+    progress.title = Utf8Utils.fromUtf8(fields['title']);
+    progress.text = Utf8Utils.fromUtf8(fields['text']);
     progress.reportWeek = fields['reportWeek'];
     progress.reportYear = fields['reportYear'];
 

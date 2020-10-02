@@ -161,6 +161,9 @@ public class RestServiceUser {
     @GetMapping("/user/search/{filter}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<UserDTO>> searchUser(@PathVariable("filter") String filter) {
+        if (filter.equals("*")) {
+            return new ResponseEntity<>(users.getUsers(), HttpStatus.OK);
+        }
         return new ResponseEntity<>(users.searchUsers(filter), HttpStatus.OK);
     }
 

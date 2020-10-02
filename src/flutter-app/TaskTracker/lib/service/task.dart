@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class Task {
 
   int id;
@@ -23,8 +25,8 @@ class Task {
   factory Task.fromMap(final Map<String, dynamic> fields) {
     Task task = Task();
     task.id = fields['id'];
-    task.title = fields['title'];
-    task.description = fields['description'];
+    task.title = Utf8Utils.fromUtf8(fields['title']);
+    task.description = Utf8Utils.fromUtf8(fields['description']);
     if (fields['dateCreation'] != null) {
       task.dateCreation = DateTime.parse(fields['dateCreation'].toString());
     }

@@ -88,6 +88,9 @@ public class RestServiceTeam {
 
     @GetMapping("/team/search/{filter}")
     public ResponseEntity<List<TeamDTO>> searchTeam(@PathVariable("filter") String filter) {
+        if (filter.equals("*")) {
+            return new ResponseEntity<>(teams.getTeams(), HttpStatus.OK);
+        }
         return new ResponseEntity<>(teams.searchTeams(filter), HttpStatus.OK);
     }
 

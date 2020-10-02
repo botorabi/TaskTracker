@@ -49,9 +49,9 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
 
   final _serviceTeam = ServiceTeam();
 
-  List<Container> _teamsWidget = List<Container>();
-  List<Team>      _teams = List<Team>();
-  bool            _readOnly = false;
+  List<Widget> _teamsWidget = List<Widget>();
+  List<Team>   _teams = List<Team>();
+  bool         _readOnly = false;
 
   void setTeams(List<Team> teams) {
     _teams = teams;
@@ -157,21 +157,19 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
   }
 
   void _createUI() {
-    _teamsWidget = List<Container>();
+    _teamsWidget = List<Widget>();
     _teams.forEach((team) {
-      _teamsWidget.add(Container(
-        child: Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(team.name),
-                CircleButton.create(16, Icons.remove, () {
-                  _teams.remove(team);
-                  _createUI();
-                }),
-              ]
-            ),
+      _teamsWidget.add(Padding(
+          padding: EdgeInsets.all(5.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(team.name),
+              CircleButton.create(16, Icons.delete, () {
+                _teams.remove(team);
+                _createUI();
+              }),
+            ]
           ),
         ),
       );

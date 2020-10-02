@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class Team {
 
   int id;
@@ -23,8 +25,8 @@ class Team {
   factory Team.fromMap(final Map<String, dynamic> fields) {
     Team team = Team();
     team.id = fields['id'];
-    team.name = fields['name'];
-    team.description = fields['description'];
+    team.name = Utf8Utils.fromUtf8(fields['name']);
+    team.description = Utf8Utils.fromUtf8(fields['description']);
     if (fields.containsKey('active')) {
       team.active = fields['active'];
     }

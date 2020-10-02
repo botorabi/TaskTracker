@@ -149,6 +149,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 decoration: InputDecoration(
                                   labelText: 'Optional Mail Body Text',
                                   hintText: '\nThis is an automatically generated report mail...',
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                 ),
                               ),
                             ),

@@ -12,14 +12,11 @@ import org.apache.fop.apps.*;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cglib.core.CollectionUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
-import org.springframework.web.util.HtmlUtils;
 
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
@@ -29,7 +26,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.IsoFields;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ReportGeneratorPDF implements ReportGenerator {
 
@@ -112,26 +108,26 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
 
-            String progressSection = progressTemplate.replace("@AUTHOR@", encodeHtml(progress.getOwnerName()));
+            String progressSection = progressTemplate.replace("@AUTHOR@", encodeFoString(progress.getOwnerName()));
 
             String dateString = LocalDateTime.ofInstant(progress.getDateCreation(),
                     ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
-            progressSection = progressSection.replace("@DATE@", encodeHtml(dateString));
+            progressSection = progressSection.replace("@DATE@", encodeFoString(dateString));
 
             LocalDate date = progress.getReportWeek();
             int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             int reportYear = date.get(IsoFields.WEEK_BASED_YEAR);
-            progressSection = progressSection.replace("@WEEK@", encodeHtml("" + reportYear + "/" + reportWeek));
+            progressSection = progressSection.replace("@WEEK@", encodeFoString("" + reportYear + "/" + reportWeek));
 
-            progressSection = progressSection.replace("@TASK@", encodeHtml(progress.getTask().getTitle()));
+            progressSection = progressSection.replace("@TASK@", encodeFoString(progress.getTask().getTitle()));
 
             StringBuffer tags = new StringBuffer();
             if (progress.getTags() != null && !progress.getTags().isEmpty()) {
                 progress.getTags().forEach((tag) -> tags.append(tag.getName() + " "));
             }
-            progressSection = progressSection.replace("@TAGS@", encodeHtml(tags.toString()));
+            progressSection = progressSection.replace("@TAGS@", encodeFoString(tags.toString()));
 
-            progressSection = progressSection.replace("@TEXTTITLE@", encodeHtml(progress.getTitle()));
+            progressSection = progressSection.replace("@TEXTTITLE@", encodeFoString(progress.getTitle()));
             progressSection = progressSection.replace("@TEXT@", addMultiLineText(progress.getText()));
 
             taskNames.add(progress.getTask().getTitle());
@@ -143,7 +139,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
         if (!sectionContent.isEmpty()) {
             documentContentFo += "\n<fo:block space-after=\"12pt\" text-align=\"left\">\n" +
                                  "\n  <fo:inline font-weight=\"bold\">" +
-                                 encodeHtml(currentSectionTitle) + encodeHtml(" - " + String.join(", ", taskNames)) +
+                                 encodeFoString(currentSectionTitle) + encodeFoString(" - " + String.join(", ", taskNames)) +
                                  "</fo:inline>\n" +
                                  "\n</fo:block>\n";
 
@@ -151,9 +147,25 @@ public class ReportGeneratorPDF implements ReportGenerator {
         }
     }
 
-    @Nullable
-    protected String encodeHtml(@Nullable final String text) {
-        return (text == null) ? "" : HtmlUtils.htmlEscape(text);
+    @NonNull
+    protected String encodeFoString(@Nullable final String text) {
+        if (text == null) {
+            return "";
+        }
+        // NOTE the usual html escaping (Spring's and Apache's) converts also the UTF8 leading to a problem in FOP Sax parser.
+        // We take Bruno Eberhard's solution: https://stackoverflow.com/questions/1265282/recommended-method-for-escaping-html-in-java
+        StringBuilder out = new StringBuilder(Math.max(16, text.length()));
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c > 127 || c == '"' || c == '\'' || c == '<' || c == '>' || c == '&') {
+                out.append("&#");
+                out.append((int) c);
+                out.append(';');
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
 
     @NonNull
@@ -164,7 +176,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
         String multiLineText = "";
         String textLines[] = text.split("\n");
         for (String line: textLines) {
-            multiLineText += "\n<fo:block space-after=\"6pt\" >" + encodeHtml(line) + "</fo:block>\n";
+            multiLineText += "\n<fo:block space-after=\"6pt\" >" + encodeFoString(line) + "</fo:block>\n";
         }
         return multiLineText;
     }

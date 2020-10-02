@@ -36,33 +36,34 @@ class DialogChooseUsers {
   DialogChooseUsers(this._context);
 
   Future<List<UserInfo>> show(String title, String text) async {
+    await _searchUser('*');
     return showDialog(
-        context: _context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Text(title),
-                content: _createUsersUI(text, setState),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text(ButtonID.CANCEL),
-                    onPressed: () {
-                      Navigator.of(_context).pop(List<UserInfo>());
-                    },
-                  ),
-                  FlatButton(
-                    child: Text(ButtonID.CHOOSE),
-                    onPressed: () {
-                      Navigator.of(_context).pop(_chosenUsers);
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
+      context: _context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(title),
+              content: _createUsersUI(text, setState),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(ButtonID.CANCEL),
+                  onPressed: () {
+                    Navigator.of(_context).pop(List<UserInfo>());
+                  },
+                ),
+                FlatButton(
+                  child: Text(ButtonID.CHOOSE),
+                  onPressed: () {
+                    Navigator.of(_context).pop(_chosenUsers);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   SizedBox _createUsersUI(String text, setState) {
@@ -85,7 +86,7 @@ class DialogChooseUsers {
                 ),
                 TextField(
                   decoration: InputDecoration(
-                      hintText: 'Enter at least 3 characters'
+                      hintText: 'Enter a user search string'
                   ),
                   onChanged: (value) {
                     _searchUser(value).then((value) {
@@ -193,8 +194,9 @@ class DialogChooseUsers {
         Container(
           child:
             ListTile(
-              title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.arrow_right, () {
+              dense: true,
+              title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
+              trailing: CircleButton.create(24, Icons.arrow_right, () {
                 if (_addNewChosenUser(userInfo)) {
                   _updateChosenUsersUI();
                   _scrollToLastChosenUser();
@@ -213,8 +215,9 @@ class DialogChooseUsers {
         Container(
           child:
           ListTile(
-              title: Text(userInfo.realName, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.remove, () {
+              dense: true,
+              title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
+              trailing: CircleButton.create(16, Icons.delete, () {
                 _chosenUsers.remove(userInfo);
                 _updateChosenUsersUI();
               }),
@@ -251,15 +254,11 @@ class DialogChooseUsers {
   }
 
   Future<void> _searchUser(String value) async {
-    if (value.length > 2) {
-      await _serviceUser.searchUser(value)
-          .then((users) {
-            _createCandidates(users);
-            return Future<void>.value(users.length);
-      });
-    }
-    else {
-      _listCandidates = List<Container>();
-    }
+    String filter = (value != null && value.length > 0) ? value : '*';
+    await _serviceUser.searchUser(filter)
+        .then((users) {
+          _createCandidates(users);
+          return Future<void>.value(users.length);
+        });
   }
 }

@@ -8,6 +8,7 @@
 
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/utf8.utils.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
@@ -195,7 +196,7 @@ class _DataProvider extends DataTableSource {
   DataRow getRow(int index) {
     String teamLeadNames = '';
     parent._teams[index].teamLeaderNames.forEach((userName) {
-      teamLeadNames += userName + ' ';
+      teamLeadNames += Utf8Utils.fromUtf8(userName) + ' ';
     });
 
     return DataRow.byIndex(

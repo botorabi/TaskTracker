@@ -108,10 +108,11 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                                   padding: EdgeInsets.all(10.0),
                                   child: TextFormField(
                                     controller: _textEditingControllerDescription,
-                                    maxLines: 3,
+                                    maxLines: 5,
                                     maxLength: 255,
                                     decoration: InputDecoration(
                                       labelText: 'Description',
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                     ),
                                   ),
                                 ),

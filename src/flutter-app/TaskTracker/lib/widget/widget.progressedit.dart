@@ -145,8 +145,9 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                     maxLength: 10 * 1024,
                                     showCursor: true,
                                     decoration: InputDecoration(
-                                      labelText: 'Text',
+                                      labelText: 'Your Progress Text',
                                       hintText: '\n- Done great things on this\n- Resolved problems on that\n- ...',
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                     ),
                                   ),
                                 ),
@@ -261,8 +262,14 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   }
 
   void _retrieveUserTasksAndSelect([int selectTaskId = 0]) {
-    int ownerId = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ?
-                  _currentProgress.ownerId : Config.authStatus.userId;
+    int ownerId = 0;
+    if (!_newProgress) {
+      ownerId = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ?
+                _currentProgress.ownerId : Config.authStatus.userId;
+    }
+    else {
+      ownerId = Config.authStatus.userId;
+    }
 
     _serviceUser
         .getUserTasks(ownerId)

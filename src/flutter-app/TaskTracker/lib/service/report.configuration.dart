@@ -8,6 +8,8 @@
 
 import 'dart:convert';
 
+import 'package:TaskTracker/common/utf8.utils.dart';
+
 class ReportMailConfiguration {
 
   int id;
@@ -31,11 +33,11 @@ class ReportMailConfiguration {
   factory ReportMailConfiguration.fromMap(final Map<String, dynamic> fields) {
     ReportMailConfiguration configuration = ReportMailConfiguration();
     configuration.id = fields['id'];
-    configuration.name = fields['name'];
-    configuration.mailSenderName = fields['mailSenderName'];
-    configuration.mailSubject = fields['mailSubject'];
+    configuration.name = Utf8Utils.fromUtf8(fields['name']);
+    configuration.mailSenderName = Utf8Utils.fromUtf8(fields['mailSenderName']);
+    configuration.mailSubject = Utf8Utils.fromUtf8(fields['mailSubject']);
     if (fields['mailText'] != null) {
-      configuration.mailText = fields['mailText'];
+      configuration.mailText = Utf8Utils.fromUtf8(fields['mailText']);
     }
     if (fields['reportingTeams'] != null) {
       configuration.reportingTeams = List.from(fields['reportingTeams']);
@@ -49,8 +51,8 @@ class ReportMailConfiguration {
     configuration.reportWeekDay = fields['reportWeekDay'];
     configuration.reportHour = fields['reportHour'];
     configuration.reportMinute = fields['reportMinute'];
-    configuration.reportTitle = fields['reportTitle'];
-    configuration.reportSubTitle = fields['reportSubTitle'];
+    configuration.reportTitle = Utf8Utils.fromUtf8(fields['reportTitle']);
+    configuration.reportSubTitle = Utf8Utils.fromUtf8(fields['reportSubTitle']);
 
     return configuration;
   }

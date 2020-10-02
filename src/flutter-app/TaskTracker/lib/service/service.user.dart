@@ -88,7 +88,7 @@ class ServiceUser {
 
   Future<bool> deleteUser(int id) async {
     Response response = await delete(Config.baseURL + '/api/user/delete/' + id.toString(),
-                                     headers: ServiceCommon.HTTP_HEADERS_REST);
+        headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
       return true;

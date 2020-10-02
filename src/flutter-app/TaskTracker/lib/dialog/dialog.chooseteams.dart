@@ -36,33 +36,34 @@ class DialogChooseTeams {
   DialogChooseTeams(this._context);
 
   Future<List<Team>> show(String title, String text) async {
+    await _searchTeam('*');
     return showDialog(
-        context: _context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return AlertDialog(
-                title: Text(title),
-                content: _createTeamsUI(text, setState),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text(ButtonID.CANCEL),
-                    onPressed: () {
-                      Navigator.of(_context).pop(List<Team>());
-                    },
-                  ),
-                  FlatButton(
-                    child: Text(ButtonID.CHOOSE),
-                    onPressed: () {
-                      Navigator.of(_context).pop(_chosenTeams);
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
+      context: _context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(title),
+              content: _createTeamsUI(text, setState),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(ButtonID.CANCEL),
+                  onPressed: () {
+                    Navigator.of(_context).pop(List<Team>());
+                  },
+                ),
+                FlatButton(
+                  child: Text(ButtonID.CHOOSE),
+                  onPressed: () {
+                    Navigator.of(_context).pop(_chosenTeams);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   SizedBox _createTeamsUI(String text, setState) {
@@ -193,8 +194,9 @@ class DialogChooseTeams {
         Container(
           child:
           ListTile(
-            title: Text(team.name, style: TextStyle(fontWeight: FontWeight.w600)),
-            trailing: CircleButton.create(16, Icons.arrow_right, () {
+            dense: true,
+            title: Text(team.name, style: TextStyle(fontSize: 14.0)),
+            trailing: CircleButton.create(24, Icons.arrow_right, () {
               if (_addNewChosenTeam(team)) {
                 _updateChosenTeamsUI();
                 _scrollToLastChosenTeam();
@@ -213,11 +215,12 @@ class DialogChooseTeams {
         Container(
           child:
           ListTile(
-              title: Text(team.name, style: TextStyle(fontWeight: FontWeight.w600)),
-              trailing: CircleButton.create(16, Icons.remove, () {
-                _chosenTeams.remove(team);
-                _updateChosenTeamsUI();
-              }),
+            dense: true,
+            title: Text(team.name, style: TextStyle(fontSize: 14.0)),
+            trailing: CircleButton.create(16, Icons.delete, () {
+              _chosenTeams.remove(team);
+              _updateChosenTeamsUI();
+            }),
           ),
         ),
       );
@@ -251,15 +254,11 @@ class DialogChooseTeams {
   }
 
   Future<void> _searchTeam(String value) async {
-    if (value.length > 2) {
-      await _serviceTeam.searchTeam(value)
-          .then((teams) {
-            _createTeamCandidates(teams);
-            return Future<void>.value(teams.length);
-      });
-    }
-    else {
-      _listCandidates = List<Container>();
-    }
+    String filter = (value != null && value.length > 0) ? value : '*';
+    await _serviceTeam.searchTeam(filter)
+        .then((teams) {
+          _createTeamCandidates(teams);
+          return Future<void>.value(teams.length);
+    });
   }
 }

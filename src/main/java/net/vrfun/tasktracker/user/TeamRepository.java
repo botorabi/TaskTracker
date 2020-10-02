@@ -20,11 +20,12 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
 
     Optional<Team> findTeamByName(@NonNull final String name);
 
+    @Query("select team from net.vrfun.tasktracker.user.Team team order by team.name")
     List<Team> findAll();
 
     @Query("select new net.vrfun.tasktracker.user.TeamDTO(team) " +
             "from net.vrfun.tasktracker.user.Team team where " +
-            "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%'))")
+            "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%')) order by team.name")
     List<TeamDTO> searchTeam(@NonNull @Param("filter") final String filter);
 
     @Query("select team " +
@@ -32,6 +33,6 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
     List<Team> findUserTeams(@NonNull final User user);
 
     @Query("select team " +
-            "from net.vrfun.tasktracker.user.Team team where :user member of team.teamLeaders")
+            "from net.vrfun.tasktracker.user.Team team where :user member of team.teamLeaders order by team.name")
     List<Team> findTeamLeadTeams(@NonNull final User user);
 }

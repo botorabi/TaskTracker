@@ -25,11 +25,11 @@ public interface UserRepository extends CrudRepository<User, Long> {
      */
 
     @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
-            "from net.vrfun.tasktracker.user.User user")
+            "from net.vrfun.tasktracker.user.User user order by user.realName")
     List<UserDTO> getUsers();
 
     @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
-            "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%')")
+            "from net.vrfun.tasktracker.user.User user where user.realName like concat('%',:filter,'%') order by user.realName")
     List<UserDTO> searchUser(@NonNull @Param("filter") final String filter);
 
     @Query("select new net.vrfun.tasktracker.user.UserDTO(user.id, user.realName, user.login, user.email, user.dateCreation, user.lastLogin) " +
