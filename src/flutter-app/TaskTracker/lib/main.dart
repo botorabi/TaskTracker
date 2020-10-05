@@ -15,7 +15,9 @@ import 'package:TaskTracker/page/page.newreportconfiguration.dart';
 import 'package:TaskTracker/page/page.newtask.dart';
 import 'package:TaskTracker/page/page.newteam.dart';
 import 'package:TaskTracker/page/page.report.dart';
+import 'package:TaskTracker/page/page.teamlead.dart';
 import 'package:TaskTracker/page/page.viewprogress.dart';
+import 'package:TaskTracker/service/appinfo.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +35,7 @@ class StartApp {
 
   void run() {
     _updateAuthStatusAndStart();
+    _updateAppInfo();
   }
 
   void _updateAuthStatusAndStart() {
@@ -43,6 +46,15 @@ class StartApp {
     onError: (err) {
       runApp(AppTaskTracker());
       Config.authStatus = AuthStatus();
+    });
+  }
+
+  void _updateAppInfo() {
+    this._serviceLogin.getAppInfo().then((appInfo) {
+      Config.appInfo = appInfo;
+    },
+    onError: (err) {
+      Config.appInfo = AppInfo();
     });
   }
 }
@@ -67,6 +79,7 @@ class AppTaskTracker extends StatelessWidget {
           NavigationLinks.NAV_HOME            : (context) => PageHome(title: 'Task Tracker'),
           NavigationLinks.NAV_PROFILE         : (context) => PageLogin(title: 'User Profile'),
           NavigationLinks.NAV_ADMIN           : (context) => PageAdmin(title: 'Administration'),
+          NavigationLinks.NAV_TEAM_LEAD       : (context) => PageTeamLead(title: 'Team Management'),
           NavigationLinks.NAV_NEW_USER        : (context) => PageNewUser(title: 'Create New User'),
           NavigationLinks.NAV_EDIT_USER       : (context) => PageEditUser(title: 'Edit User'),
           NavigationLinks.NAV_NEW_TEAM        : (context) => PageNewTeam(title: 'Create New Team'),

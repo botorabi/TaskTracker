@@ -9,12 +9,25 @@
 import 'dart:io';
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/service/appinfo.dart';
 import 'package:TaskTracker/service/service.common.dart';
 import 'package:http/http.dart';
 
 import 'authstatus.dart';
 
 class ServiceLogin {
+
+  Future<AppInfo> getAppInfo() async {
+    Response response = await get(Config.baseURL + '/api/app/info',
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return AppInfo.fromJsonString(response.body);
+    }
+    else {
+      return Future<AppInfo>.error(response.statusCode);
+    }
+  }
 
   Future<AuthStatus> getLoginStatus() async {
     Response response = await get(Config.baseURL + '/api/user/status',

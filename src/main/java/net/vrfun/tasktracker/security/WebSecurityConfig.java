@@ -62,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .authorizeRequests()
-                .antMatchers("/*", "/assets/**", "/icons/**", "/api/user/login", "/api/user/logout", "/api/user/status").permitAll();
+                .antMatchers("/*", "/assets/**", "/icons/**", "/api/app/info", "/api/user/login",
+                                "/api/user/logout", "/api/user/status").permitAll();
 
         if (developmentModeEnabled) {
             //! NOTE we enable CORS during development

@@ -184,6 +184,11 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
     task.users = _widgetAffiliates.getUserIDs();
     task.teams = _widgetAffiliates.getTeamIDs();
 
+    if ((task.users.length < 1) && (task.teams.length < 1)) {
+      DialogModal(context).show("Attention", "Please choose at least one team or user affiliation.", true);
+      return;
+    }
+
     _serviceTask
         .createTask(task)
         .then((id) {
@@ -210,6 +215,11 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
     task.description = _textEditingControllerDescription.text;
     task.users = _widgetAffiliates.getUserIDs();
     task.teams = _widgetAffiliates.getTeamIDs();
+
+    if ((task.users.length < 1) && (task.teams.length < 1)) {
+      DialogModal(context).show("Attention", "Please choose at least one team or user affiliation.", true);
+      return;
+    }
 
     _serviceTask
       .editTask(task)

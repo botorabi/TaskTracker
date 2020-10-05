@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -30,6 +31,8 @@ public class TasksTest {
     private UserRepository userRepository;
     @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private UserAuthenticator userAuthenticator;
 
     private Tasks tasks;
 
@@ -37,7 +40,7 @@ public class TasksTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        tasks = new Tasks(taskRepository, userRepository, teamRepository);
+        tasks = new Tasks(taskRepository, userRepository, teamRepository, userAuthenticator);
     }
 
     @Test
@@ -46,7 +49,7 @@ public class TasksTest {
         allTasks.add(new Task("Task1"));
         allTasks.add(new Task("Task2"));
 
-        doReturn(allTasks).when(taskRepository).findAll();
+        doReturn(allTasks).when(taskRepository).findUserTasks(any());
 
         assertThat(tasks.getTasks()).hasSize(allTasks.size());
     }

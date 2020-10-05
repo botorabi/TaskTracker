@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.task;
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +29,21 @@ public class Tasks {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private TaskRepository taskRepository;
-    private UserRepository userRepository;
-    private TeamRepository teamRepository;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
+    private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Tasks(@NonNull final TaskRepository taskRepository,
                  @NonNull final UserRepository userRepository,
-                 @NonNull final TeamRepository teamRepository) {
+                 @NonNull final TeamRepository teamRepository,
+                 @NonNull final UserAuthenticator userAuthenticator) {
 
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
+        this.userAuthenticator = userAuthenticator;
     }
 
     @NonNull
@@ -130,13 +134,12 @@ public class Tasks {
     @NonNull
     public List<TaskDTO> getTasks() {
         List<TaskDTO> tasks = new ArrayList<>();
-        Iterable<Task> allTasks = taskRepository.findAll();
-        if (allTasks != null) {
-            allTasks.forEach((task) -> {
-                TaskDTO t = new TaskDTO(task);
-                tasks.add(t);
-            });
-        }
+        final List<Task> allTasks = taskRepository.findUserTasks(userAuthenticator.getUser());
+        teamRepository.findUserTeams(userAuthenticator.getUser()).forEach(((team) ->
+                allTasks.addAll(taskRepository.findTeamTasks(team))));
+
+        allTasks.forEach((task) -> tasks.add(new TaskDTO(task)));
+
         return tasks;
     }
 
@@ -146,7 +149,17 @@ public class Tasks {
         if (foundTask.isEmpty()) {
             throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
         }
-        return new TaskDTO(foundTask.get());
+        if (userAuthenticator.isRoleAdmin()) {
+            return new TaskDTO(foundTask.get());
+        } else {
+            List<TaskDTO> userTasks = getTasks();
+            for (TaskDTO userTask: userTasks) {
+                if (id.equals(userTask.getId())) {
+                    return userTask;
+                }
+            }
+            throw new IllegalArgumentException("Unauthorized access to task, not your Task!");
+        }
     }
 
     @NonNull

@@ -33,7 +33,6 @@ public class RestServiceTeam {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     private final Teams teams;
-
     private final UserAuthenticator userAuthenticator;
 
 
@@ -87,6 +86,7 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team/search/{filter}")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<TeamDTO>> searchTeam(@PathVariable("filter") String filter) {
         if (filter.equals("*")) {
             return new ResponseEntity<>(teams.getTeams(), HttpStatus.OK);

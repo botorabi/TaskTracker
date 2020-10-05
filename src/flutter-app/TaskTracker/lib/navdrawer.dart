@@ -25,22 +25,28 @@ class NavDrawer extends StatelessWidget {
           DrawerHeader(
             child: Column(
               children: [
+                SizedBox(height: 10.0),
                 Text(
-                  'Menu',
+                  Config.appInfo.name,
                   style: TextStyle(color: Colors.white, fontSize: 25),
+                  textAlign: TextAlign.left,
                 ),
+                SizedBox(height: 10.0),
+                Text(
+                  "Version " + Config.appInfo.version,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  textAlign: TextAlign.left,
+                ),
+                SizedBox(height: 20.0),
                 Text(
                   Config.authStatus.loginName,
                   style: TextStyle(color: Colors.white, fontSize: 20),
+                  textAlign: TextAlign.left,
                 ),
               ],
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('images/cover.jpg'),
-                )
+                color: Colors.blue,
             ),
           ),
           ListTile(
@@ -82,6 +88,17 @@ class NavDrawer extends StatelessWidget {
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, NavigationLinks.NAV_ADMIN);
+                    },
+                  ),
+                ),
+                Visibility(
+                  visible: Config.authStatus.isTeamLead(),
+                  child: ListTile(
+                    leading: Icon(Icons.settings),
+                    title: Text('Team Management'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushNamed(context, NavigationLinks.NAV_TEAM_LEAD);
                     },
                   ),
                 ),

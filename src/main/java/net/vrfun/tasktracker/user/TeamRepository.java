@@ -26,7 +26,12 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
     @Query("select new net.vrfun.tasktracker.user.TeamDTO(team) " +
             "from net.vrfun.tasktracker.user.Team team where " +
             "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%')) order by team.name")
-    List<TeamDTO> searchTeam(@NonNull @Param("filter") final String filter);
+    List<TeamDTO> searchAllTeam(@NonNull @Param("filter") final String filter);
+
+    @Query("select new net.vrfun.tasktracker.user.TeamDTO(team) " +
+            "from net.vrfun.tasktracker.user.Team team where :user member of team.users and " +
+            "( (team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%')) ) order by team.name")
+    List<TeamDTO> searchUserTeams(@NonNull final User user, @NonNull @Param("filter") final String filter);
 
     @Query("select team " +
             "from net.vrfun.tasktracker.user.Team team where :user member of team.users")

@@ -58,35 +58,29 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
-      return Column();
-    }
-    else {
-      _dataTable = _createDataTable();
-      return LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10.0),
-            child:
-            ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: _dataTable,
-                    ),
-                  )
-                ]
-            ),
+    _dataTable = _createDataTable();
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Card(
+          elevation: 5,
+          margin: EdgeInsets.all(10.0),
+          child:
+          ExpansionTile(
+              title: Text(widget.title),
+              initiallyExpanded: _expanded,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: _dataTable,
+                  ),
+                )
+              ]
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _addTeam() async {
@@ -178,7 +172,10 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addTeam(), 'Add New Team'),
+        Visibility(
+          visible: Config.authStatus.isAdmin(),
+          child: CircleButton.create(24, Icons.add, () => _addTeam(), 'Add New Team'),
+        ),
       ],
     );
 
@@ -224,11 +221,14 @@ class _DataProvider extends DataTableSource {
                   }
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(4.0),
-                child:
-                  CircleButton.create(20, Icons.delete,
-                          () => parent._deleteTeam(parent._teams[index].id, parent._teams[index].name)
+              Visibility(
+                visible: Config.authStatus.isAdmin(),
+                child: Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child:
+                    CircleButton.create(20, Icons.delete,
+                            () => parent._deleteTeam(parent._teams[index].id, parent._teams[index].name)
+                  ),
                 ),
               ),
             ],

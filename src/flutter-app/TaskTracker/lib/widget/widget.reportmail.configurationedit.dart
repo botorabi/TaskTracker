@@ -411,6 +411,10 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
     }
 
     final reportConfiguration = _assembleConfiguration();
+    if (reportConfiguration.reportingTeams.length < 1) {
+      DialogModal(context).show("Attention", "Please choose at least one team.", true);
+      return;
+    }
 
     _serviceReportConfiguration
         .createConfiguration(reportConfiguration)
@@ -454,6 +458,10 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
 
     final reportConfiguration = _assembleConfiguration();
     reportConfiguration.id = _currentReportConfiguration.id;
+    if (reportConfiguration.reportingTeams.length < 1) {
+      DialogModal(context).show("Attention", "Please choose at least one team.", true);
+      return;
+    }
 
     _serviceReportConfiguration
       .editConfiguration(reportConfiguration)

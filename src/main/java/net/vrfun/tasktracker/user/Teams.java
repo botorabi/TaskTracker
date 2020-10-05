@@ -7,6 +7,8 @@
  */
 package net.vrfun.tasktracker.user;
 
+import net.vrfun.tasktracker.report.ReportMailConfigurationDTO;
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A collection of team related services.
@@ -28,13 +31,16 @@ public class Teams {
 
     private TeamRepository teamRepository;
     private UserRepository userRepository;
+    private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Teams(@NonNull final TeamRepository teamRepository,
-                 @NonNull final UserRepository userRepository) {
+                 @NonNull final UserRepository userRepository,
+                 @NonNull final UserAuthenticator userAuthenticator) {
 
         this.teamRepository = teamRepository;
         this.userRepository = userRepository;
+        this.userAuthenticator = userAuthenticator;
     }
 
     @NonNull
@@ -144,7 +150,14 @@ public class Teams {
     @NonNull
     public List<TeamDTO> getTeams() {
         List<TeamDTO> teams = new ArrayList<>();
-        teamRepository.findAll().forEach((team) -> teams.add(new TeamDTO(team)));
+        if (userAuthenticator.isRoleAdmin()) {
+            teamRepository.findAll().forEach((team) -> teams.add(new TeamDTO(team)));
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            teamRepository.findTeamLeadTeams(userAuthenticator.getUser()).forEach((team) -> teams.add(new TeamDTO(team)));
+        }
+        else {
+            throw new IllegalArgumentException("Unauthorized access to teams");
+        }
         return teams;
     }
 
@@ -154,11 +167,27 @@ public class Teams {
         if (foundTeam.isEmpty()) {
             throw new IllegalArgumentException("Team with ID '" + id + "' does not exist!");
         }
-        return new TeamDTO(foundTeam.get());
+        if (userAuthenticator.isRoleAdmin()) {
+            return new TeamDTO(foundTeam.get());
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            for (User teamLead: foundTeam.get().getTeamLeaders()) {
+                if (teamLead.getId().equals(userAuthenticator.getUserId())) {
+                    return new TeamDTO(foundTeam.get());
+                }
+            }
+            throw new IllegalArgumentException("Unauthorized access to team, not your Team!");
+        }
+        else {
+            throw new IllegalArgumentException("Unauthorized access to team");
+        }
     }
 
     @NonNull
     public List<TeamDTO> searchTeams(@NonNull final String filter) {
-        return teamRepository.searchTeam(filter);
+        if (userAuthenticator.isRoleAdmin()) {
+            return teamRepository.searchAllTeam(filter);
+        } else {
+            return teamRepository.searchUserTeams(userAuthenticator.getUser(), filter);
+        }
     }
 }

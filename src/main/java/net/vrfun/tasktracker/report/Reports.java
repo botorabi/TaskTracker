@@ -8,7 +8,6 @@
 package net.vrfun.tasktracker.report;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.task.ProgressRepository;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ public class Reports {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private final ProgressRepository progressRepository;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final ReportMailConfigurationRepository reportMailConfigurationRepository;
@@ -41,14 +39,12 @@ public class Reports {
 
 
     @Autowired
-    public Reports(@NonNull final ProgressRepository progressRepository,
-                   @NonNull final UserRepository userRepository,
+    public Reports(@NonNull final UserRepository userRepository,
                    @NonNull final TeamRepository teamRepository,
                    @NonNull final ReportMailConfigurationRepository reportMailConfigurationRepository,
                    @NonNull final ReportGeneratorScheduler reportGeneratorScheduler,
                    @NonNull final UserAuthenticator userAuthenticator) {
 
-        this.progressRepository = progressRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.reportMailConfigurationRepository = reportMailConfigurationRepository;
@@ -199,15 +195,23 @@ public class Reports {
     }
 
     public void deleteMailConfiguration(@NonNull final Long configurationID) {
-        Optional<ReportMailConfiguration> config = reportMailConfigurationRepository.findById(configurationID);
-        if (!config.isPresent()) {
-            throw new IllegalArgumentException("Could not find report generation configuration with given ID");
+        Optional<ReportMailConfiguration> configuration = Optional.empty();
+        if (userAuthenticator.isRoleAdmin()) {
+            configuration = reportMailConfigurationRepository.findById(configurationID);
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            configuration = reportMailConfigurationRepository.findTeamLeadConfiguration(userAuthenticator.getUser(), configurationID);
         }
-        reportMailConfigurationRepository.delete(config.get());
 
-        reportGeneratorScheduler.removeReportingJob(configurationID);
+        if (configuration.isPresent()) {
+            reportMailConfigurationRepository.delete(configuration.get());
+            reportGeneratorScheduler.removeReportingJob(configurationID);
+        }
+        else {
+            throw new IllegalArgumentException("Could not access report mail configuration for deletion");
+        }
     }
 
+    @NonNull
     public List<ReportMailConfigurationDTO> getReportMailConfigurations() {
         if (userAuthenticator.isRoleAdmin()) {
             return reportMailConfigurationRepository.findAll().stream()
@@ -223,6 +227,7 @@ public class Reports {
         }
     }
 
+    @NonNull
     public ReportMailConfigurationDTO getReportMailConfiguration(@NonNull final Long id) {
         Optional<ReportMailConfiguration> configuration;
         if (userAuthenticator.isRoleAdmin()) {

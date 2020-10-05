@@ -58,35 +58,29 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
-      return Column();
-    }
-    else {
-      _dataTable = _createDataTable();
-      return LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10.0),
-            child:
-            ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: _dataTable,
-                    ),
-                  )
-                ]
-            ),
+    _dataTable = _createDataTable();
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Card(
+          elevation: 5,
+          margin: EdgeInsets.all(10.0),
+          child:
+          ExpansionTile(
+              title: Text(widget.title),
+              initiallyExpanded: _expanded,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: constraints.maxWidth,
+                    child: _dataTable,
+                  ),
+                )
+              ]
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _addUser() async {

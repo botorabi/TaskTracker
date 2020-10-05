@@ -56,7 +56,7 @@ public class RestServiceReport {
     }
 
     @PostMapping("/report/generator-configuration/create")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> createGeneratorConfiguration(@RequestBody ReqReportMailConfiguration reqReportMailConfiguration) {
         try {
             return new ResponseEntity<>(reports.createMailConfiguration(reqReportMailConfiguration).getId(), HttpStatus.OK);
@@ -68,7 +68,7 @@ public class RestServiceReport {
     }
 
     @PutMapping("/report/generator-configuration/edit")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> editGeneratorConfiguration(@RequestBody ReqReportMailConfiguration reqReportMailConfiguration) {
         try {
             return new ResponseEntity<>(reports.editMailConfiguration(reqReportMailConfiguration).getId(), HttpStatus.OK);
@@ -80,7 +80,7 @@ public class RestServiceReport {
     }
 
     @DeleteMapping("/report/generator-configuration/delete/{id}")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Void> deleteGeneratorConfiguration(@PathVariable("id") Long id) {
         try {
             reports.deleteMailConfiguration(id);
