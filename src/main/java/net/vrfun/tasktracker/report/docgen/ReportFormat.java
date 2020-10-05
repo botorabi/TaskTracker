@@ -14,6 +14,7 @@ package net.vrfun.tasktracker.report.docgen;
  * Creation Date    September 2020
  */
 public enum ReportFormat {
+    Unknown,
     PlainText,
     PDF
 }

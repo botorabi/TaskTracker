@@ -26,9 +26,7 @@ public class ReportGeneratorPlainText implements ReportGenerator {
     @Override
     public void begin() {
         if (byteArrayOutputStream != null) {
-            try {
-                byteArrayOutputStream.close();
-            } catch (IOException ignore) {}
+            throw new IllegalStateException("Call end() before beginning a new Pain Text generation!");
         }
 
         byteArrayOutputStream = new ByteArrayOutputStream();
