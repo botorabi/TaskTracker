@@ -21,6 +21,7 @@ class Config {
   /// during the development set it to 'http://localhost:8080' in order to
   /// use Flutter's devtools server.
   static final String baseURL = '/apps/tasktracker';
+  static final String defaultLocale = 'de';
 
   static final double defaultPanelWidth = 800;
 

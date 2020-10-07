@@ -14,6 +14,7 @@ import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
 import 'package:TaskTracker/service/service.user.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.calendarweek.dart';
 import 'package:flutter/material.dart';
 
@@ -38,7 +39,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
   List<DropdownMenuItem<int>> _userTaskDropdownItems = List();
   int _userTaskDropdownSelection = 0;
 
-  WidgetCalendarWeek _widgetCalendarWeek = WidgetCalendarWeek(title: 'Calendar Week',);
+  WidgetCalendarWeek _widgetCalendarWeek = WidgetCalendarWeek(title: Translator.text('Common', 'Calendar Week'),);
 
   final _serviceProgress = ServiceProgress();
   final _serviceUser = ServiceUser();
@@ -83,7 +84,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        'Edit Progress Entry',
+                        Translator.text('WidgetProgressEdit', 'Edit Progress Entry'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
@@ -101,7 +102,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Task'),
+                                    Text(Translator.text('Common', 'Task')),
                                     _userTaskDropdownButton,
                                     ],
                                 ),
@@ -130,7 +131,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                   child: TextFormField(
                                     controller: _textEditingControllerTitle,
                                     decoration: InputDecoration(
-                                      labelText: 'Title',
+                                      labelText: Translator.text('Common', 'Title'),
                                     ),
                                   ),
                                 ),
@@ -144,8 +145,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                                     maxLength: 10 * 1024,
                                     showCursor: true,
                                     decoration: InputDecoration(
-                                      labelText: 'Your Progress Text',
-                                      hintText: '\n- Done great things on this\n- Resolved problems on that\n- ...',
+                                      labelText: Translator.text('WidgetProgressEdit', 'Your Progress Text'),
+                                      hintText: Translator.text('WidgetProgressEdit', '\n- Done great things on this\n- Resolved problems on that\n- ...'),
                                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                     ),
                                   ),
@@ -166,14 +167,14 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text('Cancel'),
+                    child: Text(Translator.text('Common', ButtonID.CANCEL)),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(_newProgress ? ButtonID.CREATE : ButtonID.APPLY),
+                    child: Text(Translator.text('Common', _newProgress ? ButtonID.CREATE : ButtonID.APPLY)),
                     onPressed: () {
                       if (_newProgress) {
                         _createProgress(context);
@@ -194,11 +195,11 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   void _createProgress(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please, enter a progress title!", true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a progress title!'), true);
       return;
     }
     if (_textEditingControllerText.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please, enter a text!", true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a text!'), true);
       return;
     }
 
@@ -209,7 +210,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
     progress.reportWeek = _widgetCalendarWeek.getWeek();
     progress.reportYear = _widgetCalendarWeek.getYear();
 
-//TODO    progress.tags = _widgetTags.getTags();
+    //TODO    progress.tags = _widgetTags.getTags();
 
     _serviceProgress
         .createProgress(progress)
@@ -226,18 +227,18 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           else {
             text = "Could not create new progress entry!\nReason:" + err.toString();
           }
-          DialogModal(context).show("Attention", text, true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), text, true);
         }
     );
   }
 
   void _applyChanges(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please, enter a progress title!", true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a progress title!'), true);
       return;
     }
     if (_textEditingControllerText.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please, enter a text!", true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a text!'), true);
       return;
     }
 
@@ -255,7 +256,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
       .editProgress(progress)
       .then((success) {
           if (success) {
-            DialogModal(context).show("Edit Progress", "All changes successfully applied.", false)
+            DialogModal(context).show(Translator.text('WidgetProgressEdit', 'Edit Progress'),
+                Translator.text('WidgetProgressEdit', 'All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },

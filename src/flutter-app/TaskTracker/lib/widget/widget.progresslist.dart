@@ -15,12 +15,12 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
 class WidgetProgressList extends StatefulWidget {
-  WidgetProgressList({Key key, this.title = 'Progress'
-      ''}) : super(key: key);
+  WidgetProgressList({Key key, this.title = 'Progress'}) : super(key: key);
 
   final String title;
   final _WidgetProgressListState _widgetProgressListState = _WidgetProgressListState();
@@ -79,7 +79,9 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 
   void _deleteProgress(int id) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete the progress entry?", ButtonID.YES, ButtonID.NO);
+        .show(Translator.text('Common', 'Attention'),
+              Translator.text('WidgetProgressList', 'You really want to delete the progress entry?'),
+              ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
@@ -88,7 +90,8 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
     _serviceProgress
       .deleteProgress(id)
       .then((status) {
-          DialogModal(context).show('Progress Deletion', 'Progress entry was successfully deleted.', false);
+          DialogModal(context).show(Translator.text('WidgetProgressList', 'Progress Deletion'),
+              Translator.text('WidgetProgressList', 'Progress entry was successfully deleted.'), false);
           _retrieveProgresses();
         },
         onError: (err) {
@@ -120,17 +123,17 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
     String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     String currentYear = CalendarUtils.getCurrentCalendarYear().toString();
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text('Current Calendar Week ' + currentYear + ' / ' + currentWeek),
+      header: Text(Translator.text('WidgetProgressList', 'Current Calendar Week') + ' ' + currentYear + ' / ' + currentWeek),
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Title',
+            Translator.text('Common', 'Title'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Calendar Week',
+            Translator.text('Common', 'Calendar Week'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -151,7 +154,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), "Add New Progress"),
+        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), Translator.text('WidgetProgressList', 'Add New Progress')),
       ],
     );
 
@@ -187,7 +190,7 @@ class _DataProvider extends DataTableSource {
                   CircleButton.create(24, Icons.visibility, () {
                     _showProgressEntry(parent._progresses[index]);
                   },
-                  'View Progress'),
+                  Translator.text('WidgetProgressList', 'View Progress')),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
@@ -201,7 +204,7 @@ class _DataProvider extends DataTableSource {
                      }
                     );
                   },
-                  'Edit Progress'
+                  Translator.text('WidgetProgressList', 'Edit Progress'),
                 ),
               ),
               Padding(
@@ -209,7 +212,7 @@ class _DataProvider extends DataTableSource {
                 child:
                   CircleButton.create(24, Icons.delete,
                     !modifiable ? null :  () => parent._deleteProgress(parent._progresses[index].id),
-                    'Delete Progress'
+                    Translator.text('WidgetProgressList', 'Delete Progress'),
                 ),
               ),
             ],
@@ -229,9 +232,9 @@ class _DataProvider extends DataTableSource {
   int get selectedRowCount => 0;
 
   void _showProgressEntry(Progress progress) {
-    String text = 'Report Week ' + progress.reportWeek.toString() + ' / ' + progress.reportYear.toString() + '\n';
-    text += '\nUser: ' + progress.ownerName + '\n';
-    text += '\nText:\n\n' + progress.text;
+    String text = Translator.text('Common', 'Calendar Week') + ' ' + progress.reportWeek.toString() + ' / ' + progress.reportYear.toString() + '\n';
+    text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
+    text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
     DialogModal(parent.context).show( progress.title, text, false);
   }
 }

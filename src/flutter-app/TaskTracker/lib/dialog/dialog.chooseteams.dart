@@ -11,6 +11,7 @@ import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -47,13 +48,13 @@ class DialogChooseTeams {
               content: _createTeamsUI(text, setState),
               actions: <Widget>[
                 FlatButton(
-                  child: Text(ButtonID.CANCEL),
+                  child: Text(Translator.text('Common', ButtonID.CANCEL)),
                   onPressed: () {
                     Navigator.of(_context).pop(List<Team>());
                   },
                 ),
                 FlatButton(
-                  child: Text(ButtonID.CHOOSE),
+                  child: Text(Translator.text('Common', ButtonID.CHOOSE)),
                   onPressed: () {
                     Navigator.of(_context).pop(_chosenTeams);
                   },

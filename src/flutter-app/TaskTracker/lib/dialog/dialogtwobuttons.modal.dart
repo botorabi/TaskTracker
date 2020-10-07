@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 /*
@@ -34,13 +35,13 @@ class DialogTwoButtonsModal {
         ),
         actions: <Widget>[
           FlatButton(
-            child: Text(buttonLabel2),
+            child: Text(Translator.text('Common', buttonLabel2)),
             onPressed: () {
               Navigator.of(_context).pop(buttonLabel2);
             },
           ),
           FlatButton(
-            child: Text(buttonLabel1),
+            child: Text(Translator.text('Common', buttonLabel1)),
             onPressed: () {
               Navigator.of(_context).pop(buttonLabel1);
             },

@@ -9,6 +9,7 @@
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/navdrawer.dart';
 import 'package:TaskTracker/navigation.links.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.login.dart';
 import 'package:TaskTracker/widget/widget.progresslist.dart';
 import 'package:flutter/material.dart';
@@ -42,14 +43,14 @@ class _PageHomeState extends State<PageHome> {
                 Padding(
                   padding: EdgeInsets.only(top: 20.0, bottom: 30),
                   child: Text(
-                    'Welcome to Task Tracker',
+                    Translator.text('PageHome', 'Welcome to Task Tracker'),
                     style: Theme.of(context).textTheme.headline6,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, bottom: 30),
                   child: Text(
-                      'Track and report your project activities.'
+                    Translator.text('PageHome', 'Track and report your project activities.'),
                   ),
                 ),
                 Visibility(

@@ -8,6 +8,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../translator.dart';
+
 class DialogModal {
 
   BuildContext _context;
@@ -28,7 +30,7 @@ class DialogModal {
           ),
           actions: <Widget>[
             FlatButton(
-              child: Text('Close'),
+              child: Text(Translator.text('Common', 'Close')),
               onPressed: () {
                 Navigator.of(_context).pop();
               },
