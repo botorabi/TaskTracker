@@ -23,6 +23,9 @@ public interface TeamRepository extends CrudRepository<Team, Long> {
     @Query("select team from net.vrfun.tasktracker.user.Team team order by team.name")
     List<Team> findAll();
 
+    @Query("select team from net.vrfun.tasktracker.user.Team team where team.id in :teamIDs order by team.name")
+    List<Team> findAllById(@NonNull final List<Long> teamIDs);
+
     @Query("select new net.vrfun.tasktracker.user.TeamDTO(team) " +
             "from net.vrfun.tasktracker.user.Team team where " +
             "(team.name like concat('%',:filter,'%')) or (team.description like concat('%',:filter,'%')) order by team.name")

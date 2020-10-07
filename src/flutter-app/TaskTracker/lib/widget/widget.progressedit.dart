@@ -9,7 +9,6 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
-import 'package:TaskTracker/common/calendar.utils.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
@@ -195,7 +194,11 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   void _createProgress(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show("Attention", "Enter a progress title!", true);
+      DialogModal(context).show("Attention", "Please, enter a progress title!", true);
+      return;
+    }
+    if (_textEditingControllerText.text.isEmpty) {
+      DialogModal(context).show("Attention", "Please, enter a text!", true);
       return;
     }
 
@@ -230,7 +233,11 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   void _applyChanges(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show("Attention", "Enter a progress title!", true);
+      DialogModal(context).show("Attention", "Please, enter a progress title!", true);
+      return;
+    }
+    if (_textEditingControllerText.text.isEmpty) {
+      DialogModal(context).show("Attention", "Please, enter a text!", true);
       return;
     }
 

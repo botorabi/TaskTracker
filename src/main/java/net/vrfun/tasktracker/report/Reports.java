@@ -58,7 +58,7 @@ public class Reports {
         }
 
         List<Long> userTeamIDs = teamRepository.findTeamLeadTeams(userAuthenticator.getUser()).stream()
-                .map((user) -> user.getId())
+                .map((team) -> team.getId())
                 .collect(Collectors.toList());
 
         return userTeamIDs.containsAll(teamIDs);

@@ -85,8 +85,7 @@ public class ReportComposer {
                                                   @NonNull final String title,
                                                   @NonNull final String subTitle) {
 
-        List<Team> teamList = new ArrayList<>();
-        teamRepository.findAllById(teamIDs).forEach((team -> teamList.add(team)));
+        List<Team> teamList = teamRepository.findAllById(teamIDs);
         if (teamList.isEmpty()) {
             throw new IllegalArgumentException("Invalid team IDs!");
         }
