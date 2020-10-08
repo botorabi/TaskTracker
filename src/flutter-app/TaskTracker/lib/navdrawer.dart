@@ -107,7 +107,7 @@ class NavDrawer extends StatelessWidget {
                 visible: (Config.authStatus.isTeamLead() || Config.authStatus.isAdmin()),
                   child: ListTile(
                     leading: Icon(Icons.insert_chart),
-                    title: Text(Translator.text('NavDrawer', 'Progress Report')),
+                    title: Text(Translator.text('Common', 'Progress Report')),
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, NavigationLinks.NAV_REPORT);
@@ -116,7 +116,7 @@ class NavDrawer extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
-                  title: Text('Logout'),
+                  title: Text(Translator.text('NavDrawer', 'Logout')),
                   onTap: () => {
                     this._serviceLogin.logoutUser().then((result) {
                       Config.authStatus = AuthStatus();

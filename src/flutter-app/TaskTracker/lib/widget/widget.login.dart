@@ -10,6 +10,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/service.login.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -46,13 +47,12 @@ class _WidgetLoginState extends State<WidgetLogin> {
       margin: const EdgeInsets.all(30.0),
       child: SizedBox(
         width: 350,
-        height: 305,
         child: Column(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
-                'Login User',
+                Translator.text('WidgetLogin', 'Login User'),
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
@@ -66,7 +66,7 @@ class _WidgetLoginState extends State<WidgetLogin> {
                       child: TextFormField(
                         controller: _textEditingControllerLoginName,
                         decoration: InputDecoration(
-                          labelText: 'Login Name',
+                          labelText: Translator.text('WidgetLogin', 'Login Name'),
                         ),
                         onEditingComplete: () {
                           _focusPassword.requestFocus();
@@ -86,14 +86,14 @@ class _WidgetLoginState extends State<WidgetLogin> {
                           _focusButton.requestFocus();
                         },
                         decoration: InputDecoration(
-                          labelText: 'Password',
+                          labelText: Translator.text('WidgetLogin', 'Password'),
                         ),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 15.0),
+                      padding: EdgeInsets.only(top: 20.0),
                       child: RaisedButton(
-                        child: Text('Login'),
+                        child: Text(Translator.text('WidgetLogin', 'Login'),),
                           focusNode: _focusButton,
                           onPressed: () {
                             loginUser(context);
@@ -122,11 +122,15 @@ class _WidgetLoginState extends State<WidgetLogin> {
         Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
       }
       else {
-        DialogModal(context).show("Attention", "Could not login. Check your credentials!", true);
+        DialogModal(context).show(
+            Translator.text('Common', 'Attention'),
+            Translator.text('WidgetLogin', 'Could not login. Please, check your credentials!'), true);
       }
     },
     onError: (err) {
-      DialogModal(context).show("Attention", "Could not login! Reason: " + err.toString(), true);
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetLogin', 'Could not login! Reason: ') + err.toString(), true);
     });
   }
 }

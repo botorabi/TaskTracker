@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.report.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,7 @@ class _PageReportState extends State<PageReport> {
                 children: [
                   Visibility(
                     visible: Config.authStatus.isTeamLead() || Config.authStatus.isAdmin(),
-                    child: WidgetTeamReport(title: 'Progress Report'),
+                    child: WidgetTeamReport(title: Translator.text('Common', 'Progress Report')),
                   ),
                   Visibility(
                     visible: !Config.authStatus.isTeamLead() && !Config.authStatus.isAdmin(),

@@ -7,7 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/translation.dart';
+import 'package:TaskTracker/localization/all.translation.dart';
 
 class TranslatorCore {
   String _locale = '';
