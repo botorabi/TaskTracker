@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.task;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.lang.NonNull;
 
@@ -17,9 +18,11 @@ import java.util.List;
 @Transactional
 public interface ProgressRepository extends CrudRepository<Progress, Long> {
 
-    List<Progress> findProgressByOwnerId(@NonNull final Long ownerId);
+    List<Progress> findAllByOrderByReportWeekDesc(@NonNull final Pageable pageable);
 
-    List<Progress> findProgressByOwnerName(@NonNull final String ownerName);
+    long countProgressByOwnerId(@NonNull final Long ownerId);
+
+    List<Progress> findProgressByOwnerIdOrderByReportWeekDesc(@NonNull final Long ownerId, @NonNull final Pageable pageable);
 
     List<Progress> findByTaskId(@NonNull final Long id);
 

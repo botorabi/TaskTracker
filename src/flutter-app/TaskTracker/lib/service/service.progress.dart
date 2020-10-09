@@ -11,6 +11,7 @@ import 'dart:io';
 
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/progress.dart';
+import 'package:TaskTracker/service/progress.paged.dart';
 import 'package:TaskTracker/service/service.common.dart';
 import 'package:http/http.dart';
 
@@ -75,6 +76,18 @@ class ServiceProgress {
     }
     else {
       return Future<List<Progress>>.error(response.statusCode);
+    }
+  }
+
+  Future<ProgressPaged> getPagedProgress(int page, int size) async {
+    Response response = await get(Config.baseURL + '/api/progress/paged/' + page.toString() + '/' + size.toString(),
+        headers: ServiceCommon.HTTP_HEADERS_REST);
+
+    if (response.statusCode == HttpStatus.ok) {
+      return ProgressPaged.fromJsonString(response.body);
+    }
+    else {
+      return Future<ProgressPaged>.error(response.statusCode);
     }
   }
 

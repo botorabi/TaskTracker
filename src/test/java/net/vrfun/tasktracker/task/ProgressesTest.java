@@ -17,7 +17,6 @@ import org.mockito.*;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.*;
@@ -137,7 +136,7 @@ public class ProgressesTest {
         progress.setOwnerName(userLogin);
 
         mockUser(userLogin, userId);
-        doReturn(progs).when(progressRepository).findProgressByOwnerId(anyLong());
+        doReturn(progs).when(progressRepository).findProgressByOwnerIdOrderByReportWeekDesc(anyLong(), any());
 
         assertThat(progresses.getAll().size()).isEqualTo(1);
         assertThat(progresses.getAll().get(0).getOwnerId()).isEqualTo(userId);

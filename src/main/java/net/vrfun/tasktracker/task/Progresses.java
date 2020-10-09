@@ -11,7 +11,9 @@ import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.*;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,15 +67,29 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getAll() {
         if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
-
             List<ProgressDTO> progs = new ArrayList<>();
-            progressRepository.findAll()
+            int count = (int)progressRepository.count();
+            progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(0, count))
                     .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
             return progs;
         }
         else {
             return getUserProgress();
+        }
+    }
+
+    @NonNull
+    public ProgressPagedDTO getPaged(int page, int size) {
+        if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
+            List<ProgressDTO> progs = new ArrayList<>();
+            progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(page, size))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+
+            return new ProgressPagedDTO(progressRepository.count(), page, progs);
+        }
+        else {
+            return getUserProgressPaged(page, size);
         }
     }
 
@@ -100,10 +116,21 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getUserProgress() {
         List<ProgressDTO> progs = new ArrayList<>();
-        progressRepository.findProgressByOwnerId(userAuthenticator.getUserId())
+        int count = (int)progressRepository.count();
+        progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(0, count))
                 .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
         return progs;
+    }
+
+    @NonNull
+    public ProgressPagedDTO getUserProgressPaged(int page , int size) {
+        long totalCount = progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
+        List<ProgressDTO> progs = new ArrayList<>();
+        progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(page, size))
+                .forEach((progress -> progs.add(new ProgressDTO(progress))));
+
+        return new ProgressPagedDTO(totalCount, page, progs);
     }
 
     @NonNull

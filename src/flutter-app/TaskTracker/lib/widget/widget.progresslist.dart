@@ -31,15 +31,15 @@ class WidgetProgressList extends StatefulWidget {
 
 class _WidgetProgressListState extends State<WidgetProgressList> {
 
+  static const MAX_ROWS_PER_PAGE = 10;
+
   final _serviceProgress = ServiceProgress();
   PaginatedDataTable _dataTable;
-  List<Progress> _progresses = [];
-  bool _sortAscending = false;
+  _DataProvider _dataProvider;
 
   @override
   void initState() {
     super.initState();
-    _retrieveProgresses();
   }
 
   @override
@@ -49,6 +49,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 
   @override
   Widget build(BuildContext context) {
+    _dataProvider = _DataProvider(this, MAX_ROWS_PER_PAGE);
     _dataTable = _createDataTable();
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
@@ -73,8 +74,12 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   void _addProgress() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS);
-    _retrieveProgresses();
+    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS)
+        .then((value) {
+          if (value != ButtonID.CANCEL) {
+            _dataProvider.updateCurrentPage();
+          }
+    });
   }
 
   void _deleteProgress(int id) async {
@@ -91,32 +96,12 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
       .deleteProgress(id)
       .then((status) {
           DialogModal(context).show(Translator.text('WidgetProgressList', 'Progress Deletion'),
-              Translator.text('WidgetProgressList', 'Progress entry was successfully deleted.'), false);
-          _retrieveProgresses();
+              Translator.text('WidgetProgressList', 'Progress entry was successfully deleted.'), false)
+              .then((value) { _dataProvider.updateCurrentPage(); });
         },
         onError: (err) {
           print('Failed to delete progress entry, reason: ' + err.toString());
       });
-  }
-
-  void _sortProgress(bool ascending) {
-    _progresses.sort((progressA, progressB) => progressA.reportWeek?.compareTo(progressB?.reportWeek));
-    if (!ascending) {
-      _progresses = _progresses.reversed.toList();
-    }
-  }
-
-  void _retrieveProgresses() {
-    _serviceProgress
-        .getAllProgress()
-        .then((listTasks) {
-            _progresses = listTasks;
-            _sortProgress(_sortAscending);
-            setState(() {});
-          },
-          onError: (err) {
-            print("Failed to retrieve progress entries, reason: " + err.toString());
-          });
   }
 
   PaginatedDataTable _createDataTable() {
@@ -136,23 +121,14 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
             Translator.text('Common', 'Calendar Week'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
-          onSort:(columnIndex, ascending) {
-            setState(() {
-              _sortAscending = !_sortAscending;
-              _sortProgress(_sortAscending);
-              _dataTable = _createDataTable();
-            });
-          },
         ),
         DataColumn(
           label: Text(''),
         ),
       ],
-      rowsPerPage: 10,
-      onRowsPerPageChanged: null,
-      source: _DataProvider(this),
+      rowsPerPage: MAX_ROWS_PER_PAGE,
+      source: _dataProvider,
       sortColumnIndex: 0,
-      sortAscending: _sortAscending,
       actions: [
         CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), Translator.text('WidgetProgressList', 'Add New Progress')),
       ],
@@ -163,23 +139,70 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 }
 
 class _DataProvider extends DataTableSource {
-
   _WidgetProgressListState parent;
+  int maxRowCount;
 
-  _DataProvider(this.parent);
+  int  _currentPage = -1;
+  int  _rowCount = 1;
+  bool _fetchingData = false;
+  List<Progress> _progresses = [];
+
+  _DataProvider(this.parent, this.maxRowCount);
+
+  void sortProgress(bool ascending) {
+    _progresses.sort((progressA, progressB) => progressA.reportWeek?.compareTo(progressB?.reportWeek));
+    if (!ascending) {
+      _progresses = _progresses.reversed.toList();
+    }
+  }
+
+  void updateCurrentPage() {
+    _fetchEntries(_currentPage);
+  }
+
+  void _fetchEntries(int page) async {
+    _fetchingData = true;
+    parent._serviceProgress
+        .getPagedProgress(page, maxRowCount)
+        .then((progressPaged) {
+          _rowCount = progressPaged.totalCount;
+          _currentPage = progressPaged.currentPage;
+          _progresses = progressPaged.progressList;
+          _fetchingData = false;
+          notifyListeners();
+        },
+        onError: (err) {
+          print("Failed to retrieve progress entries, reason: " + err.toString());
+          _fetchingData = false;
+        });
+  }
 
   @override
   DataRow getRow(int index) {
-    bool modifiable = Config.authStatus.isAdmin() ||
-        CalendarUtils.checkCurrentWeekDistance(parent._progresses[index].reportWeek, parent._progresses[index].reportYear);
+    if (_fetchingData) {
+      return null;
+    }
 
-    String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + parent._progresses[index].ownerName + ']') : '';
+    int minIndex = _currentPage * maxRowCount;
+    int maxIndex = (_currentPage + 1) * maxRowCount - 1;
+    if ((_currentPage < 0) || (index < minIndex) || (index > maxIndex)) {
+      int page = (index / maxRowCount).floor();
+      _fetchEntries(page);
+      return null;
+    }
+
+    index = (index % maxRowCount);
+
+    bool modifiable = Config.authStatus.isAdmin() ||
+        CalendarUtils.checkCurrentWeekDistance(_progresses[index].reportWeek, _progresses[index].reportYear);
+
+    String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + _progresses[index].ownerName + ']') : '';
 
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._progresses[index].title + userName)),
-        DataCell(Text(parent._progresses[index].reportYear.toString() + ' / ' + parent._progresses[index].reportWeek.toString())),
+        DataCell(Text(_progresses[index].title + userName)),
+        DataCell(Text(_progresses[index].reportYear.toString() + ' / ' + _progresses[index].reportWeek.toString())),
         DataCell(
           Row(
             children: [
@@ -188,7 +211,7 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.visibility, () {
-                    _showProgressEntry(parent._progresses[index]);
+                    _showProgressEntry(_progresses[index]);
                   },
                   Translator.text('WidgetProgressList', 'View Progress')),
               ),
@@ -196,10 +219,10 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.edit, !modifiable ? null : () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: parent._progresses[index].id)
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: _progresses[index].id)
                         .then((value) {
                       if (value != ButtonID.CANCEL) {
-                        parent._retrieveProgresses();
+                        _fetchEntries(_currentPage);
                       }
                      }
                     );
@@ -211,7 +234,7 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.delete,
-                    !modifiable ? null :  () => parent._deleteProgress(parent._progresses[index].id),
+                    !modifiable ? null :  () => parent._deleteProgress(_progresses[index].id),
                     Translator.text('WidgetProgressList', 'Delete Progress'),
                 ),
               ),
@@ -226,7 +249,7 @@ class _DataProvider extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => parent._progresses.length;
+  int get rowCount => _rowCount;
 
   @override
   int get selectedRowCount => 0;

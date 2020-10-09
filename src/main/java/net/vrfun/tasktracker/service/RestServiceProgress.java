@@ -79,6 +79,11 @@ public class RestServiceProgress {
         return new ResponseEntity<>(progresses.getAll(), HttpStatus.OK);
     }
 
+    @GetMapping("/progress/paged/{page}/{size}")
+    public ResponseEntity<ProgressPagedDTO> getProgressPaged(@PathVariable("page") final Integer page, @PathVariable("size") final Integer size) {
+        return new ResponseEntity<>(progresses.getPaged(page, size), HttpStatus.OK);
+    }
+
     @GetMapping("/progress/team/{id}")
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<ProgressDTO>> getTeamProgress(@PathVariable("id") final Long id) {
