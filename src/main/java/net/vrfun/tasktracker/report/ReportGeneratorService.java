@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
@@ -117,7 +118,8 @@ public class ReportGeneratorService {
                     LOGGER.warn(" Could not send report mail, no recipients for configuration {}", configuration.getName());
                 }
             } catch (MessagingException exception) {
-                LOGGER.error(" Could not create report, reason: '{}', recipients: {}", exception.getMessage(), recipients);
+                LOGGER.error(" Could not create report for configuration {}, reason: '{}', recipients: {}",
+                        configuration.getName(), exception.getMessage(), recipients);
             }
         });
     }
@@ -155,7 +157,7 @@ public class ReportGeneratorService {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setFrom(from);
-        helper.setTo(to);
+        helper.setTo(InternetAddress.parse(to));
         helper.setSubject(subject);
 
         String body = (text != null ? text + "\n\n" : "");

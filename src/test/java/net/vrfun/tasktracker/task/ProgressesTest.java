@@ -101,7 +101,8 @@ public class ProgressesTest {
         List<Progress> progs = new ArrayList<>();
         progs.add(new Progress());
 
-        doReturn(progs).when(progressRepository).findAll();
+        doReturn(progs).when(progressRepository).findAllByOrderByReportWeekDesc(any());
+        doReturn((long)progs.size()).when(progressRepository).count();
 
         mockUserAsAdmin();
 
@@ -113,7 +114,8 @@ public class ProgressesTest {
         List<Progress> progs = new ArrayList<>();
         progs.add(new Progress());
 
-        doReturn(progs).when(progressRepository).findAll();
+        doReturn(progs).when(progressRepository).findAllByOrderByReportWeekDesc(any());
+        doReturn((long)progs.size()).when(progressRepository).count();
 
         mockUserAsTeamLead();
 
@@ -137,8 +139,9 @@ public class ProgressesTest {
 
         mockUser(userLogin, userId);
         doReturn(progs).when(progressRepository).findProgressByOwnerIdOrderByReportWeekDesc(anyLong(), any());
+        doReturn((long)progs.size()).when(progressRepository).countProgressByOwnerId(anyLong());
 
-        assertThat(progresses.getAll().size()).isEqualTo(1);
+        assertThat(progresses.getAll().size()).isEqualTo((long)progs.size());
         assertThat(progresses.getAll().get(0).getOwnerId()).isEqualTo(userId);
     }
 

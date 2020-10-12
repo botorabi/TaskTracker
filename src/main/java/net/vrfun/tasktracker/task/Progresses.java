@@ -69,9 +69,10 @@ public class Progresses {
         if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
             List<ProgressDTO> progs = new ArrayList<>();
             int count = (int)progressRepository.count();
-            progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(0, count))
-                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
-
+            if (count > 0) {
+                progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(0, count))
+                        .forEach((progress -> progs.add(new ProgressDTO(progress))));
+            }
             return progs;
         }
         else {
@@ -116,20 +117,22 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getUserProgress() {
         List<ProgressDTO> progs = new ArrayList<>();
-        int count = (int)progressRepository.count();
-        progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(0, count))
-                .forEach((progress -> progs.add(new ProgressDTO(progress))));
-
+        int count = (int)progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
+        if (count > 0) {
+            progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(0, count))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+        }
         return progs;
     }
 
     @NonNull
     public ProgressPagedDTO getUserProgressPaged(int page , int size) {
-        long totalCount = progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
         List<ProgressDTO> progs = new ArrayList<>();
-        progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(page, size))
-                .forEach((progress -> progs.add(new ProgressDTO(progress))));
-
+        long totalCount = progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
+        if (totalCount > 0) {
+            progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(page, size))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+        }
         return new ProgressPagedDTO(totalCount, page, progs);
     }
 
