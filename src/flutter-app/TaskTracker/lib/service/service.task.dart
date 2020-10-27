@@ -17,7 +17,7 @@ import 'package:http/http.dart';
 class ServiceTask {
 
   Future<List<Task>> getTasks() async {
-    Response response = await get(Config.baseURL + '/api/task',
+    Response response = await get(Config.BASE_URL + '/api/task',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -29,7 +29,7 @@ class ServiceTask {
   }
 
   Future<Task> getTask(int taskId) async {
-    Response response = await get(Config.baseURL + '/api/task/' + taskId.toString(),
+    Response response = await get(Config.BASE_URL + '/api/task/' + taskId.toString(),
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -41,7 +41,7 @@ class ServiceTask {
   }
 
   Future<bool> editTask(Task task) async {
-    Response response = await put(Config.baseURL + '/api/task/edit',
+    Response response = await put(Config.BASE_URL + '/api/task/edit',
                                   headers: ServiceCommon.HTTP_HEADERS_REST,
                                   body: jsonEncode(task));
 
@@ -54,7 +54,7 @@ class ServiceTask {
   }
 
   Future<int> createTask(Task task) async {
-    Response response = await post(Config.baseURL + '/api/task/create',
+    Response response = await post(Config.BASE_URL + '/api/task/create',
                                    headers: ServiceCommon.HTTP_HEADERS_REST,
                                    body: jsonEncode(task));
 
@@ -67,7 +67,7 @@ class ServiceTask {
   }
 
   Future<bool> deleteTask(int id) async {
-    Response response = await delete(Config.baseURL + '/api/task/delete/' + id.toString(),
+    Response response = await delete(Config.BASE_URL + '/api/task/delete/' + id.toString(),
                                      headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

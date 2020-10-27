@@ -17,7 +17,7 @@ import 'package:http/http.dart';
 class ServiceTeam {
 
   Future<List<Team>> getTeams() async {
-    Response response = await get(Config.baseURL + '/api/team',
+    Response response = await get(Config.BASE_URL + '/api/team',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -29,7 +29,7 @@ class ServiceTeam {
   }
 
   Future<Team> getTeam(int teamId) async {
-    Response response = await get(Config.baseURL + '/api/team/' + teamId.toString(),
+    Response response = await get(Config.BASE_URL + '/api/team/' + teamId.toString(),
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -41,7 +41,7 @@ class ServiceTeam {
   }
 
   Future<bool> editTeam(Team team) async {
-    Response response = await put(Config.baseURL + '/api/team/edit',
+    Response response = await put(Config.BASE_URL + '/api/team/edit',
                                   headers: ServiceCommon.HTTP_HEADERS_REST,
                                   body: jsonEncode(team));
 
@@ -54,7 +54,7 @@ class ServiceTeam {
   }
 
   Future<int> createTeam(Team team) async {
-    Response response = await post(Config.baseURL + '/api/team/create',
+    Response response = await post(Config.BASE_URL + '/api/team/create',
                                    headers: ServiceCommon.HTTP_HEADERS_REST,
                                    body: jsonEncode(team));
 
@@ -67,7 +67,7 @@ class ServiceTeam {
   }
 
   Future<bool> deleteTeam(int id) async {
-    Response response = await delete(Config.baseURL + '/api/team/delete/' + id.toString(),
+    Response response = await delete(Config.BASE_URL + '/api/team/delete/' + id.toString(),
                                      headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -79,7 +79,7 @@ class ServiceTeam {
   }
 
   Future<List<Team>> searchTeam(String value) async {
-    Response response = await get(Config.baseURL + '/api/team/search/' + value,
+    Response response = await get(Config.BASE_URL + '/api/team/search/' + value,
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

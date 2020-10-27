@@ -12,9 +12,7 @@ import 'package:TaskTracker/localization/all.translation.dart';
 class TranslatorCore {
   String _locale = '';
 
-  TranslatorCore(String locale) {
-    _locale = locale;
-  }
+  TranslatorCore(this._locale);
 
   void setLocale(String locale) {
     _locale = locale;
@@ -31,4 +29,4 @@ class TranslatorCore {
   }
 }
 
-final Translator = TranslatorCore(Config.defaultLocale);
+final Translator = TranslatorCore(Config.locale);

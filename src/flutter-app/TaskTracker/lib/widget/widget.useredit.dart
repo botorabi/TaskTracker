@@ -70,7 +70,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: Config.defaultEditorWidth),
+        constraints: BoxConstraints(maxWidth: Config.DEFAULT_EDITOR_WIDTH),
         child: Column(
           children: <Widget>[
             ListView(

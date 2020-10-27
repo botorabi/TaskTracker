@@ -33,7 +33,7 @@ class _PageReportState extends State<PageReport> {
         children: [
           Center(
             child: Container(
-              constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
+              constraints: BoxConstraints(maxWidth: Config.DEFAULT_PANEL_WIDTH),
               padding: const EdgeInsets.all(20.0),
               child:
               Column(

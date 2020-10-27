@@ -63,7 +63,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: Config.defaultEditorWidth),
+        constraints: BoxConstraints(maxWidth: Config.DEFAULT_EDITOR_WIDTH),
         child: Column(
           children: [
             ListView(
@@ -119,7 +119,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                                   ),
                                 ),
                                 Visibility(
-                                  visible: !_newTeam,
+                                  //! NOTE currently we do not use the active flag
+                                  visible: false, //!_newTeam,
                                   child: Row(
                                     children: [
                                       Padding(

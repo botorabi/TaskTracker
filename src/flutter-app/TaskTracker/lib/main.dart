@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+
 import 'package:TaskTracker/page/page.editprogress.dart';
 import 'package:TaskTracker/page/page.editreportconfiguration.dart';
 import 'package:TaskTracker/page/page.edittask.dart';
@@ -19,6 +20,7 @@ import 'package:TaskTracker/page/page.teamlead.dart';
 import 'package:TaskTracker/page/page.viewprogress.dart';
 import 'package:TaskTracker/service/appinfo.dart';
 import 'package:TaskTracker/service/authstatus.dart';
+import 'package:TaskTracker/sessiontimeout.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
@@ -60,22 +62,30 @@ class StartApp {
   }
 }
 
-void main() {
-  StartApp app = StartApp();
-  app.run();
+class AppTaskTracker extends StatefulWidget {
+  @override
+  _AppTaskTrackerState createState() => _AppTaskTrackerState();
 }
 
-class AppTaskTracker extends StatelessWidget {
+class _AppTaskTrackerState extends State<AppTaskTracker> {
+
+  final GlobalKey<NavigatorState> _navigator = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    SessionTimeoutHandler(_navigator, Config.LOGOUT_TIMEOUT).installLogoutHandler();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
         title: Translator.text('AppTaskTracker', 'Task Tracker'),
         theme: ThemeData(
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
+        navigatorKey: _navigator,
         routes: {
           NavigationLinks.NAV_HOME            : (context) => PageHome(title: Translator.text('AppTaskTracker', 'Task Tracker')),
           NavigationLinks.NAV_PROFILE         : (context) => PageLogin(title: Translator.text('AppTaskTracker', 'User Profile')),
@@ -96,4 +106,10 @@ class AppTaskTracker extends StatelessWidget {
         },
       );
   }
+}
+
+
+void main() {
+  StartApp app = StartApp();
+  app.run();
 }

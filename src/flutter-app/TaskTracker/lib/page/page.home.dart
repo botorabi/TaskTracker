@@ -65,7 +65,7 @@ class _PageHomeState extends State<PageHome> {
                         children: [
                           const SizedBox(height: 30),
                           Container(
-                            constraints: BoxConstraints(maxWidth: Config.defaultPanelWidth),
+                            constraints: BoxConstraints(maxWidth: Config.DEFAULT_PANEL_WIDTH),
                             child: WidgetProgressList(title: ""),
                           )
                         ],

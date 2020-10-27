@@ -15,6 +15,10 @@ const Translations_NavDrawer = {
     'en': 'Welcome',
     'de': 'Willkommen',
   },
+  'Language': {
+    'en': 'German',
+    'de': 'Englisch',
+  },
   'Login': {
     'en': 'Login',
     'de': 'Anmelden',

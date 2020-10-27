@@ -128,8 +128,8 @@ class DialogChooseTeams {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             shrinkWrap: true,
@@ -167,8 +167,8 @@ class DialogChooseTeams {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             controller: _controller,

@@ -18,7 +18,7 @@ import 'package:http/http.dart';
 class ServiceProgress {
 
   Future<int> createProgress(Progress progress) async {
-    Response response = await post(Config.baseURL + '/api/progress/create',
+    Response response = await post(Config.BASE_URL + '/api/progress/create',
         headers: ServiceCommon.HTTP_HEADERS_REST,
         body: jsonEncode(progress));
 
@@ -31,7 +31,7 @@ class ServiceProgress {
   }
 
   Future<bool> editProgress(Progress progress) async {
-    Response response = await put(Config.baseURL + '/api/progress/edit',
+    Response response = await put(Config.BASE_URL + '/api/progress/edit',
         headers: ServiceCommon.HTTP_HEADERS_REST,
         body: jsonEncode(progress));
 
@@ -44,7 +44,7 @@ class ServiceProgress {
   }
 
   Future<List<Progress>> getUserProgress() async {
-    Response response = await get(Config.baseURL + '/api/progress',
+    Response response = await get(Config.BASE_URL + '/api/progress',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -56,7 +56,7 @@ class ServiceProgress {
   }
 
   Future<List<Progress>> getTeamProgress(int teamId) async {
-    Response response = await get(Config.baseURL + '/api/progress/team/' + teamId.toString(),
+    Response response = await get(Config.BASE_URL + '/api/progress/team/' + teamId.toString(),
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -68,7 +68,7 @@ class ServiceProgress {
   }
 
   Future<List<Progress>> getAllProgress() async {
-    Response response = await get(Config.baseURL + '/api/progress/all',
+    Response response = await get(Config.BASE_URL + '/api/progress/all',
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -80,7 +80,7 @@ class ServiceProgress {
   }
 
   Future<ProgressPaged> getPagedProgress(int page, int size) async {
-    Response response = await get(Config.baseURL + '/api/progress/paged/' + page.toString() + '/' + size.toString(),
+    Response response = await get(Config.BASE_URL + '/api/progress/paged/' + page.toString() + '/' + size.toString(),
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -92,7 +92,7 @@ class ServiceProgress {
   }
 
   Future<Progress> getProgress(int progressId) async {
-    Response response = await get(Config.baseURL + '/api/progress/' + progressId.toString(),
+    Response response = await get(Config.BASE_URL + '/api/progress/' + progressId.toString(),
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -104,7 +104,7 @@ class ServiceProgress {
   }
 
   Future<bool> deleteProgress(int id) async {
-    Response response = await delete(Config.baseURL + '/api/progress/delete/' + id.toString(),
+    Response response = await delete(Config.BASE_URL + '/api/progress/delete/' + id.toString(),
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

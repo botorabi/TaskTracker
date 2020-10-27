@@ -58,6 +58,16 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
             },
           ),
+          ListTile(
+            leading: Icon(Icons.language),
+            title: Text(Translator.text('NavDrawer', 'Language')),
+            onTap: () {
+              Config.locale = (Config.locale == 'de') ? 'en' : 'de';
+              Translator.setLocale(Config.locale);
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
+            },
+          ),
           Visibility(
             visible: (Config.authStatus.authenticated == false),
             child: ListTile(

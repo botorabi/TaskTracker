@@ -177,8 +177,8 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                     height: 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      border: Border.all(color: Config.listBorderColor,),
-                      color: Config.listBackgroundColor,
+                      border: Border.all(color: Config.LIST_BORDER_COLOR,),
+                      color: Config.LIST_BACKGROUND_COLOR,
                     ),
                     child: ListView(
                       children: <Widget>[
@@ -238,8 +238,8 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                     height: 90,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      border: Border.all(color: Config.listBorderColor,),
-                      color: Config.listBackgroundColor,
+                      border: Border.all(color: Config.LIST_BORDER_COLOR,),
+                      color: Config.LIST_BACKGROUND_COLOR,
                     ),
                     child: ListView(
                       children: <Widget>[

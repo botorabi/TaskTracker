@@ -18,7 +18,7 @@ import 'authstatus.dart';
 class ServiceLogin {
 
   Future<AppInfo> getAppInfo() async {
-    Response response = await get(Config.baseURL + '/api/app/info',
+    Response response = await get(Config.BASE_URL + '/api/app/info',
         headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -30,7 +30,7 @@ class ServiceLogin {
   }
 
   Future<AuthStatus> getLoginStatus() async {
-    Response response = await get(Config.baseURL + '/api/user/status',
+    Response response = await get(Config.BASE_URL + '/api/user/status',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -42,7 +42,7 @@ class ServiceLogin {
   }
 
   Future<AuthStatus> loginUser(final String login, final String password) async {
-    Response response = await post(Config.baseURL + '/api/user/login',
+    Response response = await post(Config.BASE_URL + '/api/user/login',
                                    headers: ServiceCommon.HTTP_HEADERS_REST,
                                    body: '{"login": "' + login + '", "password": "' + password + '"}');
 
@@ -55,7 +55,7 @@ class ServiceLogin {
   }
 
   Future<bool> logoutUser() async {
-    Response response = await get(Config.baseURL + '/api/user/logout',
+    Response response = await get(Config.BASE_URL + '/api/user/logout',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

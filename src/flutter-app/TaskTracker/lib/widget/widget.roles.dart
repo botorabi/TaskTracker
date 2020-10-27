@@ -49,9 +49,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
   }
 
   void setUserRoles(List<String> roles) {
-    setState(() {
-      _userRoles = roles;
-    });
+    _userRoles = roles;
   }
 
   List<String> getUserRoles() {
@@ -59,9 +57,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
   }
 
   void setReadOnly(bool readOnly) {
-    setState(() {
-      this._readOnly = readOnly;
-    });
+    this._readOnly = readOnly;
   }
 
   @override
