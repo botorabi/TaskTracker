@@ -14,6 +14,7 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/service.task.dart';
 import 'package:TaskTracker/service/task.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -89,8 +90,9 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
 
   void _deleteTask(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete task '$name'?", ButtonID.YES, ButtonID.NO);
-
+        .show(Translator.text('Common','Attention'),
+        Translator.text('WidgetTask', 'Do you really want to delete task \'') + name +'\'?',
+        ButtonID.YES, ButtonID.NO);
     if (button != ButtonID.YES) {
       return;
     }
@@ -98,11 +100,12 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
     _serviceTask
       .deleteTask(id)
       .then((status) {
-          DialogModal(context).show('Task Deletion', 'Task was successfully deleted.', false);
+          DialogModal(context).show(Translator.text('WidgetTask','Task Deletion'),
+              Translator.text('WidgetTask','Task was successfully deleted.'), false);
           _retrieveTasks();
         },
         onError: (err) {
-          print('Failed to delete task, reason: ' + err.toString());
+          print(Translator.text('WidgetTask','Failed to delete task, reason: ') + err.toString());
       });
   }
 
@@ -122,7 +125,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve tasks, reason: " + err.toString());
+            print(Translator.text('WidgetTask','Failed to retrieve tasks, reason: ') + err.toString());
           });
   }
 
@@ -132,7 +135,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Title',
+            Translator.text('Common','Title'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -145,7 +148,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
         ),
         DataColumn(
           label: Text(
-            'Description',
+            Translator.text('Common','Description'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),

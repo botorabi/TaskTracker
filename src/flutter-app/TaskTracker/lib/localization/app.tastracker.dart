@@ -13,7 +13,7 @@ const Translations_AppTaskTracker = {
   },
   'User Profile': {
     'en': 'User Profile',
-    'de': 'Benutzer',
+    'de': 'Benutzerprofil',
   },
   'Administration': {
     'en': 'Administration',
@@ -21,7 +21,7 @@ const Translations_AppTaskTracker = {
   },
   'Team Management': {
     'en': 'Team Management',
-    'de': 'Team Verwaltung',
+    'de': 'Teamverwaltung',
   },
   'Create New User': {
     'en': 'Create New User',
@@ -61,10 +61,10 @@ const Translations_AppTaskTracker = {
   },
   'Create New Report Configuration': {
     'en': 'Create New Report Configuration',
-    'de': 'Fortschritt - Reportkonfiguration erstellen',
+    'de': 'Fortschritt - Berichtskonfiguration erstellen',
   },
   'Edit Report Configuration': {
     'en': 'Edit Report Configuration',
-    'de': 'Reportkonfiguration - Einstellungen',
+    'de': 'Berichtskonfiguration - Einstellungen',
   },
 };

@@ -124,7 +124,7 @@ class _WidgetLoginState extends State<WidgetLogin> {
       else {
         DialogModal(context).show(
             Translator.text('Common', 'Attention'),
-            Translator.text('WidgetLogin', 'Could not login. Please, check your credentials!'), true);
+            Translator.text('WidgetLogin', 'Could not login. Please check your credentials!'), true);
       }
     },
     onError: (err) {

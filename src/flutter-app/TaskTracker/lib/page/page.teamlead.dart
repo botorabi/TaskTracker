@@ -7,10 +7,10 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.reportmail.configurationlist.dart';
 import 'package:TaskTracker/widget/widget.tasklist.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
-import 'package:TaskTracker/widget/widget.userlist.dart';
 import 'package:flutter/material.dart';
 
 
@@ -31,6 +31,7 @@ class _PageTeamLeadState extends State<PageTeamLead> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [

@@ -14,6 +14,7 @@ import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/team.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -135,7 +136,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                     Padding(
                       padding: const EdgeInsets.only(top: 15.0, left: 0.0),
                       child: Text(
-                        "Affiliate Teams",
+                        Translator.text('WidgetTask','Affiliate Teams'),
                         style: TextStyle(fontWeight: FontWeight.w600),
                         textAlign: TextAlign.left,
                       ),
@@ -148,7 +149,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                         padding: const EdgeInsets.only(top: 0.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseTeams(context).show('Teams', 'Add teams.')
+                          DialogChooseTeams(context).show(Translator.text('Common','Teams'), Translator.text('WidgetTask','Add teams'))
                               .then((chosenTeams) {
                                 if (chosenTeams != null && chosenTeams.length > 0) {
                                   chosenTeams.forEach((team) {
@@ -196,7 +197,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                     Padding(
                       padding: const EdgeInsets.only(top: 30.0, left: 0.0),
                       child: Text(
-                        "Affiliate Users",
+                        Translator.text('WidgetTask','Affiliate Users'),
                         style: TextStyle(fontWeight: FontWeight.w600),
                         textAlign: TextAlign.left,
                       ),
@@ -209,7 +210,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                         padding: const EdgeInsets.only(top: 15.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseUsers(context).show('Users', 'Add users.')
+                          DialogChooseUsers(context).show(Translator.text('Common','Users'), Translator.text('WidgetTask','Add users.'))
                               .then((chosenUsers) {
                                 if (chosenUsers != null && chosenUsers.length > 0) {
                                   chosenUsers.forEach((userInfo) {

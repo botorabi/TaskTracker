@@ -13,6 +13,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/report.configuration.dart';
 import 'package:TaskTracker/service/service.report.configuration.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.teamchooser.dart';
 import 'package:TaskTracker/widget/widget.userchooser.dart';
 import 'package:flutter/material.dart';
@@ -48,8 +49,8 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   String _reportPeriod = "PERIOD_WEEKLY";
   String _reportWeekDay = "WEEKDAY_FRIDAY";
 
-  WidgetUserChooser _widgetMasterRecipients = WidgetUserChooser(title: 'Master Recipients');
-  WidgetTeamChooser _widgetReportingTeams = WidgetTeamChooser(title: 'Reporting Teams');
+  WidgetUserChooser _widgetMasterRecipients = WidgetUserChooser(title: Translator.text('WidgetReportMailConfiguration','Additional Recipients'));
+  WidgetTeamChooser _widgetReportingTeams = WidgetTeamChooser(title: Translator.text('WidgetReportMailConfiguration','Reporting Teams'));
 
   _WidgetReportConfigurationEditState({this.configurationId}) {
     if (configurationId != 0) {
@@ -90,7 +91,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        'Edit Report Configuration',
+                        Translator.text('WidgetReportMailConfiguration','Edit Report Configuration'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
@@ -114,7 +115,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                   controller: _textEditingControllerConfigName,
                                   autofocus: true,
                                   decoration: InputDecoration(
-                                    labelText: 'Configuration Name',
+                                    labelText: Translator.text('WidgetReportMailConfiguration','Configuration Name'),
                                   ),
                                 ),
                               ),
@@ -124,7 +125,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerMailSenderName,
                                 decoration: InputDecoration(
-                                  labelText: 'Mail Sender',
+                                  labelText: Translator.text('WidgetReportMailConfiguration','Mail Sender'),
                                 ),
                               ),
                             ),
@@ -133,7 +134,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerMailSubject,
                                 decoration: InputDecoration(
-                                  labelText: 'Mail Subject',
+                                  labelText: Translator.text('WidgetReportMailConfiguration','Mail Subject'),
                                 ),
                               ),
                             ),
@@ -147,8 +148,8 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 maxLength: 1024,
                                 showCursor: true,
                                 decoration: InputDecoration(
-                                  labelText: 'Optional Mail Body Text',
-                                  hintText: '\nThis is an automatically generated report mail...',
+                                  labelText: Translator.text('WidgetReportMailConfiguration','Optional Mail Body Text'),
+                                  hintText: Translator.text('WidgetReportMailConfiguration','\nThis is an automatically generated report mail...'),
                                   border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                 ),
                               ),
@@ -158,7 +159,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerReportTitle,
                                 decoration: InputDecoration(
-                                  labelText: 'Report Title',
+                                  labelText: Translator.text('WidgetReportMailConfiguration','Report Title'),
                                 ),
                               ),
                             ),
@@ -167,7 +168,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerReportSubTitle,
                                 decoration: InputDecoration(
-                                  labelText: 'Report Sub-Title',
+                                  labelText: Translator.text('WidgetReportMailConfiguration','Report Sub-Title'),
                                 ),
                               ),
                             ),
@@ -176,7 +177,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10, right: 20.0),
                                     child:
-                                    Text('Report to Team Leads',
+                                    Text(Translator.text('WidgetReportMailConfiguration','Report to Team Leads'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -199,7 +200,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10, right: 20.0),
                                     child:
-                                    Text('Report to Team Members',
+                                    Text(Translator.text('WidgetReportMailConfiguration','Report to Team Members'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -222,7 +223,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Period',
+                                    Text(Translator.text('WidgetReport','Report Period'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -234,11 +235,11 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                       value: '',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Weekly'),
+                                      child: Text(Translator.text('Common','Weekly')),
                                       value: 'PERIOD_WEEKLY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Monthly'),
+                                      child: Text(Translator.text('Common','Monthly')),
                                       value: 'PERIOD_MONTHLY',
                                     ),
                                   ],
@@ -247,7 +248,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                       _reportPeriod = value;
                                     });
                                   },
-                                  hint: Text('Choose Period'),
+                                  hint: Text(Translator.text('WidgetReportMailConfiguration','Choose Period')),
                                   value: _reportPeriod,
                                 ),
                               ],
@@ -257,7 +258,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Week Day',
+                                    Text(Translator.text('WidgetReportMailConfiguration','Report Week Day'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -269,31 +270,31 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                       value: '',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Monday'),
+                                      child: Text(Translator.text('Common','Monday')),
                                       value: 'WEEKDAY_MONDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Tuesday'),
+                                      child: Text(Translator.text('Common','Tuesday')),
                                       value: 'WEEKDAY_TUESDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Wednesday'),
+                                      child: Text(Translator.text('Common','Wednesday')),
                                       value: 'WEEKDAY_WEDNESDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Thursday'),
+                                      child: Text(Translator.text('Common','Thursday')),
                                       value: 'WEEKDAY_THURSDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Friday'),
+                                      child: Text(Translator.text('Common','Friday')),
                                       value: 'WEEKDAY_FRIDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Saturday'),
+                                      child: Text(Translator.text('Common','Saturday')),
                                       value: 'WEEKDAY_SATURDAY',
                                     ),
                                     DropdownMenuItem<String>(
-                                      child: Text('Sunday'),
+                                      child: Text(Translator.text('Common','Sunday')),
                                       value: 'WEEKDAY_SUNDAY',
                                     ),
                                   ],
@@ -302,7 +303,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                       _reportWeekDay = value;
                                     });
                                   },
-                                  hint: Text('Choose Week Day'),
+                                  hint: Text(Translator.text('WidgetReportMailConfiguration','Choose Week Day')),
                                   value: _reportWeekDay,
                                 ),
                               ],
@@ -312,7 +313,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Time',
+                                    Text(Translator.text('WidgetReportMailConfiguration','Report Time'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -379,14 +380,14 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text('Cancel'),
+                    child: Text(Translator.text('Common','Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(_newConfiguration ? ButtonID.CREATE : ButtonID.APPLY),
+                    child: Text(_newConfiguration ? Translator.text('Common', ButtonID.CREATE) : Translator.text('Common', ButtonID.APPLY)),
                     onPressed: () {
                       if (_newConfiguration) {
                         _createReportConfiguration(context);
@@ -412,40 +413,50 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
 
     final reportConfiguration = _assembleConfiguration();
     if (reportConfiguration.reportingTeams.length < 1) {
-      DialogModal(context).show("Attention", "Please choose at least one team.", true);
+      DialogModal(context).show(
+          Translator.text('Common','Attention'),
+          Translator.text('WidgetReportMailConfiguration','Please choose at least one team.'), true);
       return;
     }
 
     _serviceReportConfiguration
         .createConfiguration(reportConfiguration)
         .then((id) {
-          DialogModal(context).show("New Report Configuration", "New report configuration was successfully created.", false)
+          DialogModal(context).show(
+              Translator.text('WidgetReportMailConfiguration','New Report Configuration'),
+              Translator.text('WidgetReportMailConfiguration','New report configuration was successfully created.'), false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = "Could not create new report configuration!";
+            text = Translator.text('WidgetReportMailConfiguration','Could not create new report configuration!');
           }
           else {
-            text = "Could not create new report configuration!\nReason:" + err.toString();
+            text = Translator.text('WidgetReportMailConfiguration','Could not create new report configuration!\nReason: ') + err.toString();
           }
-          DialogModal(context).show("Attention", text, true);
+          DialogModal(context).show(Translator.text('Common','Attention'), text, true);
         }
     );
   }
 
   bool validateInput() {
     if (_textEditingControllerConfigName.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a configuration name!", true);
+      DialogModal(context).show(
+          Translator.text('Common','Attention'),
+          Translator.text('WidgetReportMailConfiguration','Please choose a configuration name!'), true);
       return false;
     }
     if (_textEditingControllerMailSenderName.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a name for mail sender!", true);
+      DialogModal(context).show(
+          Translator.text('Common','Attention'),
+          Translator.text('WidgetReportMailConfiguration','Please choose a name for mail sender!'), true);
       return false;
     }
     if (_textEditingControllerMailSubject.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a subject for report mail!", true);
+      DialogModal(context).show(
+          Translator.text('Common','Attention'),
+          Translator.text('WidgetReportMailConfiguration','Please choose a subject for report mail!'), true);
       return false;
     }
     return true;
@@ -459,7 +470,9 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
     final reportConfiguration = _assembleConfiguration();
     reportConfiguration.id = _currentReportConfiguration.id;
     if (reportConfiguration.reportingTeams.length < 1) {
-      DialogModal(context).show("Attention", "Please choose at least one team.", true);
+      DialogModal(context).show(
+          Translator.text('Common','Attention'),
+          Translator.text('WidgetReportMailConfiguration','Please choose at least one team.'), true);
       return;
     }
 
@@ -467,12 +480,16 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
       .editConfiguration(reportConfiguration)
       .then((success) {
           if (success) {
-            DialogModal(context).show("Edit Report Configuration", "All changes successfully applied.", false)
+            DialogModal(context).show(
+                Translator.text('WidgetReportMailConfiguration','Edit Report Configuration'),
+                Translator.text('Common','All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not apply changes! Reason:" + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common','Attention'),
+              Translator.text('Common','Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
   }
@@ -498,7 +515,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
 
   void _retrieveReportConfiguration() {
     if(configurationId == 0) {
-      print('Internal error, use this widget for an authenticated user');
+      print(Translator.text('Common','Internal error, use this widget for an authenticated user'));
       return;
     }
 
@@ -534,7 +551,10 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           setState(() {});
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve report configuration! Reason: " + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common','Attention'),
+              Translator.text('WidgetReportMailConfiguration','Could not retrieve report configuration! Reason: ') + err.toString(),
+              true);
         }
     );
   }

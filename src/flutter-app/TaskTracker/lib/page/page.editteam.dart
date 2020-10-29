@@ -6,7 +6,7 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.teamedit.dart';
 import 'package:flutter/material.dart';
 
@@ -34,6 +34,7 @@ class _PageEditTeamState extends State<PageEditTeam> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [

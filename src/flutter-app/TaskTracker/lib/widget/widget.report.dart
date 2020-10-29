@@ -143,7 +143,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
     if (fromDate.isAfter(toDate) || (fromDate.millisecondsSinceEpoch == toDate.millisecondsSinceEpoch)) {
       DialogModal(context).show(
           Translator.text('Common', 'Attention'),
-          Translator.text('WidgetReport', 'Please, choose a date for \'From\' less than \'To\'.'), true);
+          Translator.text('WidgetReport', 'Please choose a date for \'From\' less than \'To\'.'), true);
       return;
     }
 
@@ -161,7 +161,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
     if (countSelectedTeams < 1) {
       DialogModal(context).show(
           Translator.text('Common', 'Attention'),
-          Translator.text('WidgetReport', 'Please, select at least one team.'), true);
+          Translator.text('WidgetReport', 'Please select at least one team.'), true);
       return;
     }
 

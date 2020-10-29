@@ -85,7 +85,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   void _deleteProgress(int id) async {
     var button = await DialogTwoButtonsModal(context)
         .show(Translator.text('Common', 'Attention'),
-              Translator.text('WidgetProgressList', 'You really want to delete the progress entry?'),
+              Translator.text('WidgetProgressList', 'Do you really want to delete the progress entry?'),
               ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {

@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class _PageNewUserState extends State<PageNewUser> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [

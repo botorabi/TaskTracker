@@ -11,6 +11,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.chooseteams.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -110,7 +111,7 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseTeams(context).show('Teams', 'Add New Team')
+                          DialogChooseTeams(context).show(Translator.text('Common','Teams'), Translator.text('WidgetTeam','Add New Team'))
                               .then((chosenTeams) {
                               if (chosenTeams != null && chosenTeams.length > 0) {
                                 chosenTeams.forEach((chosenTeam) {

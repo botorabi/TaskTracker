@@ -13,6 +13,7 @@ import 'package:TaskTracker/dialog/dialog.chooseusers.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -112,7 +113,7 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(20, Icons.add, () {
-                          DialogChooseUsers(context).show('Users', 'Add New User')
+                          DialogChooseUsers(context).show(Translator.text('Common','Users'), Translator.text('WidgetUser','Add New User'))
                               .then((chosenUsers) {
                               if (chosenUsers != null && chosenUsers.length > 0) {
                                 chosenUsers.forEach((userInfo) {
@@ -170,7 +171,9 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                 Text(userInfo.realName),
                 CircleButton.create(16, Icons.delete, () {
                   DialogTwoButtonsModal(context)
-                          .show('Attention', "You really want to remove user '" + userInfo.realName + "'?", ButtonID.YES, ButtonID.NO)
+                          .show(Translator.text('Common','Attention'),
+                                Translator.text('WidgetUser','Do you really want to delete user ') + '\'' + userInfo.realName + '\'?',
+                                ButtonID.YES, ButtonID.NO)
                           .then((button) {
                                 if (button == ButtonID.YES) {
                                   _users.remove(userInfo);

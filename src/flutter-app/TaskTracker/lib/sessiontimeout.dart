@@ -25,7 +25,7 @@ class SessionTimeoutHandler {
   Timer _sessionTimer;
   int   _timeoutInSeconds;
 
-  static DateTime _timeLeft;
+  static DateTime _timeOut;
 
   SessionTimeoutHandler(this._navigator, this._timeoutInSeconds);
 
@@ -40,14 +40,21 @@ class SessionTimeoutHandler {
   /// Return the time left to logout in seconds.
   /// If user is not authenticated then 0 is returned.
   static int timeLeftInSeconds() {
-    if ((_timeLeft == null) || !Config.authStatus.authenticated) {
+    if ((_timeOut == null) || !Config.authStatus.authenticated) {
       return 0;
     }
-    return ((DateTime.now().millisecondsSinceEpoch - _timeLeft.millisecondsSinceEpoch) / 1000).floor();
+    return ((_timeOut.millisecondsSinceEpoch - DateTime.now().millisecondsSinceEpoch) / 1000).floor();
+  }
+
+  /// Return a string representing the timeout in mm:ss format.
+  static String timeLeftFormattedString() {
+    int seconds = timeLeftInSeconds();
+    int minutes = (seconds / 60).floor();
+    return minutes.toString().padLeft(2, '0') + ':' + (seconds % 60).toString().padLeft(2, '0');
   }
 
   void resetLogoutTimer() {
-    _timeLeft = DateTime.now();
+    _timeOut = DateTime.now().add(Duration(seconds: _timeoutInSeconds));
     _sessionTimer?.cancel();
     _sessionTimer = Timer(Duration(seconds: _timeoutInSeconds), _logout);
   }

@@ -82,12 +82,12 @@ class DialogChooseUsers {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Find User',
+                Text(Translator.text('WidgetUser','Find User'),
                     style: TextStyle(fontWeight: FontWeight.w500)
                 ),
                 TextField(
                   decoration: InputDecoration(
-                      hintText: 'Enter a user search string'
+                      hintText: Translator.text('WidgetUser','Enter a user search string')
                   ),
                   onChanged: (value) {
                     _searchUser(value).then((value) {
@@ -114,7 +114,7 @@ class DialogChooseUsers {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Found Users',
+                        child: Text(Translator.text('WidgetTeam','Found Users'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -153,7 +153,7 @@ class DialogChooseUsers {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Chosen Users',
+                        child: Text(Translator.text('WidgetTeam','Chosen Users'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,

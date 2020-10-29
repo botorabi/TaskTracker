@@ -27,16 +27,16 @@ const Translations_WidgetProgressList = {
     'en': 'Delete Progress',
     'de': 'Fortschritt löschen',
   },
-  'You really want to delete the progress entry?': {
-    'en': 'You really want to delete the progress entry?',
-    'de': 'Möchten Sie wirklich den Fortschrittseintrag löschen?',
+  'Do you really want to delete the progress entry?': {
+    'en': 'Do you really want to delete the progress entry?',
+    'de': 'Soll der Fortschrittseintrag wirklich gelöscht werden?',
   },
   'Progress Deletion': {
     'en': 'Progress Deletion',
-    'de': 'Fortschrittseintrag löschen'
+    'de': 'Löschen des Fortschrittseintrags'
   },
   'Progress entry was successfully deleted.': {
     'en': 'Progress entry was successfully deleted.',
-    'de': 'Der Fortschrittseintrag wurde gelöscht.'
+    'de': 'Fortschrittseintrag wurde erfolgreich gelöscht.'
   },
 };

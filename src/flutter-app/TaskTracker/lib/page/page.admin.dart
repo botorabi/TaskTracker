@@ -7,6 +7,8 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/translator.dart';
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.reportmail.configurationlist.dart';
 import 'package:TaskTracker/widget/widget.tasklist.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
@@ -31,6 +33,7 @@ class _PageAdminState extends State<PageAdmin> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [
@@ -41,10 +44,10 @@ class _PageAdminState extends State<PageAdmin> {
               child:
                 Column(
                   children: [
-                    WidgetTaskList().setExpanded(true),
-                    WidgetTeamList().setExpanded(false),
-                    WidgetUserList().setExpanded(false),
-                    WidgetReportMailConfigurationList().setExpanded(false),
+                    WidgetTaskList(title: Translator.text('Common','Tasks')).setExpanded(true),
+                    WidgetTeamList(title: Translator.text('Common','Teams')).setExpanded(false),
+                    WidgetUserList(title: Translator.text('Common','Users')).setExpanded(false),
+                    WidgetReportMailConfigurationList(title: Translator.text('WidgetReportMailConfiguration','Report Mail Configuration')).setExpanded(false),
                   ],
                 ),
               ),

@@ -7,17 +7,13 @@
  */
 
 const Translations_NavDrawer = {
-  'Version': {
-    'en': 'Version',
-    'de': 'Version',
-  },
   'Welcome': {
     'en': 'Welcome',
     'de': 'Willkommen',
   },
   'Language': {
-    'en': 'German',
-    'de': 'Englisch',
+    'en': 'Deutsch',
+    'de': 'English',
   },
   'Login': {
     'en': 'Login',
@@ -37,6 +33,6 @@ const Translations_NavDrawer = {
   },
   'Team Management': {
     'en': 'Team Management',
-    'de': 'Team Verwaltung',
+    'de': 'Team-Verwaltung',
   },
 };

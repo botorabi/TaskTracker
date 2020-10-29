@@ -7,6 +7,14 @@
  */
 
 const Translations_Common = {
+  'Version': {
+    'en': 'Version',
+    'de': 'Version',
+  },
+  'Timeout': {
+    'en': 'Timeout',
+    'de': 'Timeout',
+  },
   'Yes': {
     'en': 'Yes',
     'de': 'Ja',
@@ -15,13 +23,13 @@ const Translations_Common = {
     'en': 'No',
     'de': 'Nein',
   },
-  'Ok': {
-    'en': 'Ok',
-    'de': 'Ok',
+  'OK': {
+    'en': 'OK',
+    'de': 'OK',
   },
   'Apply': {
     'en': 'Apply',
-    'de': 'Annehmen',
+    'de': 'Übernehmen',
   },
   'Cancel': {
     'en': 'Cancel',
@@ -43,13 +51,16 @@ const Translations_Common = {
     'en': 'Choose',
     'de': 'Wählen',
   },
-
   'Name': {
     'en': 'Name',
     'de': 'Name',
   },
   'User': {
     'en': 'User',
+    'de': 'Benutzer',
+  },
+  'Users': {
+    'en': 'Users',
     'de': 'Benutzer',
   },
   'Text': {
@@ -64,13 +75,17 @@ const Translations_Common = {
     'en': 'Task',
     'de': 'Aufgabe',
   },
+  'Tasks': {
+    'en': 'Tasks',
+    'de': 'Aufgaben',
+  },
   'Title': {
     'en': 'Title',
     'de': 'Bezeichnung',
   },
   'Report': {
     'en': 'Report',
-    'de': 'Report',
+    'de': 'Bericht',
   },
   'Teams': {
     'en': 'Teams',
@@ -86,6 +101,62 @@ const Translations_Common = {
   },
   'Progress Report': {
     'en': 'Progress Report',
-    'de': 'Fortschritt Report',
+    'de': 'Fortschrittsbericht',
+  },
+  'Weekly': {
+    'en': 'Weekly',
+    'de': 'Wöchentlich',
+  },
+  'Monthly': {
+    'en': 'Monthly',
+    'de': 'Monatlich',
+  },
+  'Monday': {
+    'en': 'Monday',
+    'de': 'Montag',
+  },
+  'Tuesday': {
+    'en': 'Tuesday',
+    'de': 'Dienstag',
+  },
+  'Wednesday': {
+    'en': 'Wednesday',
+    'de': 'Mittwoch',
+  },
+  'Thursday': {
+    'en': 'Thursday',
+    'de': 'Donnerstag',
+  },
+  'Friday': {
+    'en': 'Friday',
+    'de': 'Freitag',
+  },
+  'Saturday': {
+    'en': 'Saturday',
+    'de': 'Samstag',
+  },
+  'Sunday': {
+    'en': 'Sunday',
+    'de': 'Sonntag',
+  },
+  'Could not apply changes! Reason: ' : {
+    'en': 'Could not apply changes! Reason: ',
+    'de': 'Änderungen konnten nicht übernommen werden! Grund: ',
+  },
+  'All changes successfully applied.': {
+    'en': 'All changes successfully applied.',
+    'de': 'Alle Änderungen wurden erfolgreich übernommen.',
+  },
+  'Internal error, use this widget for an authenticated user': {
+    'en': 'Internal error, use this widget for an authenticated user',
+    'de': 'Interner Fehler - verwenden Sie dieses Widget für angemeldete Benutzer',
+  },
+  'Active': {
+    'en': 'Active',
+    'de': 'Aktiv',
+  },
+  'Enter at least 3 characters': {
+    'en': 'Enter at least 3 characters',
+    'de': 'Geben Sie mindestens 3 Zeichen ein',
   },
 };

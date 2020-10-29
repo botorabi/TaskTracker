@@ -11,6 +11,7 @@ import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:TaskTracker/service/service.login.dart';
 import 'package:TaskTracker/translator.dart';
+import 'package:TaskTracker/widget/widget.sessiontimeout.dart';
 import 'package:flutter/material.dart';
 
 class NavDrawer extends StatelessWidget {
@@ -34,15 +35,23 @@ class NavDrawer extends StatelessWidget {
                 ),
                 SizedBox(height: 10.0),
                 Text(
-                  Translator.text('NavDrawer', 'Version') + " " + Config.appInfo.version,
+                  Translator.text('Common', 'Version') + " " + Config.appInfo.version,
                   style: TextStyle(color: Colors.white, fontSize: 16),
                   textAlign: TextAlign.left,
                 ),
-                SizedBox(height: 20.0),
-                Text(
-                  Config.authStatus.loginName,
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                  textAlign: TextAlign.left,
+                SizedBox(height: 5.0),
+                Visibility(
+                  visible: (Config.authStatus.authenticated == true),
+                  child:
+                  Column(
+                    children: [
+                      Text(
+                        Config.authStatus.loginName,
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                    ]
+                  ),
                 ),
               ],
             ),

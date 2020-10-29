@@ -9,6 +9,7 @@
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -96,7 +97,9 @@ class _WidgetRolesState extends State<WidgetRoles> {
           _createRolesUI(roles);
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve user Roles! Reason: " + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common', 'Attention'),
+              Translator.text('WidgetRoles', 'Could not retrieve user Roles! Reason: ') + err.toString(), true);
         }
     );
   }

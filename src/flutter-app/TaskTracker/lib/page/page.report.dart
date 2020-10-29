@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.report.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +29,7 @@ class _PageReportState extends State<PageReport> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [

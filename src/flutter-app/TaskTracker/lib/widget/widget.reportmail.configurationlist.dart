@@ -16,6 +16,7 @@ import 'package:TaskTracker/service/report.configuration.dart';
 import 'package:TaskTracker/service/service.report.configuration.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -97,8 +98,10 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
 
   void _deleteConfiguration(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete configuration '$name'?", ButtonID.YES, ButtonID.NO);
-
+        .show(
+        Translator.text('Common','Attention'),
+        Translator.text('WidgetReportMailConfiguration','Do you really want to delete configuration \'') + name + '\'?',
+        ButtonID.YES, ButtonID.NO);
     if (button != ButtonID.YES) {
       return;
     }
@@ -106,11 +109,13 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
     _serviceReportConfiguration
       .deleteConfiguration(id)
       .then((status) {
-          DialogModal(context).show('Configuration Deletion', 'Report configuration was successfully deleted.', false);
+          DialogModal(context).show(
+              Translator.text('WidgetReportMailConfiguration','Configuration Deletion'),
+              Translator.text('WidgetReportMailConfiguration','Report configuration was successfully deleted.'), false);
           _retrieveConfigurations();
         },
         onError: (err) {
-          print('Failed to delete report configuration, reason: ' + err.toString());
+          print(Translator.text('WidgetReportMailConfiguration','Failed to delete report configuration. Reason: ') + err.toString());
       });
   }
 
@@ -130,7 +135,7 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve report configuration, reason: " + err.toString());
+            print(Translator.text('WidgetReportMailConfiguration','Failed to retrieve report configuration. Reason: ') + err.toString());
           });
   }
 
@@ -153,7 +158,7 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
         ),
         DataColumn(
           label: Text(
-            'Subject',
+            Translator.text('WidgetReportMailConfiguration','Subject'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -167,7 +172,7 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addConfiguration(), 'Add New Report Mail Configuration'),
+        CircleButton.create(24, Icons.add, () => _addConfiguration(), Translator.text('WidgetReportMailConfiguration','Add New Report Mail Configuration')),
       ],
     );
 
@@ -203,7 +208,7 @@ class _DataProvider extends DataTableSource {
                             }
                           }
                         );
-                  }, "Edit Report Configuration"
+                  }, Translator.text('WidgetReportMailConfiguration','Edit Report Configuration')
                 ),
               ),
               Padding(
@@ -211,7 +216,7 @@ class _DataProvider extends DataTableSource {
                 child:
                   CircleButton.create(20, Icons.delete,
                           () => parent._deleteConfiguration(parent._reportConfigurations[index].id, parent._reportConfigurations[index].name),
-                          "Delete Report Mail Configuration"
+                          Translator.text('WidgetReportMailConfiguration','Delete Report Mail Configuration')
                 ),
               ),
             ],

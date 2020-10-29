@@ -17,10 +17,10 @@ const Translations_WidgetReport = {
   },
   'Report Period': {
     'en': 'Report Period',
-    'de': 'Report Zeitraum',
+    'de': 'Berichtszeitraum',
   },
-  'Please, choose a date for \'From\' less than \'To\'.': {
-    'en': 'Please, choose a date for \'From\' less than \'To\'.',
+  'Please choose a date for \'From\' less than \'To\'.': {
+    'en': 'Please choose a date for \'From\' less than \'To\'.',
     'de': 'Bitte wählen Sie einen Zeitraum aus, wobei \'Von\' kleiner als \'Bis\' sein muss.',
   },
   'Report document could not be created!': {
@@ -31,8 +31,8 @@ const Translations_WidgetReport = {
     'en': 'Select Teams for Report Creation',
     'de': 'Markieren Sie Teams für die Erstellung eines Berichts.',
   },
-  'Please, select at least one team.': {
-    'en': 'Please, select at least one team.',
+  'Please select at least one team.': {
+    'en': 'Please select at least one team.',
     'de': 'Bitte markieren Sie mindestens ein Team.',
   },
 };

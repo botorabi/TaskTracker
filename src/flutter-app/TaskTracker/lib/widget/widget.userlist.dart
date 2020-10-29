@@ -15,6 +15,7 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -90,7 +91,8 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete user '$realName'?", ButtonID.YES, ButtonID.NO);
+        .show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Do you really want to delete user \'') + realName + '\'?',
+        ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
@@ -99,11 +101,11 @@ class _WidgetUserListState extends State<WidgetUserList> {
     _serviceUser
       .deleteUser(id)
       .then((status) {
-          DialogModal(context).show('User Deletion', 'User was successfully deleted.', false);
+          DialogModal(context).show(Translator.text('WidgetUser','User Deletion'), Translator.text('WidgetUser','User was successfully deleted.'), false);
           _retrieveUsers();
         },
         onError: (err) {
-          print('Failed to delete user, reason: ' + err.toString());
+          print(Translator.text('WidgetUser','Failed to delete user, reason: ') + err.toString());
       });
   }
 
@@ -123,7 +125,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve users, reason: " + err.toString());
+            print(Translator.text('WidgetUser','Failed to retrieve users, reason: ') + err.toString());
           });
   }
 
@@ -133,7 +135,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Name',
+            Translator.text('Common','Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -146,19 +148,19 @@ class _WidgetUserListState extends State<WidgetUserList> {
         ),
         DataColumn(
           label: Text(
-            'Login',
+            Translator.text('WidgetUser','Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Last Login',
+            Translator.text('WidgetUser','Last Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Roles',
+            Translator.text('WidgetRoles','Roles'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),

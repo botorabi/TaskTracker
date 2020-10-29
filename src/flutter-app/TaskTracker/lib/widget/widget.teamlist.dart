@@ -15,6 +15,7 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -90,7 +91,8 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   void _deleteTeam(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete team '$name'?", ButtonID.YES, ButtonID.NO);
+        .show(Translator.text('Common','Attention'), Translator.text('WidgetTeam','Do you really want to delete team \'') + name  + '?',
+        ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
@@ -99,11 +101,11 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
     _serviceTeam
       .deleteTeam(id)
       .then((status) {
-          DialogModal(context).show('Team Deletion', 'Team was successfully deleted.', false);
+          DialogModal(context).show(Translator.text('WidgetTeam','Team Deletion'), Translator.text('WidgetTeam','Team was successfully deleted.'), false);
           _retrieveTeams();
         },
         onError: (err) {
-          print('Failed to delete team, reason: ' + err.toString());
+          print(Translator.text('WidgetTeam','Failed to delete team, reason: ') + err.toString());
       });
   }
 
@@ -123,7 +125,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
             setState(() {});
           },
           onError: (err) {
-            print("Failed to retrieve teams, reason: " + err.toString());
+            print(Translator.text('WidgetTeam','Failed to retrieve teams, reason: ') + err.toString());
           });
   }
 
@@ -133,7 +135,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Name',
+            Translator.text('Common','Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -146,19 +148,19 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         ),
         DataColumn(
           label: Text(
-            'Description',
+            Translator.text('Common', 'Description'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Active',
+            Translator.text('Common','Active'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Team Lead',
+            Translator.text('Common','Team Lead'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -174,7 +176,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       actions: [
         Visibility(
           visible: Config.authStatus.isAdmin(),
-          child: CircleButton.create(24, Icons.add, () => _addTeam(), 'Add New Team'),
+          child: CircleButton.create(24, Icons.add, () => _addTeam(), Translator.text('WidgetTeam','Add New Team')),
         ),
       ],
     );
@@ -201,7 +203,7 @@ class _DataProvider extends DataTableSource {
       cells: [
         DataCell(Text(parent._teams[index].name)),
         DataCell(Text(parent._teams[index].description)),
-        DataCell(Text(parent._teams[index].active ? 'Yes' : 'No')),
+        DataCell(Text(parent._teams[index].active ? Translator.text('Common','Yes') : Translator.text('Common','No'))),
         DataCell(Text(teamLeadNames)),
         DataCell(
           Row(

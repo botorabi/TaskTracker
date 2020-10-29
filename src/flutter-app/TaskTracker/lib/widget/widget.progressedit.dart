@@ -195,15 +195,15 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   void _createProgress(BuildContext context) {
     if (_userTaskDropdownSelection == 0) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, choose a task!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please choose a task!'), true);
       return;
     }
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a progress title!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a progress title!'), true);
       return;
     }
     if (_textEditingControllerText.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a progress description!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a progress description!'), true);
       return;
     }
 
@@ -228,7 +228,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
           String text;
           if (err == HttpStatus.notAcceptable) {
             text = Translator.text('WidgetProgressEdit', 'Could not create new progress entry!\nPlease choose a task and proper calendar week.\n'
-              'A maximal calendar week distance of 4 is allowed.');
+              'A maximum calendar week distance of 4 is allowed.');
           }
           else {
             text = Translator.text('WidgetProgressEdit', 'Could not create new progress entry!\nReason: ') + err.toString();
@@ -240,15 +240,15 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
 
   void _applyChanges(BuildContext context) {
     if (_userTaskDropdownSelection == 0) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, choose a task!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please choose a task!'), true);
       return;
     }
     if (_textEditingControllerTitle.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a progress title!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a progress title!'), true);
       return;
     }
     if (_textEditingControllerText.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please, enter a text!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a text!'), true);
       return;
     }
 
@@ -273,7 +273,7 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
         },
         onError: (err) {
           String text = Translator.text('WidgetProgressEdit', 'Could not apply changes to progress entry!\nPlease choose a task and proper calendar week.\n'
-              'A maximal calendar week distance of 4 is allowed.');
+              'A maximum calendar week distance of 4 is allowed.');
 
           DialogModal(context).show(Translator.text('Common', 'Attention'), text, true);
         }

@@ -13,6 +13,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.userchooser.dart';
 import 'package:flutter/material.dart';
 
@@ -37,8 +38,8 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   final _serviceTeam = ServiceTeam();
   final _textEditingControllerName = TextEditingController();
   final _textEditingControllerDescription = TextEditingController();
-  final _widgetTeamMembers = WidgetUserChooser(title: "Team Members");
-  final _widgetTeamLeaders = WidgetUserChooser(title: "Team Leaders");
+  final _widgetTeamMembers = WidgetUserChooser(title: Translator.text('WidgetTeam','Team Members'));
+  final _widgetTeamLeaders = WidgetUserChooser(title: Translator.text('WidgetTeam','Team Leaders'));
 
   _WidgetTeamEditState({this.teamId = 0}) {
     _newTeam = teamId == 0;
@@ -74,7 +75,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        'Edit Team Settings',
+                        Translator.text('WidgetTeam','Edit Team Settings'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
@@ -83,7 +84,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: Text(
-                          'Name: ' + _textEditingControllerName.text,
+                          Translator.text('Common','Name') + ': ' + _textEditingControllerName.text,
                         ),
                       ),
                     ),
@@ -102,7 +103,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                                   child: TextFormField(
                                     controller: _textEditingControllerName,
                                     decoration: InputDecoration(
-                                      labelText: 'Name',
+                                      labelText: Translator.text('Common','Name'),
                                     ),
                                   ),
                                 ),
@@ -113,7 +114,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                                     maxLines: 5,
                                     maxLength: 255,
                                     decoration: InputDecoration(
-                                      labelText: 'Description',
+                                      labelText: Translator.text('Common','Description'),
                                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                     ),
                                   ),
@@ -126,7 +127,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                                       Padding(
                                           padding: EdgeInsets.only(left: 10, right: 10.0),
                                           child:
-                                          Text('Active',
+                                          Text(Translator.text('Common','Active'),
                                             textAlign: TextAlign.left,
                                           )
                                       ),
@@ -183,14 +184,14 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text('Cancel'),
+                    child: Text(Translator.text('Common','Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(_newTeam ? ButtonID.CREATE : ButtonID.APPLY),
+                    child: Text(_newTeam ? Translator.text('Common', ButtonID.CREATE) : Translator.text('Common', ButtonID.APPLY)),
                     onPressed: () {
                       if (_newTeam) {
                         _createTeam(context);
@@ -211,7 +212,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
 
   void _createTeam(BuildContext context) {
     if (_textEditingControllerName.text.isEmpty) {
-      DialogModal(context).show("Attention", "Choose a team name!", true);
+      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetTeam','Choose a team name!'), true);
       return;
     }
 
@@ -224,18 +225,18 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
     _serviceTeam
         .createTeam(team)
         .then((id) {
-          DialogModal(context).show("New Team", "New team was successfully created.", false)
+          DialogModal(context).show(Translator.text('WidgetTeam','New Team'), Translator.text('WidgetTeam','New team was successfully created.'), false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = "Could not create new team!\nReason: A team with given name already exists.";
+            text = Translator.text('WidgetTeam','Could not create new team!\nReason: A team with given name already exists.');
           }
           else {
-            text = "Could not create new team!\nReason:" + err.toString();
+            text = Translator.text('WidgetTeam','Could not create new team!\nReason: ') + err.toString();
           }
-          DialogModal(context).show("Attention", text, true);
+          DialogModal(context).show(Translator.text('Common','Attention'), text, true);
         }
     );
   }
@@ -253,19 +254,20 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
       .editTeam(team)
       .then((success) {
           if (success) {
-            DialogModal(context).show("Edit Team", "All changes successfully applied.", false)
+            DialogModal(context).show(Translator.text('WidgetTeam','Edit Team'), Translator.text('Common','All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not apply changes! Reason:" + err.toString(), true);
+          DialogModal(context).show(Translator.text('Common','Attention'),
+              Translator.text('Common','Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
   }
 
   void _retrieveTeam() {
     if(teamId == 0) {
-      print('Internal error, use this widget for an authenticated user');
+      print(Translator.text('Common','Internal error, use this widget for an authenticated user'));
       return;
     }
 
@@ -283,7 +285,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
           setState(() {});
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve team! Reason: " + err.toString(), true);
+          DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetTeam','Could not retrieve team! Reason: ') + err.toString(), true);
         }
     );
   }

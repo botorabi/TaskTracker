@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.progressedit.dart';
 import 'package:flutter/material.dart';
 
@@ -33,6 +34,7 @@ class _PageEditProgressState extends State<PageEditProgress> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: Center(
         child: ListView(
           shrinkWrap: true,

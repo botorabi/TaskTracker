@@ -9,10 +9,10 @@
 const Translations_PageHome = {
   'Welcome to Task Tracker': {
     'en': 'Welcome to Task Tracker',
-    'de': 'Willkommen in Task Tracker',
+    'de': 'Willkommen im Task Tracker',
   },
   'Track and report your project activities.': {
     'en': 'Track and report your project activities.',
-    'de': 'Verwenden Sie Task Tracker für die Fortschrittserfassung Ihrer Projekte sowie automatische Report Generierung.',
+    'de':'Projektaktivitäten erfassen und automatische Fortschrittsberichte generieren',
   },
 };

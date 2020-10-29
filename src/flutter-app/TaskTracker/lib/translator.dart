@@ -24,7 +24,7 @@ class TranslatorCore {
         return Translations[context][text][_locale];
       }
     }
-    print("WARN: no translation exists, taking original text, context: " + context + ", text: " + text);
+    print("WARN: translation does not exist, using original text, context: " + context + ", text: " + text);
     return text;
   }
 }

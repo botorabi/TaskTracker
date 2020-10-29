@@ -13,19 +13,19 @@ const Translations_WidgetLogin = {
   },
   'Login User': {
     'en': 'Login User',
-    'de': 'Anmelden',
+    'de': 'Benutzer anmelden',
   },
   'Login Name': {
     'en': 'Login Name',
-    'de': 'Login Name',
+    'de': 'Login-Name',
   },
   'Password': {
     'en': 'Password',
     'de': 'Passwort',
   },
-  'Could not login. Please, check your credentials!': {
-    'en': 'Could not login. Please, check your credentials!',
-    'de': 'Anmeldung fehlgeschlagen!',
+  'Could not login. Please check your credentials!': {
+    'en': 'Could not login. Please check your credentials!',
+    'de': 'Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten.',
   },
   'Could not login! Reason: ': {
     'en': 'Could not login! Reason: ',

@@ -18,14 +18,14 @@ class Config {
   static AppInfo appInfo = AppInfo();
 
   /// Timeout in seconds for automatic logout on inactivity
-  static const LOGOUT_TIMEOUT = 20 * 60;
+  static const LOGOUT_TIMEOUT = 30 * 60;
 
   static String locale = 'de';
 
   /// Adapt the base URL if e.g. your server is behind a reverse proxy, or
   /// during the development set it to 'http://localhost:8080' in order to
   /// use Flutter's devtools server.
-  static const String BASE_URL = '';
+  static const String BASE_URL = 'http://localhost:8080';
 
   static const double DEFAULT_PANEL_WIDTH = 800;
 
