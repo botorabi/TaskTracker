@@ -162,7 +162,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addTask()),
+        CircleButton.create(24, Icons.add_circle_rounded, () => _addTask()),
       ],
     );
 

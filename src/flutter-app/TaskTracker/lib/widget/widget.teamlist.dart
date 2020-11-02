@@ -176,7 +176,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       actions: [
         Visibility(
           visible: Config.authStatus.isAdmin(),
-          child: CircleButton.create(24, Icons.add, () => _addTeam(), Translator.text('WidgetTeam','Add New Team')),
+          child: CircleButton.create(24, Icons.add_circle_rounded, () => _addTeam(), Translator.text('WidgetTeam','Add New Team')),
         ),
       ],
     );

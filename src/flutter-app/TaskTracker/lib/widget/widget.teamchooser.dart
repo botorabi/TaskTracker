@@ -110,7 +110,7 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
                       Padding(
                         padding: const EdgeInsets.all(0.0),
                         child:
-                        CircleButton.create(20, Icons.add, () {
+                        CircleButton.create(18, Icons.add_circle_rounded, () {
                           DialogChooseTeams(context).show(Translator.text('Common','Teams'), Translator.text('WidgetTeam','Add New Team'))
                               .then((chosenTeams) {
                               if (chosenTeams != null && chosenTeams.length > 0) {
@@ -166,7 +166,7 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(team.name),
-              CircleButton.create(16, Icons.delete, () {
+              CircleButton.create(18, Icons.remove_circle_outlined, () {
                 _teams.remove(team);
                 _createUI();
               }),

@@ -148,7 +148,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                       Padding(
                         padding: const EdgeInsets.only(top: 0.0),
                         child:
-                        CircleButton.create(20, Icons.add, () {
+                        CircleButton.create(18, Icons.add_circle_rounded, () {
                           DialogChooseTeams(context).show(Translator.text('Common','Teams'), Translator.text('WidgetTask','Add teams'))
                               .then((chosenTeams) {
                                 if (chosenTeams != null && chosenTeams.length > 0) {
@@ -209,7 +209,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                       Padding(
                         padding: const EdgeInsets.only(top: 15.0),
                         child:
-                        CircleButton.create(20, Icons.add, () {
+                        CircleButton.create(18, Icons.add_circle_rounded, () {
                           DialogChooseUsers(context).show(Translator.text('Common','Users'), Translator.text('WidgetTask','Add users.'))
                               .then((chosenUsers) {
                                 if (chosenUsers != null && chosenUsers.length > 0) {
@@ -266,7 +266,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(userInfo.realName),
-                CircleButton.create(16, Icons.delete, () {
+                CircleButton.create(18, Icons.remove_circle_outlined, () {
                   _users.remove(userInfo);
                   _createUsersUI();
                 }),
@@ -289,7 +289,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(team.name),
-                CircleButton.create(16, Icons.delete, () {
+                CircleButton.create(18, Icons.remove_circle_outlined, () {
                   _teams.remove(team);
                   _createTeamsUI();
                 }),

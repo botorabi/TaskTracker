@@ -197,7 +197,7 @@ class DialogChooseTeams {
           ListTile(
             dense: true,
             title: Text(team.name, style: TextStyle(fontSize: 14.0)),
-            trailing: CircleButton.create(24, Icons.arrow_right, () {
+            trailing: CircleButton.create(18, Icons.add_circle_rounded, () {
               if (_addNewChosenTeam(team)) {
                 _updateChosenTeamsUI();
                 _scrollToLastChosenTeam();
@@ -218,7 +218,7 @@ class DialogChooseTeams {
           ListTile(
             dense: true,
             title: Text(team.name, style: TextStyle(fontSize: 14.0)),
-            trailing: CircleButton.create(16, Icons.delete, () {
+            trailing: CircleButton.create(18, Icons.remove_circle_outlined, () {
               _chosenTeams.remove(team);
               _updateChosenTeamsUI();
             }),

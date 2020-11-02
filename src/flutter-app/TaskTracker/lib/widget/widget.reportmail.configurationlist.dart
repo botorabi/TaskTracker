@@ -172,7 +172,7 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addConfiguration(), Translator.text('WidgetReportMailConfiguration','Add New Report Mail Configuration')),
+        CircleButton.create(24, Icons.add_circle_rounded, () => _addConfiguration(), Translator.text('WidgetReportMailConfiguration','Add New Report Mail Configuration')),
       ],
     );
 

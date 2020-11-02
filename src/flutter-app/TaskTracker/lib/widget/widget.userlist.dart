@@ -174,7 +174,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addUser()),
+        CircleButton.create(24, Icons.add_circle_rounded, () => _addUser()),
       ],
     );
 

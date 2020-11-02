@@ -37,7 +37,9 @@ class Team {
       team.teamLeaderIDs = List.from(fields['teamLeaderIDs']);
     }
     if (fields.containsKey('teamLeaderNames')) {
-      team.teamLeaderNames = List.from(fields['teamLeaderNames']);
+      team.teamLeaderNames = List.from(fields['teamLeaderNames'])
+          .map((name) => Utf8Utils.fromUtf8(name))
+          .toList();
     }
     return team;
   }

@@ -197,7 +197,7 @@ class DialogChooseUsers {
             ListTile(
               dense: true,
               title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
-              trailing: CircleButton.create(24, Icons.arrow_right, () {
+              trailing: CircleButton.create(18, Icons.add_circle_rounded, () {
                 if (_addNewChosenUser(userInfo)) {
                   _updateChosenUsersUI();
                   _scrollToLastChosenUser();
@@ -218,7 +218,7 @@ class DialogChooseUsers {
           ListTile(
               dense: true,
               title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
-              trailing: CircleButton.create(16, Icons.delete, () {
+              trailing: CircleButton.create(18, Icons.remove_circle_outlined, () {
                 _chosenUsers.remove(userInfo);
                 _updateChosenUsersUI();
               }),
