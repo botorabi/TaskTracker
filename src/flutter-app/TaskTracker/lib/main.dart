@@ -7,6 +7,7 @@
  */
 
 
+import 'package:TaskTracker/page/page.about.dart';
 import 'package:TaskTracker/page/page.editprogress.dart';
 import 'package:TaskTracker/page/page.editreportconfiguration.dart';
 import 'package:TaskTracker/page/page.edittask.dart';
@@ -80,6 +81,7 @@ class _AppTaskTrackerState extends State<AppTaskTracker> {
       navigatorKey: _navigator,
       routes: {
         NavigationLinks.NAV_HOME            : (context) => PageHome(title: Translator.text('AppTaskTracker', 'Task Tracker')),
+        NavigationLinks.NAV_ABOUT           : (context) => PageAbout(title: Translator.text('AppTaskTracker', 'About')),
         NavigationLinks.NAV_PROFILE         : (context) => PageLogin(title: Translator.text('AppTaskTracker', 'User Profile')),
         NavigationLinks.NAV_ADMIN           : (context) => PageAdmin(title: Translator.text('AppTaskTracker', 'Administration')),
         NavigationLinks.NAV_TEAM_LEAD       : (context) => PageTeamLead(title: Translator.text('AppTaskTracker', 'Team Management')),

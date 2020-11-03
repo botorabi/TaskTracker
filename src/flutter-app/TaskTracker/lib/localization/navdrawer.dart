@@ -35,4 +35,8 @@ const Translations_NavDrawer = {
     'en': 'Team Management',
     'de': 'Team-Verwaltung',
   },
+  'About': {
+    'en': 'About Task Tracker',
+    'de': 'Über Task Tracker',
+  },
 };

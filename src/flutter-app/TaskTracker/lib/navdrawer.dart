@@ -77,6 +77,14 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
             },
           ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text(Translator.text('NavDrawer', 'About')),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
+            },
+          ),
           Visibility(
             visible: (Config.authStatus.authenticated == false),
             child: ListTile(
@@ -132,6 +140,14 @@ class NavDrawer extends StatelessWidget {
                       Navigator.pushNamed(context, NavigationLinks.NAV_REPORT);
                     },
                   ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.info),
+                  title: Text(Translator.text('NavDrawer', 'About')),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),

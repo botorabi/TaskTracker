@@ -34,6 +34,9 @@ dependencies:
   intl:
     version: any
 
+  url_launcher:
+    version: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
