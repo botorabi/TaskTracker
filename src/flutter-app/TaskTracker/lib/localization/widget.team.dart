@@ -6,9 +6,6 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/service/task.dart';
-import 'package:flutter/services.dart';
-
 const Translations_WidgetTeam = {
   'New Team': {
     'en': 'New Team',

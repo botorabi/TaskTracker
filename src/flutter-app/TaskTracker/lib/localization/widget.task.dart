@@ -6,7 +6,6 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/service/task.dart';
 
 const Translations_WidgetTask = {
   'New Task': {
@@ -15,7 +14,7 @@ const Translations_WidgetTask = {
   },
   'Edit Task Settings': {
     'en': 'Edit Task Settings',
-    'de': 'Aufgaben-Einstellungen bearbeiten',
+    'de': 'Aufgaben-Einstellungen',
   },
   'Please choose a task name!': {
     'en': 'Please choose a task name!',

@@ -23,23 +23,17 @@ class WidgetUserList extends StatefulWidget {
   WidgetUserList({Key key, this.title = 'Users'}) : super(key: key);
 
   final String title;
-  final _WidgetUserListState _widgetUserListState = _WidgetUserListState();
 
   @override
-  _WidgetUserListState createState() => _widgetUserListState;
-
-  WidgetUserList setExpanded(bool expanded) {
-    _widgetUserListState.setExpanded(expanded);
-    return this;
-  }
+  _WidgetUserListState createState() => _WidgetUserListState();
 }
 
 class _WidgetUserListState extends State<WidgetUserList> {
 
+  bool _stateReady = false;
   final _serviceUser = ServiceUser();
   PaginatedDataTable _dataTable;
   List<UserInfo> _users = [];
-  bool _expanded = false;
   bool _sortAscending = true;
 
   @override
@@ -48,36 +42,44 @@ class _WidgetUserListState extends State<WidgetUserList> {
     _retrieveUsers();
   }
 
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
-  }
-
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     _dataTable = _createDataTable();
+    _stateReady = true;
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: Card(
           elevation: 5,
           margin: EdgeInsets.all(10.0),
-          child:
-          ExpansionTile(
-              title: Text(widget.title),
-              initiallyExpanded: _expanded,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SizedBox(
-                    width: constraints.maxWidth,
-                    child: _dataTable,
-                  ),
-                )
-              ]
+          child: Column(
+            children: [
+              Visibility(
+                visible: widget.title != null && widget.title != '',
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: _dataTable,
+                ),
+              )
+            ]
           ),
         ),
       ),
@@ -91,7 +93,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Do you really want to delete user \'') + realName + '\'?',
+        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Do you really want to delete user \'') + realName + '\'?',
         ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
@@ -101,11 +103,11 @@ class _WidgetUserListState extends State<WidgetUserList> {
     _serviceUser
       .deleteUser(id)
       .then((status) {
-          DialogModal(context).show(Translator.text('WidgetUser','User Deletion'), Translator.text('WidgetUser','User was successfully deleted.'), false);
+          DialogModal(context).show(Translator.text('WidgetUser', 'User Deletion'), Translator.text('WidgetUser', 'User was successfully deleted.'), false);
           _retrieveUsers();
         },
         onError: (err) {
-          print(Translator.text('WidgetUser','Failed to delete user, reason: ') + err.toString());
+          print(Translator.text('WidgetUser', 'Failed to delete user, reason: ') + err.toString());
       });
   }
 
@@ -122,10 +124,10 @@ class _WidgetUserListState extends State<WidgetUserList> {
         .then((listUserInfo) {
             _users = listUserInfo;
             _sortUsers(_sortAscending);
-            setState(() {});
+            _updateState();
           },
           onError: (err) {
-            print(Translator.text('WidgetUser','Failed to retrieve users, reason: ') + err.toString());
+            print(Translator.text('WidgetUser', 'Failed to retrieve users, reason: ') + err.toString());
           });
   }
 
@@ -135,7 +137,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            Translator.text('Common','Name'),
+            Translator.text('Common', 'Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -148,19 +150,19 @@ class _WidgetUserListState extends State<WidgetUserList> {
         ),
         DataColumn(
           label: Text(
-            Translator.text('WidgetUser','Login'),
+            Translator.text('WidgetUser', 'Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            Translator.text('WidgetUser','Last Login'),
+            Translator.text('WidgetUser', 'Last Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            Translator.text('WidgetRoles','Roles'),
+            Translator.text('WidgetRoles', 'Roles'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),

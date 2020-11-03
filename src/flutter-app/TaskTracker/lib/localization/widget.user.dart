@@ -6,8 +6,6 @@
  *          main directory for more details.
  */
 
-import 'package:TaskTracker/service/task.dart';
-
 const Translations_WidgetUser = {
   'Login': {
     'en': 'Login',

@@ -111,7 +111,7 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(18, Icons.add_circle_rounded, () {
-                          DialogChooseTeams(context).show(Translator.text('Common','Teams'), Translator.text('WidgetTeam','Add New Team'))
+                          DialogChooseTeams(context).show(Translator.text('Common', 'Teams'), Translator.text('WidgetTeam', 'Add New Team'))
                               .then((chosenTeams) {
                               if (chosenTeams != null && chosenTeams.length > 0) {
                                 chosenTeams.forEach((chosenTeam) {

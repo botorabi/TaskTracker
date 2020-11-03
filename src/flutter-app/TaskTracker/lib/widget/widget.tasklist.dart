@@ -22,23 +22,17 @@ class WidgetTaskList extends StatefulWidget {
   WidgetTaskList({Key key, this.title = 'Tasks'}) : super(key: key);
 
   final String title;
-  final _WidgetTaskListState _widgetTaskListState = _WidgetTaskListState();
 
   @override
-  _WidgetTaskListState createState() => _widgetTaskListState;
-
-  WidgetTaskList setExpanded(bool expanded) {
-    _widgetTaskListState.setExpanded(expanded);
-    return this;
-  }
+  _WidgetTaskListState createState() => _WidgetTaskListState();
 }
 
 class _WidgetTaskListState extends State<WidgetTaskList> {
 
+  bool _stateReady = false;
   final _serviceTask = ServiceTask();
   PaginatedDataTable _dataTable;
   List<Task> _tasks = [];
-  bool _expanded = false;
   bool _sortAscending = true;
 
   @override
@@ -47,28 +41,37 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
     _retrieveTasks();
   }
 
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
-  }
-
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     _dataTable = _createDataTable();
+    _stateReady = true;
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: Card(
           elevation: 5,
           margin: EdgeInsets.all(10.0),
           child:
-            ExpansionTile(
-              title: Text(widget.title),
-              initiallyExpanded: _expanded,
-              children: <Widget>[
+          Column(
+              children: [
+                Visibility(
+                  visible: widget.title != null && widget.title != '',
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: SizedBox(
@@ -81,7 +84,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
         ),
       ),
     );
-}
+  }
 
   void _addTask() async {
     await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_TASK);
@@ -90,7 +93,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
 
   void _deleteTask(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show(Translator.text('Common','Attention'),
+        .show(Translator.text('Common', 'Attention'),
         Translator.text('WidgetTask', 'Do you really want to delete task \'') + name +'\'?',
         ButtonID.YES, ButtonID.NO);
     if (button != ButtonID.YES) {
@@ -100,12 +103,12 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
     _serviceTask
       .deleteTask(id)
       .then((status) {
-          DialogModal(context).show(Translator.text('WidgetTask','Task Deletion'),
-              Translator.text('WidgetTask','Task was successfully deleted.'), false);
+          DialogModal(context).show(Translator.text('WidgetTask', 'Task Deletion'),
+              Translator.text('WidgetTask', 'Task was successfully deleted.'), false);
           _retrieveTasks();
         },
         onError: (err) {
-          print(Translator.text('WidgetTask','Failed to delete task, reason: ') + err.toString());
+          print(Translator.text('WidgetTask', 'Failed to delete task, reason: ') + err.toString());
       });
   }
 
@@ -122,10 +125,10 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
         .then((listTasks) {
             _tasks = listTasks;
             _sortTasks(_sortAscending);
-            setState(() {});
+            _updateState();
           },
           onError: (err) {
-            print(Translator.text('WidgetTask','Failed to retrieve tasks, reason: ') + err.toString());
+            print(Translator.text('WidgetTask', 'Failed to retrieve tasks, reason: ') + err.toString());
           });
   }
 
@@ -135,7 +138,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            Translator.text('Common','Title'),
+            Translator.text('Common', 'Title'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -148,7 +151,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
         ),
         DataColumn(
           label: Text(
-            Translator.text('Common','Description'),
+            Translator.text('Common', 'Description'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),

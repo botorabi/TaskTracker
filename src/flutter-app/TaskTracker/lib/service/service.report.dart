@@ -23,7 +23,7 @@ class ServiceReport {
     String deltaTime = '/' + (fromDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString() +
                        '/' + (toDate.millisecondsSinceEpoch / (24*3600*1000)).floor().toString();
 
-    String teamIDsAsString = teamIDs.join(',');
+    String teamIDsAsString = teamIDs.join(', ');
     Response response = await get(Config.BASE_URL + '/api/report/team/' + teamIDsAsString +
                                    deltaTime + '/' + title + '/' + subTitle,
                                   headers: ServiceCommon.HTTP_HEADERS_REST_PDF);

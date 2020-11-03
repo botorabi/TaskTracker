@@ -82,7 +82,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        Translator.text('WidgetUser','Edit User Settings'),
+                        Translator.text('WidgetUser', 'Edit User Settings'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
@@ -91,7 +91,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: Text(
-                          Translator.text('WidgetUser','Login') + ': ' + _textEditingControllerLoginName.text,
+                          Translator.text('WidgetUser', 'Login') + ': ' + _textEditingControllerLoginName.text,
                         ),
                       ),
                     ),
@@ -115,7 +115,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                                   controller: _textEditingControllerLoginName,
                                   autofocus: true,
                                   decoration: InputDecoration(
-                                    labelText: Translator.text('WidgetUser','Login Name'),
+                                    labelText: Translator.text('WidgetUser', 'Login Name'),
                                   ),
                                 ),
                               ),
@@ -125,7 +125,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                               child: TextFormField(
                                 controller: _textEditingControllerRealName,
                                 decoration: InputDecoration(
-                                  labelText: Translator.text('WidgetUser','Real Name'),
+                                  labelText: Translator.text('WidgetUser', 'Real Name'),
                                 ),
                               ),
                             ),
@@ -134,7 +134,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                               child: TextFormField(
                                 controller: _textEditingControllerEMail,
                                 decoration: InputDecoration(
-                                  labelText: Translator.text('WidgetUser','E-Mail'),
+                                  labelText: Translator.text('WidgetUser', 'E-Mail'),
                                 ),
                               ),
                             ),
@@ -144,7 +144,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                                 controller: _textEditingControllerPassword,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  labelText: Translator.text('WidgetUser','Password'),
+                                  labelText: Translator.text('WidgetUser', 'Password'),
                                 ),
                               ),
                             ),
@@ -154,7 +154,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                                 controller: _textEditingControllerPasswordRepeat,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  labelText: Translator.text('WidgetUser','Repeat Password'),
+                                  labelText: Translator.text('WidgetUser', 'Repeat Password'),
                                 ),
                               ),
                             ),
@@ -171,7 +171,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                           child:
                           Padding(
                             padding: EdgeInsets.only(left: 20, top: topPadding),
-                            child: Config.authStatus.isAdmin() ? _widgetRoles : Text(Translator.text('WidgetUser','Role: User')),
+                            child: Config.authStatus.isAdmin() ? _widgetRoles : Text(Translator.text('WidgetUser', 'Role: User')),
                           ),
                         );
                       }
@@ -187,7 +187,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(Translator.text('Common','Cancel')),
+                    child: Text(Translator.text('Common', 'Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
@@ -215,15 +215,15 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
 
   void _createUser(BuildContext context) {
     if (_textEditingControllerPassword.text != _textEditingControllerPasswordRepeat.text) {
-      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Passwords do not match!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Passwords do not match!'), true);
       return;
     }
     if (_textEditingControllerPassword.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Please choose a password with at least 8 characters!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Please choose a password with at least 8 characters!'), true);
       return;
     }
     if (_textEditingControllerEMail.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Please choose a valid E-Mail address!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Please choose a valid E-Mail address!'), true);
       return;
     }
 
@@ -237,29 +237,29 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
     _serviceUser
         .createUser(userInfo)
         .then((id) {
-          DialogModal(context).show(Translator.text('WidgetUser','New User'), Translator.text('WidgetUser','New user was successfully created.'), false)
+          DialogModal(context).show(Translator.text('WidgetUser', 'New User'), Translator.text('WidgetUser', 'New user was successfully created.'), false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = Translator.text('WidgetUser','Could not create new user!\nReason: Given login name is already in use.');
+            text = Translator.text('WidgetUser', 'Could not create new user!\nReason: Given login name is already in use.');
           }
           else {
-            text = Translator.text('WidgetUser','Could not create new user!\nReason: ') + err.toString();
+            text = Translator.text('WidgetUser', 'Could not create new user!\nReason: ') + err.toString();
           }
-          DialogModal(context).show(Translator.text('Common','Attention'), text, true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), text, true);
         }
     );
   }
 
   void _applyChanges(BuildContext context) {
     if (_textEditingControllerPassword.text != _textEditingControllerPasswordRepeat.text) {
-      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Passwords do not match!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Passwords do not match!'), true);
       return;
     }
     if (_textEditingControllerEMail.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Please choose a valid E-Mail address!'), true);
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Please choose a valid E-Mail address!'), true);
       return;
     }
 
@@ -277,19 +277,19 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
       .editUser(userInfo)
       .then((success) {
           if (success) {
-            DialogModal(context).show(Translator.text('WidgetUser','Edit User'), Translator.text('Common','All changes successfully applied.'), false)
+            DialogModal(context).show(Translator.text('WidgetUser', 'Edit User'), Translator.text('Common', 'All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
-          DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('Common','Could not apply changes! Reason: ') + err.toString(), true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('Common', 'Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
   }
 
   void _retrieveUserInfo() {
     if(userId == 0) {
-      print(Translator.text('Common','Internal error, use this widget for an authenticated user'));
+      print(Translator.text('Common', 'Internal error, use this widget for an authenticated user'));
       return;
     }
 
@@ -311,7 +311,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
           setState(() {});
         },
         onError: (err) {
-          DialogModal(context).show(Translator.text('Common','Attention'), Translator.text('WidgetUser','Could not retrieve user info! Reason: ') + err.toString(), true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Could not retrieve user info! Reason: ') + err.toString(), true);
         }
     );
   }

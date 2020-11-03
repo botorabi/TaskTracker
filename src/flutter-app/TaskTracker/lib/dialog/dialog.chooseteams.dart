@@ -82,12 +82,12 @@ class DialogChooseTeams {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(Translator.text('WidgetTeam','Find Team'),
+                Text(Translator.text('WidgetTeam', 'Find Team'),
                     style: TextStyle(fontWeight: FontWeight.w500)
                 ),
                 TextField(
                   decoration: InputDecoration(
-                      hintText: Translator.text('Common','Enter at least 3 characters')
+                      hintText: Translator.text('Common', 'Enter at least 3 characters')
                   ),
                   onChanged: (value) {
                     _searchTeam(value).then((value) {
@@ -114,7 +114,7 @@ class DialogChooseTeams {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text(Translator.text('WidgetTeam','Found Teams'),
+                        child: Text(Translator.text('WidgetTeam', 'Found Teams'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -153,7 +153,7 @@ class DialogChooseTeams {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text(Translator.text('WidgetTeam','Chosen Teams'),
+                        child: Text(Translator.text('WidgetTeam', 'Chosen Teams'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,

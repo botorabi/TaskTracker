@@ -23,23 +23,17 @@ class WidgetTeamList extends StatefulWidget {
   WidgetTeamList({Key key, this.title = 'Teams'}) : super(key: key);
 
   final String title;
-  final _WidgetTeamListState _widgetTeamListState = _WidgetTeamListState();
 
   @override
-  _WidgetTeamListState createState() => _widgetTeamListState;
-
-  WidgetTeamList setExpanded(bool expanded) {
-    _widgetTeamListState.setExpanded(expanded);
-    return this;
-  }
+  _WidgetTeamListState createState() => _WidgetTeamListState();
 }
 
 class _WidgetTeamListState extends State<WidgetTeamList> {
 
+  bool _stateReady = false;
   final _serviceTeam = ServiceTeam();
   PaginatedDataTable _dataTable;
   List<Team> _teams = [];
-  bool _expanded = false;
   bool _sortAscending = true;
 
   @override
@@ -48,36 +42,44 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
     _retrieveTeams();
   }
 
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
-  }
-
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     _dataTable = _createDataTable();
+    _stateReady = true;
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: Card(
           elevation: 5,
           margin: EdgeInsets.all(10.0),
-          child:
-          ExpansionTile(
-              title: Text(widget.title),
-              initiallyExpanded: _expanded,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SizedBox(
-                    width: constraints.maxWidth,
-                    child: _dataTable,
-                  ),
-                )
-              ]
+          child: Column(
+            children: [
+              Visibility(
+                visible: widget.title != null && widget.title != '',
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: _dataTable,
+                ),
+              )
+            ]
           ),
         ),
       ),
@@ -91,7 +93,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   void _deleteTeam(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show(Translator.text('Common','Attention'), Translator.text('WidgetTeam','Do you really want to delete team \'') + name  + '?',
+        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetTeam', 'Do you really want to delete team \'') + name  + '?',
         ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
@@ -101,11 +103,11 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
     _serviceTeam
       .deleteTeam(id)
       .then((status) {
-          DialogModal(context).show(Translator.text('WidgetTeam','Team Deletion'), Translator.text('WidgetTeam','Team was successfully deleted.'), false);
+          DialogModal(context).show(Translator.text('WidgetTeam', 'Team Deletion'), Translator.text('WidgetTeam', 'Team was successfully deleted.'), false);
           _retrieveTeams();
         },
         onError: (err) {
-          print(Translator.text('WidgetTeam','Failed to delete team, reason: ') + err.toString());
+          print(Translator.text('WidgetTeam', 'Failed to delete team, reason: ') + err.toString());
       });
   }
 
@@ -122,10 +124,10 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         .then((listTeam) {
             _teams = listTeam;
             _sortTeams(_sortAscending);
-            setState(() {});
+            _updateState();
           },
           onError: (err) {
-            print(Translator.text('WidgetTeam','Failed to retrieve teams, reason: ') + err.toString());
+            print(Translator.text('WidgetTeam', 'Failed to retrieve teams, reason: ') + err.toString());
           });
   }
 
@@ -135,7 +137,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            Translator.text('Common','Name'),
+            Translator.text('Common', 'Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -154,13 +156,13 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         ),
         DataColumn(
           label: Text(
-            Translator.text('Common','Active'),
+            Translator.text('Common', 'Active'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            Translator.text('Common','Team Lead'),
+            Translator.text('Common', 'Team Lead'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -176,7 +178,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
       actions: [
         Visibility(
           visible: Config.authStatus.isAdmin(),
-          child: CircleButton.create(24, Icons.add_circle_rounded, () => _addTeam(), Translator.text('WidgetTeam','Add New Team')),
+          child: CircleButton.create(24, Icons.add_circle_rounded, () => _addTeam(), Translator.text('WidgetTeam', 'Add New Team')),
         ),
       ],
     );
@@ -195,7 +197,7 @@ class _DataProvider extends DataTableSource {
   DataRow getRow(int index) {
     String teamLeadNames = '';
     parent._teams[index].teamLeaderNames.forEach((userName) {
-      teamLeadNames += Utf8Utils.fromUtf8(userName) + ' ';
+      teamLeadNames += userName + ' ';
     });
 
     return DataRow.byIndex(
@@ -203,7 +205,7 @@ class _DataProvider extends DataTableSource {
       cells: [
         DataCell(Text(parent._teams[index].name)),
         DataCell(Text(parent._teams[index].description)),
-        DataCell(Text(parent._teams[index].active ? Translator.text('Common','Yes') : Translator.text('Common','No'))),
+        DataCell(Text(parent._teams[index].active ? Translator.text('Common', 'Yes') : Translator.text('Common', 'No'))),
         DataCell(Text(teamLeadNames)),
         DataCell(
           Row(

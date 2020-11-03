@@ -113,7 +113,7 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                         padding: const EdgeInsets.all(0.0),
                         child:
                         CircleButton.create(18, Icons.add_circle_rounded, () {
-                          DialogChooseUsers(context).show(Translator.text('Common','Users'), Translator.text('WidgetUser','Add New User'))
+                          DialogChooseUsers(context).show(Translator.text('Common', 'Users'), Translator.text('WidgetUser', 'Add New User'))
                               .then((chosenUsers) {
                               if (chosenUsers != null && chosenUsers.length > 0) {
                                 chosenUsers.forEach((userInfo) {
@@ -148,7 +148,8 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                     child: ListView(
                       children: <Widget>[
                         Column(
-                          children: _usersWidget),
+                          children: _usersWidget
+                        ),
                       ],
                     ),
                   ),
@@ -171,8 +172,8 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                 Text(userInfo.realName),
                 CircleButton.create(18, Icons.remove_circle_outlined, () {
                   DialogTwoButtonsModal(context)
-                          .show(Translator.text('Common','Attention'),
-                                Translator.text('WidgetUser','Do you really want to delete user ') + '\'' + userInfo.realName + '\'?',
+                          .show(Translator.text('Common', 'Attention'),
+                                Translator.text('WidgetUser', 'Do you really want to delete user ') + '\'' + userInfo.realName + '\'?',
                                 ButtonID.YES, ButtonID.NO)
                           .then((button) {
                                 if (button == ButtonID.YES) {

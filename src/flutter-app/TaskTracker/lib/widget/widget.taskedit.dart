@@ -73,7 +73,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        Translator.text('WidgetTaskEdit','Edit Task Settings'),
+                        Translator.text('WidgetTask', 'Edit Task Settings'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),
@@ -82,7 +82,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: Text(
-                          Translator.text('Common','Title') + ': ' + _textEditingControllerTitle.text,
+                          Translator.text('Common', 'Title') + ': ' + _textEditingControllerTitle.text,
                         ),
                       ),
                     ),
@@ -101,7 +101,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                                   child: TextFormField(
                                     controller: _textEditingControllerTitle,
                                     decoration: InputDecoration(
-                                      labelText: Translator.text('Common','Title'),
+                                      labelText: Translator.text('Common', 'Title'),
                                     ),
                                   ),
                                 ),
@@ -112,7 +112,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                                     maxLines: 5,
                                     maxLength: 255,
                                     decoration: InputDecoration(
-                                      labelText: Translator.text('Common','Description'),
+                                      labelText: Translator.text('Common', 'Description'),
                                       border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                     ),
                                   ),
@@ -123,7 +123,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                         ),
                         LayoutBuilder(
                             builder: (BuildContext context, BoxConstraints constraints) {
-                              double w = constraints.maxWidth < 535 ? 350 : 200;
+                              double w = constraints.maxWidth < 535 ? 350 : 230;
                               return ConstrainedBox(
                                 constraints: BoxConstraints(maxWidth: w),
                                 child: Padding(
@@ -147,7 +147,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
                   child: RaisedButton(
-                    child: Text(Translator.text('Common','Cancel')),
+                    child: Text(Translator.text('Common', 'Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
@@ -176,8 +176,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
   void _createTask(BuildContext context) {
     if (_textEditingControllerTitle.text.isEmpty) {
       DialogModal(context).show(
-          Translator.text('Common','Attention'),
-          Translator.text('WidgetTaskEdit','Please choose a task name!'), true);
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetTask', 'Please choose a task name!'), true);
       return;
     }
 
@@ -189,8 +189,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
 
     if ((task.users.length < 1) && (task.teams.length < 1)) {
       DialogModal(context).show(
-          Translator.text('Common','Attention'),
-          Translator.text('WidgetTaskEdit','Please choose at least one team or user affiliation.'), true);
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetTask', 'Please choose at least one team or user affiliation.'), true);
       return;
     }
 
@@ -198,19 +198,19 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
         .createTask(task)
         .then((id) {
           DialogModal(context).show(
-              Translator.text('WidgetTask','New Task'),
-              Translator.text('WidgetTask','New task was successfully created.'), false)
+              Translator.text('WidgetTask', 'New Task'),
+              Translator.text('WidgetTask', 'New task was successfully created.'), false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = Translator.text('WidgetTask','Could not create new task!\nReason: A task with given title already exists.');
+            text = Translator.text('WidgetTask', 'Could not create new task!\nReason: A task with given title already exists.');
           }
           else {
-            text = Translator.text('WidgetTask','Could not create new task!\nReason: ') + err.toString();
+            text = Translator.text('WidgetTask', 'Could not create new task!\nReason: ') + err.toString();
           }
-          DialogModal(context).show(Translator.text('Common','Attention'), text, true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), text, true);
         }
     );
   }
@@ -225,8 +225,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
 
     if ((task.users.length < 1) && (task.teams.length < 1)) {
       DialogModal(context).show(
-          Translator.text('Common','Attention'),
-          Translator.text('WidgetTask','Please choose at least one team or user affiliation.'), true);
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetTask', 'Please choose at least one team or user affiliation.'), true);
       return;
     }
 
@@ -235,14 +235,14 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
       .then((success) {
           if (success) {
             DialogModal(context).show(
-                Translator.text('WidgetTask','Edit Task'),
-                Translator.text('WidgetTask','All changes successfully applied.'), false)
+                Translator.text('WidgetTask', 'Edit Task'),
+                Translator.text('WidgetTask', 'All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
           DialogModal(context).show(
-              Translator.text('Common','Attention'),
+              Translator.text('Common', 'Attention'),
               Translator.text('WidgetTask', 'Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
@@ -250,7 +250,7 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
 
   void _retrieveTask() {
     if(taskId == 0) {
-      print(Translator.text('WidgetTask','Internal error, use this widget for an authenticated user'));
+      print(Translator.text('WidgetTask', 'Internal error, use this widget for an authenticated user'));
       return;
     }
 
@@ -267,8 +267,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
         },
         onError: (err) {
           DialogModal(context).show(
-              Translator.text('Common','Attention'),
-              Translator.text('WidgetTask','Could not retrieve task! Reason: ') + err.toString(), true);
+              Translator.text('Common', 'Attention'),
+              Translator.text('WidgetTask', 'Could not retrieve task! Reason: ') + err.toString(), true);
         }
     );
   }
