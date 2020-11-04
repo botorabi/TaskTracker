@@ -108,7 +108,8 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
           _retrieveTasks();
         },
         onError: (err) {
-          print(Translator.text('WidgetTask', 'Failed to delete task, reason: ') + err.toString());
+          DialogModal(context).show(Translator.text('Common', 'Attention'),
+              Translator.text('WidgetTask', 'Failed to delete task, it is already in use!'), true);
       });
   }
 

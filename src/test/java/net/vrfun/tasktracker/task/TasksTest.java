@@ -32,6 +32,8 @@ public class TasksTest {
     @Mock
     private TeamRepository teamRepository;
     @Mock
+    private ProgressRepository progressRepository;
+    @Mock
     private UserAuthenticator userAuthenticator;
 
     private Tasks tasks;
@@ -40,7 +42,7 @@ public class TasksTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        tasks = new Tasks(taskRepository, userRepository, teamRepository, userAuthenticator);
+        tasks = new Tasks(taskRepository, userRepository, teamRepository, progressRepository, userAuthenticator);
     }
 
     @Test

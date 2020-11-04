@@ -33,17 +33,20 @@ public class Tasks {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
+    private final ProgressRepository progressRepository;
     private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Tasks(@NonNull final TaskRepository taskRepository,
                  @NonNull final UserRepository userRepository,
                  @NonNull final TeamRepository teamRepository,
+                 @NonNull final ProgressRepository progressRepository,
                  @NonNull final UserAuthenticator userAuthenticator) {
 
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
+        this.progressRepository = progressRepository;
         this.userAuthenticator = userAuthenticator;
     }
 
@@ -125,6 +128,9 @@ public class Tasks {
     public void delete(long id) throws IllegalArgumentException {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isPresent()) {
+            if (progressRepository.countProgressByTaskId(id) > 0L) {
+                throw new IllegalArgumentException("Task is in use.");
+            }
             taskRepository.delete(task.get());
         }
         else {

@@ -24,6 +24,8 @@ public interface ProgressRepository extends CrudRepository<Progress, Long> {
 
     List<Progress> findProgressByOwnerIdOrderByReportWeekDesc(@NonNull final Long ownerId, @NonNull final Pageable pageable);
 
+    long countProgressByTaskId(@NonNull final Long taskId);
+
     List<Progress> findByTaskId(@NonNull final Long id);
 
     List<Progress> findByTaskIdAndReportWeekBetween(@NonNull final Long taskId,

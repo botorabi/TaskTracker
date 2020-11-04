@@ -52,9 +52,9 @@ const Translations_WidgetTask = {
     'en': 'Task was successfully deleted.',
     'de': 'Aufgabe wurde erfolgreich gelöscht.',
   },
-  ' Failed to delete task, reason: ': {
-    'en': 'Failed to delete task, reason: ',
-    'de': 'Aufgabe konnte nicht gelöscht werden, Grund: ',
+  'Failed to delete task, it is already in use!': {
+    'en': 'Failed to delete task, it is already in use!',
+    'de': 'Aufgabe konnte nicht gelöscht werden, sie wird verwendet!',
   },
   ' Failed to retrieve tasks, reason: ': {
     'en': 'Failed to retrieve tasks, reason: ',
