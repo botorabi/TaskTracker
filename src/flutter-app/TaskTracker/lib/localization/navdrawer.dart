@@ -23,10 +23,6 @@ const Translations_NavDrawer = {
     'en': 'Logout',
     'de': 'Abmelden',
   },
-  'Profile': {
-    'en': 'Profile',
-    'de': 'Benutzer',
-  },
   'Administration': {
     'en': 'Administration',
     'de': 'Verwaltung',

@@ -7,12 +7,8 @@
  */
 
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/navdrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/translator.dart';
-import 'package:TaskTracker/widget/widget.login.dart';
-import 'package:TaskTracker/widget/widget.progresslist.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 

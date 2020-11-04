@@ -87,6 +87,10 @@ const Translations_WidgetUser = {
     'en': 'Do you really want to delete user ',
     'de': 'Soll dieser Benutzer wirklich gelöscht werden: ',
   },
+  'Do you want to delete this user from the list: ': {
+    'en': 'Do you want to delete this user from the list: ',
+    'de': 'Soll dieser Nutzer aus der Liste gelöscht werden: '
+  },
   'User was successfully deleted.': {
     'en': 'User was successfully deleted.',
     'de': 'Benutzer wurde erfolgreich gelöscht.',

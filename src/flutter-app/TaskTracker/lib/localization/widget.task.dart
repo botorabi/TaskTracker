@@ -60,9 +60,13 @@ const Translations_WidgetTask = {
     'en': 'Failed to retrieve tasks, reason: ',
     'de': 'Aufgaben konnten nicht ausgelesen werden, Grund: ',
   },
-  'Add teams': {
+  'Add Teams': {
     'en': 'Add Teams',
     'de': 'Teams hinzufügen',
+  },
+  'Add Users': {
+    'en': 'Add Users',
+    'de': 'Benutzer hinzufügen',
   },
   'Affiliate Teams': {
     'en': 'Affiliate Teams',

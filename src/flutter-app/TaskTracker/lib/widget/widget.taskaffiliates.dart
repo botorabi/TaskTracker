@@ -149,7 +149,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                         padding: const EdgeInsets.only(top: 0.0),
                         child:
                         CircleButton.create(18, Icons.add_circle_rounded, () {
-                          DialogChooseTeams(context).show(Translator.text('Common', 'Teams'), Translator.text('WidgetTask', 'Add teams'))
+                          DialogChooseTeams(context).show(Translator.text('Common', 'Teams'), Translator.text('WidgetTask', 'Add Teams'))
                               .then((chosenTeams) {
                                 if (chosenTeams != null && chosenTeams.length > 0) {
                                   chosenTeams.forEach((team) {
@@ -210,7 +210,7 @@ class _WidgetTaskAffiliatesState extends State<WidgetTaskAffiliates> {
                         padding: const EdgeInsets.only(top: 15.0),
                         child:
                         CircleButton.create(18, Icons.add_circle_rounded, () {
-                          DialogChooseUsers(context).show(Translator.text('Common', 'Users'), Translator.text('WidgetTask', 'Add users.'))
+                          DialogChooseUsers(context).show(Translator.text('Common', 'Users'), Translator.text('WidgetTask', 'Add users'))
                               .then((chosenUsers) {
                                 if (chosenUsers != null && chosenUsers.length > 0) {
                                   chosenUsers.forEach((userInfo) {
