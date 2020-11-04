@@ -156,6 +156,12 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
           ),
         ),
         DataColumn(
+          label: Text(
+            Translator.text('Common', 'Teams'),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        DataColumn(
           label: Text(''),
         ),
       ],
@@ -181,11 +187,17 @@ class _DataProvider extends DataTableSource {
 
   @override
   DataRow getRow(int index) {
+    var teamNames = '';
+    parent._tasks[index].teamNames.forEach((name) {
+      teamNames += name + ' ';
+    });
+
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._tasks[index].title)),
-        DataCell(Text(parent._tasks[index].description)),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(parent._tasks[index].title))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 250), child: Text(parent._tasks[index].description))),
+        DataCell(Text(teamNames)),
         DataCell(
           Row(
             children: [

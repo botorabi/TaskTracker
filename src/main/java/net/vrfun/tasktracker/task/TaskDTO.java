@@ -27,6 +27,7 @@ public class TaskDTO {
     private Instant dateClosed;
     private Collection<Long> users;
     private Collection<Long> teams;
+    private Collection<String> teamNames;
 
     public TaskDTO() {}
 
@@ -42,7 +43,11 @@ public class TaskDTO {
         }
         if (task.getTeams() != null) {
             this.teams = new ArrayList<>();
-            task.getTeams().stream().forEach((team) -> this.teams.add(team.getId()));
+            this.setTeamNames(new ArrayList<>());
+            task.getTeams().stream().forEach((team) -> {
+                this.teams.add(team.getId());
+                this.getTeamNames().add(team.getName());
+            });
         }
     }
 
@@ -119,4 +124,12 @@ public class TaskDTO {
     public void setTeams(Collection<Long> teams) {
         this.teams = teams;
     }
- }
+
+    public Collection<String> getTeamNames() {
+        return teamNames;
+    }
+
+    public void setTeamNames(Collection<String> teamNames) {
+        this.teamNames = teamNames;
+    }
+}

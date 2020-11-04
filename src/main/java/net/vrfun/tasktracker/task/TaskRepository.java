@@ -21,6 +21,8 @@ public interface TaskRepository extends CrudRepository<Task, Long> {
 
     Optional<Task> findTaskByTitle(@NonNull final String title);
 
+    List<Task> findAll();
+
     @Query("select entry " +
             "from net.vrfun.tasktracker.task.Progress entry inner join " +
             "net.vrfun.tasktracker.task.Task task where task.id = :taskId")

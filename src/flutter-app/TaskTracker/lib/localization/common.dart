@@ -63,6 +63,10 @@ const Translations_Common = {
     'en': 'Users',
     'de': 'Benutzer',
   },
+  'Roles': {
+    'en': 'Roles',
+    'de': 'Rollen',
+  },
   'Text': {
     'en': 'Text',
     'de': 'Text',

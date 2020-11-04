@@ -19,6 +19,7 @@ class Task {
   DateTime dateClosed;
   List<int> users = [];
   List<int> teams = [];
+  List<String> teamNames = [];
 
   Task();
 
@@ -38,6 +39,11 @@ class Task {
     }
     if (fields.containsKey('teams')) {
       task.teams = List.from(fields['teams']);
+    }
+    if (fields.containsKey('teamNames')) {
+      task.teamNames = List.from(fields['teamNames'])
+          .map((name) => Utf8Utils.fromUtf8(name))
+          .toList();
     }
     return task;
   }

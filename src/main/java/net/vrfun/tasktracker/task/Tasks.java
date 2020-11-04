@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for handling with Tasks
@@ -133,14 +134,20 @@ public class Tasks {
 
     @NonNull
     public List<TaskDTO> getTasks() {
-        List<TaskDTO> tasks = new ArrayList<>();
-        final List<Task> allTasks = taskRepository.findUserTasks(userAuthenticator.getUser());
-        teamRepository.findUserTeams(userAuthenticator.getUser()).forEach(((team) ->
-                allTasks.addAll(taskRepository.findTeamTasks(team))));
+        if (userAuthenticator.isRoleAdmin()) {
+            return taskRepository.findAll().stream()
+                    .map((task) -> new TaskDTO(task))
+                    .collect(Collectors.toList());
+        }
+        else {
+            List<TaskDTO> tasks = new ArrayList<>();
+            final List<Task> allTasks = taskRepository.findUserTasks(userAuthenticator.getUser());
+            teamRepository.findUserTeams(userAuthenticator.getUser()).forEach(((team) ->
+                    allTasks.addAll(taskRepository.findTeamTasks(team))));
 
-        allTasks.forEach((task) -> tasks.add(new TaskDTO(task)));
-
-        return tasks;
+            allTasks.forEach((task) -> tasks.add(new TaskDTO(task)));
+            return tasks;
+        }
     }
 
     @NonNull

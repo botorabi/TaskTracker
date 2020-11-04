@@ -37,6 +37,7 @@ class WidgetRoles extends StatefulWidget {
 
 class _WidgetRolesState extends State<WidgetRoles> {
 
+  bool _stateReady = false;
   final _serviceUser = ServiceUser();
   List<Container> _rolesWidget = List<Container>();
   List<String> _userRoles = List<String>();
@@ -51,6 +52,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
 
   void setUserRoles(List<String> roles) {
     _userRoles = roles;
+    _createRolesUI(_availableRoles);
   }
 
   List<String> getUserRoles() {
@@ -59,15 +61,24 @@ class _WidgetRolesState extends State<WidgetRoles> {
 
   void setReadOnly(bool readOnly) {
     this._readOnly = readOnly;
+    _createRolesUI(_availableRoles);
   }
 
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    _stateReady = true;
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,9 +115,12 @@ class _WidgetRolesState extends State<WidgetRoles> {
     );
   }
 
-  void _createRolesUI(List<String> roles) {
+  void _createRolesUI(List<String> availableRoles) {
+    if (availableRoles == null) {
+      return;
+    }
     _rolesWidget = List<Container>();
-    roles.forEach((element) {
+    availableRoles.forEach((element) {
       _rolesWidget.add(Container(
         child:
           Row(
@@ -130,6 +144,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
         )
       );
     });
-    setState(() {});
+
+    _updateState();
   }
 }

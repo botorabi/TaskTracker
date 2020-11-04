@@ -41,7 +41,7 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
   final _textEditingControllerPassword = TextEditingController();
   final _textEditingControllerPasswordRepeat = TextEditingController();
 
-  WidgetRoles _widgetRoles = WidgetRoles(title: 'Roles');
+  WidgetRoles _widgetRoles = WidgetRoles(title: Translator.text('Common', 'Roles'));
 
   _WidgetUserEditState({this.userId}) {
     if (userId != 0) {

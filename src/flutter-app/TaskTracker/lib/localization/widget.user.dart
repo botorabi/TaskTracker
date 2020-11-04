@@ -13,7 +13,7 @@ const Translations_WidgetUser = {
   },
   'Last Login': {
     'en': 'Last Login',
-    'de': 'zuletzt eingeloggt',
+    'de': 'Zuletzt Online',
   },
   'Login Name': {
     'en': 'Login Name',

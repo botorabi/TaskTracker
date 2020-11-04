@@ -156,12 +156,6 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
         ),
         DataColumn(
           label: Text(
-            Translator.text('Common', 'Active'),
-            style: TextStyle(fontStyle: FontStyle.italic),
-          ),
-        ),
-        DataColumn(
-          label: Text(
             Translator.text('Common', 'Team Lead'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
@@ -203,10 +197,9 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._teams[index].name)),
-        DataCell(Text(parent._teams[index].description)),
-        DataCell(Text(parent._teams[index].active ? Translator.text('Common', 'Yes') : Translator.text('Common', 'No'))),
-        DataCell(Text(teamLeadNames)),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(parent._teams[index].name))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 250), child: Text(parent._teams[index].description))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 200), child: Text(teamLeadNames))),
         DataCell(
           Row(
             children: [

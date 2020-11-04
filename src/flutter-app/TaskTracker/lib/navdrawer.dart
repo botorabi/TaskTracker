@@ -77,14 +77,6 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
             },
           ),
-          ListTile(
-            leading: Icon(Icons.info),
-            title: Text(Translator.text('NavDrawer', 'About')),
-            onTap: () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
-            },
-          ),
           Visibility(
             visible: (Config.authStatus.authenticated == false),
             child: ListTile(
@@ -142,14 +134,6 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.info),
-                  title: Text(Translator.text('NavDrawer', 'About')),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
-                  },
-                ),
-                ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text(Translator.text('NavDrawer', 'Logout')),
                   onTap: () => {
@@ -160,8 +144,23 @@ class NavDrawer extends StatelessWidget {
                     }),
                   },
                 ),
-              ],
+            ],
             ),
+          ),
+          Divider(
+            color: Colors.grey,
+            height: 20,
+            thickness: 1,
+            indent: 20,
+            endIndent: 20,
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text(Translator.text('NavDrawer', 'About')),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
+            },
           ),
         ],
       ),

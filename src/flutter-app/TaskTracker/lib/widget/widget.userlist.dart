@@ -195,8 +195,8 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._users[index].realName)),
-        DataCell(Text(parent._users[index].login)),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(parent._users[index].realName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 80), child: Text(parent._users[index].login))),
         DataCell(
           Text(
             DateAndTimeFormatter.formatDate(parent._users[index].lastLogin) +
@@ -204,7 +204,7 @@ class _DataProvider extends DataTableSource {
             textAlign: TextAlign.center
           ),
         ),
-        DataCell(Text(parent._users[index].roles.join("\n").replaceAll(UserInfo.ROLE_PREFIX,''))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(parent._users[index].roles.join('\n').replaceAll(UserInfo.ROLE_PREFIX, '')))),
         DataCell(
           Row(
             children: [
