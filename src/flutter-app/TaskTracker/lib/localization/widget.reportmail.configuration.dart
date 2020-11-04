@@ -115,9 +115,9 @@ const Translations_WidgetReportMailConfiguration = {
     'en': 'Could not retrieve report configuration! Reason: ',
     'de': 'Berichtseinstellungen konnten nicht ausgelesen werden! Grund: ',
   },
-  'Do you really want to delete configuration ': {
-    'en': 'Do you really want to delete configuration ',
-    'de': 'Soll diese Konfiguration wirklich gelöscht werden: ',
+  'Do you really want to delete configuration "': {
+    'en': 'Do you really want to delete configuration "',
+    'de': 'Soll diese Konfiguration wirklich gelöscht werden: "',
   },
   'Configuration Deletion': {
     'en': 'Configuration Deletion',

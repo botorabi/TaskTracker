@@ -93,7 +93,7 @@ class _WidgetTeamListState extends State<WidgetTeamList> {
 
   void _deleteTeam(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
-        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetTeam', 'Do you really want to delete team \'') + name  + '?',
+        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetTeam', 'Do you really want to delete team "') + name  + '"?',
         ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {

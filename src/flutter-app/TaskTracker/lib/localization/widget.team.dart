@@ -47,9 +47,9 @@ const Translations_WidgetTeam = {
     'en': 'Team Deletion',
     'de': 'Team-Löschung',
   },
-  'Do you really want to delete team ': {
-    'en': 'Do you really want to delete team ',
-    'de': 'Soll dieses Team wirklich gelöscht werden: ',
+  'Do you really want to delete team "': {
+    'en': 'Do you really want to delete team "',
+    'de': 'Soll dieses Team wirklich gelöscht werden: "',
   },
   'Team was successfully deleted.': {
     'en': 'Team was successfully deleted.',

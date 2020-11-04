@@ -94,7 +94,7 @@ class _WidgetTaskListState extends State<WidgetTaskList> {
   void _deleteTask(int id, String name) async {
     var button = await DialogTwoButtonsModal(context)
         .show(Translator.text('Common', 'Attention'),
-        Translator.text('WidgetTask', 'Do you really want to delete task \'') + name +'\'?',
+        Translator.text('WidgetTask', 'Do you really want to delete task "') + name +'"?',
         ButtonID.YES, ButtonID.NO);
     if (button != ButtonID.YES) {
       return;

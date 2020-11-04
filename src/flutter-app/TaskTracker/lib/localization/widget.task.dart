@@ -40,9 +40,9 @@ const Translations_WidgetTask = {
     'en': 'Could not retrieve task! Reason: ',
     'de': 'Aufgabe konnte nicht ausgelesen werden! Grund: ',
   },
-  'Do you really want to delete task ': {
-    'en': 'Do you really want to delete task ',
-    'de': 'Soll diese Aufgabe wirklich gelöschen werden: ',
+  'Do you really want to delete task "': {
+    'en': 'Do you really want to delete task "',
+    'de': 'Soll diese Aufgabe wirklich gelöschen werden: "',
   },
   'Task Deletion': {
     'en': 'Task Deletion',

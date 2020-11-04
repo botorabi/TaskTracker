@@ -93,7 +93,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Do you really want to delete user \'') + realName + '\'?',
+        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Do you really want to delete user ') + realName + '?',
         ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {

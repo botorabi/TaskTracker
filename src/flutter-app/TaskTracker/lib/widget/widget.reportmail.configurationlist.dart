@@ -102,7 +102,7 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
     var button = await DialogTwoButtonsModal(context)
         .show(
         Translator.text('Common', 'Attention'),
-        Translator.text('WidgetReportMailConfiguration', 'Do you really want to delete configuration \'') + name + '\'?',
+        Translator.text('WidgetReportMailConfiguration', 'Do you really want to delete configuration "') + name + '"?',
         ButtonID.YES, ButtonID.NO);
     if (button != ButtonID.YES) {
       return;

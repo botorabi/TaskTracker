@@ -173,7 +173,7 @@ class _WidgetUserChooserState extends State<WidgetUserChooser> {
                 CircleButton.create(18, Icons.remove_circle_outlined, () {
                   DialogTwoButtonsModal(context)
                           .show(Translator.text('Common', 'Attention'),
-                                Translator.text('WidgetUser', 'Do you really want to delete user ') + '\'' + userInfo.realName + '\'?',
+                                Translator.text('WidgetUser', 'Do you really want to delete user ') + userInfo.realName + '?',
                                 ButtonID.YES, ButtonID.NO)
                           .then((button) {
                                 if (button == ButtonID.YES) {
