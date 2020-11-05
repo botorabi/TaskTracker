@@ -11,9 +11,13 @@ const Translations_WidgetProgressList = {
     'en': 'Current Calendar Week',
     'de': 'Aktuelle Kalenderwoche',
   },
-  'Add New Progress': {
-    'en': 'Add New Progress',
-    'de': 'Neuen Fortschritt erstellen',
+  'Progress Entries': {
+    'en': 'Progress Entries',
+    'de': 'Fortschrittseinträge',
+  },
+  'Add New Progress Entry': {
+    'en': 'Add New Progress Entry',
+    'de': 'Neuen Fortschrittseintrag erstellen',
   },
   'View Progress': {
     'en': 'View Progress',
@@ -39,4 +43,8 @@ const Translations_WidgetProgressList = {
     'en': 'Progress entry was successfully deleted.',
     'de': 'Fortschrittseintrag wurde erfolgreich gelöscht.'
   },
+  'Failed to delete progress entry, reason: ':{
+    'en': 'Failed to delete progress entry, reason: ',
+    'de': 'Fortschrittseintrag konnte nicht gelöscht werden, Grund: ',
+  }
 };

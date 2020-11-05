@@ -11,6 +11,10 @@ const Translations_AppTaskTracker = {
     'en': 'Task Tracker',
     'de': 'Task Tracker',
   },
+  'About': {
+    'en': 'About Task Tracker',
+    'de': 'Über Task Tracker',
+  },
   'User Profile': {
     'en': 'User Profile',
     'de': 'Benutzerprofil',

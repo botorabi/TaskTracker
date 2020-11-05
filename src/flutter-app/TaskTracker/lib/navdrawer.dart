@@ -156,7 +156,7 @@ class NavDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.info),
-            title: Text(Translator.text('NavDrawer', 'About')),
+            title: Text(Translator.text('AppTaskTracker', 'About')),
             onTap: () {
               Navigator.of(context).pop();
               Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);

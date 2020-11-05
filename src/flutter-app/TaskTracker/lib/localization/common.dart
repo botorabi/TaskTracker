@@ -51,6 +51,18 @@ const Translations_Common = {
     'en': 'Choose',
     'de': 'Wählen',
   },
+  'View': {
+    'en': 'View',
+    'de': 'Ansehen',
+  },
+  'Edit': {
+    'en': 'Edit',
+    'de': 'Bearbeiten',
+  },
+  'Delete': {
+    'en': 'Delete',
+    'de': 'Löschen',
+  },
   'Name': {
     'en': 'Name',
     'de': 'Name',

@@ -100,7 +100,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
               .then((value) { _dataProvider.updateCurrentPage(); });
         },
         onError: (err) {
-          print('Failed to delete progress entry, reason: ' + err.toString());
+          print(Translator.text('WidgetProgressList','Failed to delete progress entry, reason: ') + err.toString());
       });
   }
 
@@ -108,7 +108,8 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
     String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     String currentYear = CalendarUtils.getCurrentCalendarYear().toString();
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text(Translator.text('WidgetProgressList', 'Current Calendar Week') + ' ' + currentYear + ' / ' + currentWeek),
+      header: Text(Translator.text('WidgetProgressList', 'Progress Entries') + '(' +
+                    Translator.text('WidgetProgressList', 'Current Calendar Week') + ': ' + currentYear + ' / ' + currentWeek + ')'),
       columns: <DataColumn>[
         DataColumn(
           label: Text(
@@ -130,7 +131,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
       source: _dataProvider,
       sortColumnIndex: 0,
       actions: [
-        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), Translator.text('WidgetProgressList', 'Add New Progress')),
+        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), Translator.text('WidgetProgressList', 'Add New Progress Entry')),
       ],
     );
 
@@ -213,7 +214,7 @@ class _DataProvider extends DataTableSource {
                   CircleButton.create(24, Icons.visibility, () {
                     _showProgressEntry(_progresses[index]);
                   },
-                  Translator.text('WidgetProgressList', 'View Progress')),
+                  Translator.text('Common', 'View')),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
@@ -227,7 +228,7 @@ class _DataProvider extends DataTableSource {
                      }
                     );
                   },
-                  Translator.text('WidgetProgressList', 'Edit Progress'),
+                  Translator.text('Common', 'Edit'),
                 ),
               ),
               Padding(
@@ -235,7 +236,7 @@ class _DataProvider extends DataTableSource {
                 child:
                   CircleButton.create(24, Icons.delete,
                     !modifiable ? null :  () => parent._deleteProgress(_progresses[index].id),
-                    Translator.text('WidgetProgressList', 'Delete Progress'),
+                    Translator.text('Common', 'Delete'),
                 ),
               ),
             ],

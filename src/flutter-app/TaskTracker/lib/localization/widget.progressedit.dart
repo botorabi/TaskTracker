@@ -9,7 +9,7 @@
 const Translations_WidgetProgressEdit = {
   'Edit Progress Entry': {
     'en': 'Edit Progress Entry',
-    'de': 'Fortschritt anpassen',
+    'de': 'Fortschrittseintrag bearbeiten',
   },
   'Your Progress Description': {
     'en': 'Your Progress Description',
@@ -53,11 +53,11 @@ const Translations_WidgetProgressEdit = {
   },
   'Could not apply changes to progress entry!\nPlease choose a task and proper calendar week.\nA maximum calendar week distance of 4 is allowed.': {
     'en': 'Could not apply changes to progress entry!\nPlease choose a task and proper calendar week.\nA maximum calendar week distance of 4 is allowed.',
-    'de': 'Durchführung der Änderungen fehlgeschlagen!\nBitte wählen Sie eine Aufgabe sowie eine passende Kalenderwoche.\nDie Kalenderwoche kann maximal 4 Wochen in der Zukunft oder Vergangenheit liegen.',
+    'de': 'Änderungen konnten nicht übernommen werden!\nBitte wählen Sie eine Aufgabe sowie eine passende Kalenderwoche.\nDie Kalenderwoche kann maximal 4 Wochen in der Zukunft oder Vergangenheit liegen.',
   },
   'Could not create new progress entry!\nPlease choose a task and proper calendar week.\nA maximum calendar week distance of 4 is allowed.': {
     'en': 'Could not create new progress entry!\nPlease choose a task and proper calendar week.\nA maximum calendar week distance of 4 is allowed.',
-    'de': 'Konnte keinen neuen Fortschrittseintrag erstellen!\nBitte wählen Sie eine Aufgabe sowie eine passende Kalenderwoche.\nDie Kalenderwoche kann maximal 4 Wochen in der Zukunft oder Vergangenheit liegen.',
+    'de': 'Neuer Fortschrittseintrag konnte nicht erstellt werden!\nBitte wählen Sie eine Aufgabe sowie eine passende Kalenderwoche.\nDie Kalenderwoche kann maximal 4 Wochen in der Zukunft oder Vergangenheit liegen.',
   },
   'Could not retrieve progress entry! Reason: ': {
     'en': 'Could not retrieve progress entry! Reason: ',
