@@ -57,15 +57,15 @@ const Translations_AppTaskTracker = {
   },
   'Create New Progress Entry': {
     'en': 'Create New Progress Entry',
-    'de': 'Neuen Fortschritt erstellen',
+    'de': 'Neuen Aufgabenfortschritt erstellen',
   },
   'Edit Progress Entry': {
     'en': 'Edit Progress Entry',
-    'de': 'Fortschritt - Einstellungen',
+    'de': 'Aufgabenfortschritt bearbeiten',
   },
   'Create New Report Configuration': {
     'en': 'Create New Report Configuration',
-    'de': 'Fortschritt - Berichtskonfiguration erstellen',
+    'de': 'Aufgabenfortschritt - Berichtskonfiguration erstellen',
   },
   'Edit Report Configuration': {
     'en': 'Edit Report Configuration',

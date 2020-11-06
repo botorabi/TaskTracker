@@ -83,8 +83,8 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
-                      child: Text(
-                        Translator.text('WidgetProgressEdit', 'Edit Progress Entry'),
+                      child: Text( _newProgress ?
+                        Translator.text('WidgetProgressEdit', 'Progress Entry') : Translator.text('WidgetProgressEdit', 'Edit Progress Entry'),
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     ),

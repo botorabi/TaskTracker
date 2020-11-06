@@ -13,38 +13,38 @@ const Translations_WidgetProgressList = {
   },
   'Progress Entries': {
     'en': 'Progress Entries',
-    'de': 'Fortschrittseinträge',
+    'de': 'Aufgabenfortschritte',
   },
   'Add New Progress Entry': {
     'en': 'Add New Progress Entry',
-    'de': 'Neuen Fortschrittseintrag erstellen',
+    'de': 'Neuen Aufgabenfortschritt erstellen',
   },
   'View Progress': {
     'en': 'View Progress',
-    'de': 'Fortschritt ansehen',
+    'de': 'Aufgabenfortschritt ansehen',
   },
   'Edit Progress': {
     'en': 'Edit Progress',
-    'de': 'Fortschritt anpassen',
+    'de': 'Aufgabenfortschritt bearbeiten',
   },
   'Delete Progress': {
     'en': 'Delete Progress',
-    'de': 'Fortschritt löschen',
+    'de': 'Aufgabenfortschritt löschen',
   },
   'Do you really want to delete the progress entry?': {
     'en': 'Do you really want to delete the progress entry?',
-    'de': 'Soll der Fortschrittseintrag wirklich gelöscht werden?',
+    'de': 'Soll der Aufgabenfortschritt wirklich gelöscht werden?',
   },
   'Progress Deletion': {
     'en': 'Progress Deletion',
-    'de': 'Löschen des Fortschrittseintrags'
+    'de': 'Löschen des Aufgabenfortschritts'
   },
   'Progress entry was successfully deleted.': {
     'en': 'Progress entry was successfully deleted.',
-    'de': 'Fortschrittseintrag wurde erfolgreich gelöscht.'
+    'de': 'Aufgabenfortschritt wurde erfolgreich gelöscht.'
   },
   'Failed to delete progress entry, reason: ':{
     'en': 'Failed to delete progress entry, reason: ',
-    'de': 'Fortschrittseintrag konnte nicht gelöscht werden, Grund: ',
+    'de': 'Aufgabenfortschritt konnte nicht gelöscht werden, Grund: ',
   }
 };
