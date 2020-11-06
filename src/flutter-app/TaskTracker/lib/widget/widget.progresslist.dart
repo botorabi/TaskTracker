@@ -105,11 +105,16 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   PaginatedDataTable _createDataTable() {
-    String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     String currentYear = CalendarUtils.getCurrentCalendarYear().toString();
+    String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text(Translator.text('WidgetProgressList', 'Progress Entries') + '(' +
-                    Translator.text('WidgetProgressList', 'Current Calendar Week') + ': ' + currentYear + ' / ' + currentWeek + ')'),
+      header: Column(
+        children: [
+          Text(Translator.text('WidgetProgressList', 'Progress Entries')),
+          Text(Translator.text('WidgetProgressList', 'Current Calendar Week') + ': ' + currentWeek+ ' / ' + currentYear,
+               style: TextStyle(fontSize: 12)),
+        ],
+      ),
       columns: <DataColumn>[
         DataColumn(
           label: Text(

@@ -62,9 +62,9 @@ class _WidgetCalendarWeekState extends State<WidgetCalendarWeek> {
         Text(widget.title),
         Row(
           children: [
-            _calendarYearDropdownButton,
-            SizedBox(width: 10.0),
             _calendarWeekDropdownButton,
+            SizedBox(width: 10.0),
+            _calendarYearDropdownButton,
           ],
         )
       ],
