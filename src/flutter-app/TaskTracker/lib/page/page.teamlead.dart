@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagedrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.reportmail.configurationlist.dart';
@@ -45,6 +46,7 @@ class _PageTeamLeadState extends State<PageTeamLead> with SingleTickerProviderSt
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildNavigateBack(),
       ),
       persistentFooterButtons: PageFooter.build(),
       body: Center(

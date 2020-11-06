@@ -46,7 +46,7 @@ public class ProgressDTO {
         }
         if (progress.getTags() != null) {
             this.tags = new ArrayList<>();
-            progress.getTags().stream().forEach((tag) -> this.tags.add(tag.getName()));
+            progress.getTags().forEach((tag) -> this.tags.add(tag.getName()));
         }
     }
 

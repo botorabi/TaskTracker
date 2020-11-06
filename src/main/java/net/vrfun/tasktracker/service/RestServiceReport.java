@@ -22,7 +22,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -124,10 +123,10 @@ public class RestServiceReport {
                                                               @PathVariable("fromDaysSinceEpoch") final String fromDate,
                                                               @PathVariable("toDaysSinceEpoch")   final String toDate,
                                                               @PathVariable("title")              final String title,
-                                                              @PathVariable("subTitle")           final String subTitle) throws IOException {
+                                                              @PathVariable("subTitle")           final String subTitle) {
 
-        List<Long> ids = Arrays.asList(teamIDs.split(",")).stream()
-                .map((idAsString) -> Long.valueOf(idAsString))
+        List<Long> ids = Arrays.stream(teamIDs.split(","))
+                .map(Long::valueOf)
                 .collect(Collectors.toList());
 
         if (!reports.validateUserAccess(ids)) {

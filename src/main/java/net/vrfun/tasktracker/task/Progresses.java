@@ -13,7 +13,6 @@ import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.lang.*;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -97,7 +96,7 @@ public class Progresses {
     @Nullable
     public ProgressDTO get(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
-        if (!progress.isPresent()) {
+        if (progress.isEmpty()) {
             return null;
         }
 
@@ -250,7 +249,7 @@ public class Progresses {
 
     protected void setProgressTaskAndTags(@NonNull final Progress newProgress, @NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
-        if (!task.isPresent()) {
+        if (task.isEmpty()) {
             LOGGER.debug("Cannot set progress task. Task with given ID does not exist!");
             throw new IllegalArgumentException("Cannot set progress task. Task with given ID does not exist!");
         }
@@ -258,9 +257,7 @@ public class Progresses {
 
         Collection<Tag> progressTags = new ArrayList<>();
         if (reqProgressEdit.getTags() != null) {
-            reqProgressEdit.getTags()
-                    .stream()
-                    .forEach((tagName) -> progressTags.add(tags.getOrCreate(tagName)));
+            reqProgressEdit.getTags().forEach((tagName) -> progressTags.add(tags.getOrCreate(tagName)));
         }
         newProgress.setTags(progressTags);
     }
@@ -268,7 +265,7 @@ public class Progresses {
     @NonNull
     public Progress editProgress(@NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Progress> foundProgress = progressRepository.findById(reqProgressEdit.getId());
-        if (!foundProgress.isPresent()) {
+        if (foundProgress.isEmpty()) {
             throw new IllegalArgumentException("A progress entry with given ID does not exist!");
         }
 
@@ -290,7 +287,7 @@ public class Progresses {
             foundProgress.get().setText(reqProgressEdit.getText());
         }
 
-        if ((reqProgressEdit.getTask() != null) &&
+        if ((reqProgressEdit.getTask() != null) && (foundProgress.get().getTask() != null) &&
                 (!foundProgress.get().getTask().getId().equals(reqProgressEdit.getTask()))) {
 
             Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());

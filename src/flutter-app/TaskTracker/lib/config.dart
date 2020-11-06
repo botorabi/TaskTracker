@@ -25,7 +25,7 @@ class Config {
   /// Adapt the base URL if e.g. your server is behind a reverse proxy, or
   /// during the development set it to 'http://localhost:8080' in order to
   /// use Flutter's devtools server.
-  static const String BASE_URL = 'http://localhost:8080';
+  static const String BASE_URL = '';
 
   static const double DEFAULT_PANEL_WIDTH = 800;
 

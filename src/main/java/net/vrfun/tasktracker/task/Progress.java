@@ -13,8 +13,7 @@ import org.springframework.lang.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.*;
-import java.time.temporal.TemporalField;
-import java.util.*;
+import java.util.Collection;
 
 @Entity
 public class Progress extends BaseEntity implements Serializable {

@@ -7,8 +7,9 @@
  */
 
 import 'package:TaskTracker/config.dart';
-import 'package:TaskTracker/translator.dart';
+import 'package:TaskTracker/page/pagedrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.reportmail.configurationlist.dart';
 import 'package:TaskTracker/widget/widget.tasklist.dart';
 import 'package:TaskTracker/widget/widget.teamlist.dart';
@@ -46,6 +47,7 @@ class _PageAdminState extends State<PageAdmin> with SingleTickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildNavigateBack(),
       ),
       persistentFooterButtons: PageFooter.build(),
       body: Center(

@@ -7,7 +7,6 @@
  */
 package net.vrfun.tasktracker.task;
 
-import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.*;
 import org.springframework.stereotype.Service;
@@ -40,10 +39,7 @@ public class Tags {
     @Nullable
     public Tag get(long id) {
         Optional<Tag> tag = tagRepository.findById(id);
-        if (tag.isPresent()) {
-            return tag.get();
-        }
-        return null;
+        return tag.orElse(null);
     }
 
     @Nullable
@@ -54,12 +50,7 @@ public class Tags {
     @NonNull
     public Tag getOrCreate(@NonNull final String name) {
         Optional<Tag> tag = tagRepository.findTagByName(name);
-        if (tag.isPresent()) {
-            return tag.get();
-        }
-        else {
-            return tagRepository.save(new Tag(name));
-        }
+        return tag.orElseGet(() -> tagRepository.save(new Tag(name)));
     }
 
     public void delete(@NonNull final String name) throws IllegalArgumentException {

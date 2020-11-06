@@ -11,7 +11,6 @@ import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:TaskTracker/service/service.login.dart';
 import 'package:TaskTracker/translator.dart';
-import 'package:TaskTracker/widget/widget.sessiontimeout.dart';
 import 'package:flutter/material.dart';
 
 class NavDrawer extends StatelessWidget {

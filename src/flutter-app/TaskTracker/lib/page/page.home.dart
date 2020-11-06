@@ -8,6 +8,7 @@
 
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/navdrawer.dart';
+import 'package:TaskTracker/page/pagedrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.login.dart';
@@ -32,6 +33,7 @@ class _PageHomeState extends State<PageHome> {
       drawer: NavDrawer(),
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildOpenDrawer(),
       ),
       persistentFooterButtons: PageFooter.build(),
       body: ListView(

@@ -70,12 +70,7 @@ public class Tasks {
     @NonNull
     public Task getOrCreate(@NonNull final String title) {
         Optional<Task> task = taskRepository.findTaskByTitle(title);
-        if (task.isPresent()) {
-            return task.get();
-        }
-        else {
-            return taskRepository.save(new Task(title));
-        }
+        return task.orElseGet(() -> taskRepository.save(new Task(title)));
     }
 
     @NonNull
@@ -85,7 +80,7 @@ public class Tasks {
         }
 
         Optional<Task> task = taskRepository.findById(taskEdit.getId());
-        if (!task.isPresent()) {
+        if (task.isEmpty()) {
             throw new IllegalArgumentException("Task does not exists.");
         }
         task.get().setTitle(taskEdit.getTitle());
@@ -104,7 +99,7 @@ public class Tasks {
         Collection<Team> teams = new ArrayList<>();
 
         if (taskEdit.getUsers() != null) {
-            taskEdit.getUsers().stream().forEach((userID) -> {
+            taskEdit.getUsers().forEach((userID) -> {
                 Optional<User> user = userRepository.findById(userID);
                 user.ifPresentOrElse(
                         (foundUser) -> users.add(user.get()),
@@ -113,7 +108,7 @@ public class Tasks {
         }
 
         if (taskEdit.getTeams() != null) {
-            taskEdit.getTeams().stream().forEach((teamID) -> {
+            taskEdit.getTeams().forEach((teamID) -> {
                 Optional<Team> team = teamRepository.findById(teamID);
                 team.ifPresentOrElse(
                         (foundTeam) -> teams.add(team.get()),
@@ -129,7 +124,7 @@ public class Tasks {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isPresent()) {
             if (progressRepository.countProgressByTaskId(id) > 0L) {
-                throw new IllegalArgumentException("Task is in use.");
+                throw new IllegalArgumentException("Task '" + task.get().getTitle() + "' is in use!");
             }
             taskRepository.delete(task.get());
         }
@@ -142,7 +137,7 @@ public class Tasks {
     public List<TaskDTO> getTasks() {
         if (userAuthenticator.isRoleAdmin()) {
             return taskRepository.findAll().stream()
-                    .map((task) -> new TaskDTO(task))
+                    .map(TaskDTO::new)
                     .collect(Collectors.toList());
         }
         else {

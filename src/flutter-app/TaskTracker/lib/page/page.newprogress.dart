@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/page/pagedrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.progressedit.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class _PageNewProgressState extends State<PageNewProgress> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildNavigateBack(),
       ),
       persistentFooterButtons: PageFooter.build(),
       body: ListView(

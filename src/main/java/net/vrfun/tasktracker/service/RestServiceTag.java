@@ -34,7 +34,7 @@ public class RestServiceTag {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private Tags tags;
+    private final Tags tags;
 
     @Autowired
     public RestServiceTag(@NonNull final Tags tags) {

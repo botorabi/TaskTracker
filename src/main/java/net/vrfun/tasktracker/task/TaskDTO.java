@@ -39,12 +39,12 @@ public class TaskDTO {
         this.dateClosed = task.getDateClosed();
         if (task.getUsers() != null) {
             this.users = new ArrayList<>();
-            task.getUsers().stream().forEach((user) -> this.users.add(user.getId()));
+            task.getUsers().forEach((user) -> this.users.add(user.getId()));
         }
         if (task.getTeams() != null) {
             this.teams = new ArrayList<>();
             this.setTeamNames(new ArrayList<>());
-            task.getTeams().stream().forEach((team) -> {
+            task.getTeams().forEach((team) -> {
                 this.teams.add(team.getId());
                 this.getTeamNames().add(team.getName());
             });

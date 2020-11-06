@@ -23,7 +23,7 @@ const Translations_WidgetTask = {
   'New task was successfully created.': {
     'en': 'New task was successfully created.',
     'de': 'Neue Aufgabe wurde erfolgreich angelegt.',
-},
+  },
   'Could not create new task!\nReason: ': {
     'en': 'Could not create new task!\nReason: ',
     'de': 'Neue Aufgabe konnte nicht angelegt werden!\nGrund: ',
@@ -31,7 +31,7 @@ const Translations_WidgetTask = {
   'Could not create new task!': {
     'en': 'Could not create new task!',
     'de': 'Neue Aufgabe konnte nicht angelegt werden!',
-},
+  },
   'Could not create new task!\nReason: A task with given title already exists.': {
     'en': 'Could not create new task!\nReason: A task with given title already exists.',
     'de': 'Neue Aufgabe konnte nicht angelegt werden!\nGrund: Es existiert bereits eine Aufgabe mit dem angegebenen Titel.',
@@ -56,7 +56,7 @@ const Translations_WidgetTask = {
     'en': 'Failed to delete task, it is already in use!',
     'de': 'Aufgabe konnte nicht gelöscht werden, sie wird verwendet!',
   },
-  ' Failed to retrieve tasks, reason: ': {
+  'Failed to retrieve tasks, reason: ': {
     'en': 'Failed to retrieve tasks, reason: ',
     'de': 'Aufgaben konnten nicht ausgelesen werden, Grund: ',
   },

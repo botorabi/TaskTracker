@@ -7,6 +7,7 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagedrawer.dart';
 import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class _PageAboutState extends State<PageAbout> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildNavigateBack(),
       ),
       persistentFooterButtons: PageFooter.build(),
       body: ListView(
