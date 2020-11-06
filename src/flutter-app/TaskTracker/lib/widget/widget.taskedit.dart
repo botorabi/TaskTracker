@@ -235,8 +235,8 @@ class _WidgetTaskEditState extends State<WidgetTaskEdit> {
       .then((success) {
           if (success) {
             DialogModal(context).show(
-                Translator.text('WidgetTask', 'Edit Task'),
-                Translator.text('WidgetTask', 'All changes successfully applied.'), false)
+                Translator.text('AppTaskTracker', 'Edit Task'),
+                Translator.text('Common', 'All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
