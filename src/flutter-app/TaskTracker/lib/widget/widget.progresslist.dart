@@ -151,7 +151,7 @@ class _DataProvider extends DataTableSource {
   _DataProvider(this.parent, this.maxRowCount);
 
   void sortProgress(bool ascending) {
-    _progresses.sort((progressA, progressB) => progressA.reportWeek?.compareTo(progressB?.reportWeek));
+    _progresses.sort((progressA, progressB) => progressA.dateCreation?.compareTo(progressB?.dateCreation));
     if (!ascending) {
       _progresses = _progresses.reversed.toList();
     }
@@ -170,6 +170,7 @@ class _DataProvider extends DataTableSource {
           _currentPage = progressPaged.currentPage;
           _progresses = progressPaged.progressList;
           _fetchingData = false;
+          sortProgress(false);
           notifyListeners();
         },
         onError: (err) {
