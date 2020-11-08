@@ -228,31 +228,32 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                     )
                                 ),
                                 Spacer(),
-                                DropdownButton<String>(
-                                  items: [
-                                    DropdownMenuItem<String>(
-                                      child: Text(''),
-                                      value: '',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Weekly')),
-                                      value: 'PERIOD_WEEKLY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Monthly')),
-                                      value: 'PERIOD_MONTHLY',
-                                    ),
-                                  ],
-                                  onChanged: (String value) {
-                                    setState(() {
-                                      _reportPeriod = value;
-                                    });
-                                  },
-                                  hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Period')),
-                                  value: _reportPeriod,
+                                SizedBox(
+                                  width: 120,
+                                  child:
+                                  DropdownButton<String>(
+                                    items: [
+                                      DropdownMenuItem<String>(
+                                        child: Text(Translator.text('Common', 'Weekly')),
+                                        value: 'PERIOD_WEEKLY',
+                                      ),
+                                      DropdownMenuItem<String>(
+                                        child: Text(Translator.text('Common', 'Monthly')),
+                                        value: 'PERIOD_MONTHLY',
+                                      ),
+                                    ],
+                                    onChanged: (String value) {
+                                      setState(() {
+                                        _reportPeriod = value;
+                                      });
+                                    },
+                                    //hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Period')),
+                                    value: _reportPeriod,
+                                  ),
                                 ),
-                              ],
+                             ],
                             ),
+                            SizedBox(height: 10),
                             Row(
                               children: [
                                 Padding(
@@ -263,51 +264,53 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                     )
                                 ),
                                 Spacer(),
-                                DropdownButton<String>(
-                                  items: [
-                                    DropdownMenuItem<String>(
-                                      child: Text(''),
-                                      value: '',
+                                SizedBox(
+                                  width: 120,
+                                  child:
+                                    DropdownButton<String>(
+                                      isDense: true,
+                                      items: [
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Monday')),
+                                          value: 'WEEKDAY_MONDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Tuesday')),
+                                          value: 'WEEKDAY_TUESDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Wednesday')),
+                                          value: 'WEEKDAY_WEDNESDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Thursday')),
+                                          value: 'WEEKDAY_THURSDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Friday')),
+                                          value: 'WEEKDAY_FRIDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Saturday')),
+                                          value: 'WEEKDAY_SATURDAY',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('Common', 'Sunday')),
+                                          value: 'WEEKDAY_SUNDAY',
+                                        ),
+                                      ],
+                                      onChanged: (String value) {
+                                        setState(() {
+                                          _reportWeekDay = value;
+                                        });
+                                      },
+                                      //hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Week Day')),
+                                      value: _reportWeekDay,
                                     ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Monday')),
-                                      value: 'WEEKDAY_MONDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Tuesday')),
-                                      value: 'WEEKDAY_TUESDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Wednesday')),
-                                      value: 'WEEKDAY_WEDNESDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Thursday')),
-                                      value: 'WEEKDAY_THURSDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Friday')),
-                                      value: 'WEEKDAY_FRIDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Saturday')),
-                                      value: 'WEEKDAY_SATURDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text(Translator.text('Common', 'Sunday')),
-                                      value: 'WEEKDAY_SUNDAY',
-                                    ),
-                                  ],
-                                  onChanged: (String value) {
-                                    setState(() {
-                                      _reportWeekDay = value;
-                                    });
-                                  },
-                                  hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Week Day')),
-                                  value: _reportWeekDay,
                                 ),
                               ],
                             ),
+                            SizedBox(height: 10),
                             Row(
                               children: [
                                 Padding(
