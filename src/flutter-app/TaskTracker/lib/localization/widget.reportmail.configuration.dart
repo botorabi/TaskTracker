@@ -111,6 +111,10 @@ const Translations_WidgetReportMailConfiguration = {
     'en': 'Please choose a subject for report mail!',
     'de': 'Bitte einen Betreff für die Berichts-Mail wählen',
   },
+  'Please choose a valid Report Time!': {
+    'en': 'Please choose a valid Report Time!',
+    'de': 'Bitte einen gültigen Berichtszeitpunkt wählen',
+  },
   'Could not retrieve report configuration! Reason: ': {
     'en': 'Could not retrieve report configuration! Reason: ',
     'de': 'Berichtseinstellungen konnten nicht ausgelesen werden! Grund: ',
