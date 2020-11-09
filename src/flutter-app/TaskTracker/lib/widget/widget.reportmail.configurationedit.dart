@@ -480,7 +480,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
     if (_textEditingControllerMailSubject.text.isEmpty) {
       DialogModal(context).show(
           Translator.text('Common', 'Attention'),
-          Translator.text('WidgetReportMailConfiguration', 'Pleasedsd choose a subject for report mail!'), true);
+          Translator.text('WidgetReportMailConfiguration', 'Please choose a subject for report mail!'), true);
       return false;
     }
 
@@ -488,7 +488,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
     try {
       int hour = int.parse(_textEditingControllerReportHour.text);
       int minute = int.parse(_textEditingControllerReportMinute.text);
-      if (!((hour >= 0) && (hour < 12)) || !((minute >= 0) && (minute < 60))) {
+      if (!((hour >= 0) && (hour < 24)) || !((minute >= 0) && (minute < 60))) {
         validReportTime = false;
       }
     } catch(ignored) {
