@@ -94,7 +94,7 @@ public class ReportGeneratorService {
         teams.forEach((team) -> {
             String recipients = "";
             try {
-                recipients = getAllRecipients(team, additionalRecipients);
+                recipients = getAllRecipients(team, additionalRecipients, configuration.getReportToTeamMembers());
                 if (!recipients.isEmpty()) {
                     ByteArrayOutputStream reportDocument =
                             reportComposer.createTeamReport(
@@ -127,6 +127,7 @@ public class ReportGeneratorService {
         });
     }
 
+    @NonNull
     protected LocalDate calculateReportBeginDate(@NonNull final LocalDate reportEndDate, @NonNull final ReportMailConfiguration configuration) {
         switch(configuration.getReportPeriod()) {
             case PERIOD_WEEKLY:
@@ -141,14 +142,21 @@ public class ReportGeneratorService {
     }
 
     @NonNull
-    protected String getAllRecipients(@Nullable final Team team, @Nullable final List<User> additionalRecipients) {
+    protected String getAllRecipients(@Nullable final Team team, @Nullable final List<User> additionalRecipients, boolean addAllMembers) {
         Set<String> allRecipients = new HashSet<>();
         if (team != null) {
-            team.getTeamLeaders().forEach((user) -> appendUserEmailAddress(allRecipients, user));
+            if (team.getTeamLeaders() != null) {
+                team.getTeamLeaders().forEach((user) -> appendUserEmailAddress(allRecipients, user));
+            }
+            if (addAllMembers && (team.getUsers() != null)) {
+                team.getUsers().forEach((user) -> appendUserEmailAddress(allRecipients, user));
+            }
         }
+
         if (additionalRecipients != null) {
             additionalRecipients.forEach((user) -> appendUserEmailAddress(allRecipients, user));
         }
+
         if (allRecipients.isEmpty()) {
             return "";
         }
