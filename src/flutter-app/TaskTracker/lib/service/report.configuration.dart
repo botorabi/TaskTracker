@@ -14,11 +14,12 @@ class ReportMailConfiguration {
 
   int id;
   String name = '';
+  String language = '';
   String mailSenderName = '';
   String mailSubject;
   String mailText;
   List<int> reportingTeams = [];
-  List<int> masterRecipients = [];
+  List<int> additionalRecipients = [];
   bool reportToTeamLeads;
   bool reportToTeamMembers;
   String reportPeriod = "";
@@ -34,6 +35,9 @@ class ReportMailConfiguration {
     ReportMailConfiguration configuration = ReportMailConfiguration();
     configuration.id = fields['id'];
     configuration.name = Utf8Utils.fromUtf8(fields['name']);
+    if (fields['language'] != null) {
+      configuration.language = Utf8Utils.fromUtf8(fields['language']);
+    }
     configuration.mailSenderName = Utf8Utils.fromUtf8(fields['mailSenderName']);
     configuration.mailSubject = Utf8Utils.fromUtf8(fields['mailSubject']);
     if (fields['mailText'] != null) {
@@ -42,8 +46,8 @@ class ReportMailConfiguration {
     if (fields['reportingTeams'] != null) {
       configuration.reportingTeams = List.from(fields['reportingTeams']);
     }
-    if (fields.containsKey('masterRecipients')) {
-      configuration.masterRecipients = List.from(fields['masterRecipients']);
+    if (fields.containsKey('additionalRecipients')) {
+      configuration.additionalRecipients = List.from(fields['additionalRecipients']);
     }
     configuration.reportToTeamLeads = fields['reportToTeamLeads'];
     configuration.reportToTeamMembers = fields['reportToTeamMembers'];
@@ -75,11 +79,12 @@ class ReportMailConfiguration {
     return {
       'id' : id,
       'name' : name,
+      'language' : language,
       'mailSenderName' : mailSenderName,
       'mailSubject' : mailSubject,
       'mailText' : mailText,
       'reportingTeams' : reportingTeams?.toList(),
-      'masterRecipients' : masterRecipients?.toList(),
+      'additionalRecipients' : additionalRecipients?.toList(),
       'reportToTeamLeads' : reportToTeamLeads,
       'reportToTeamMembers' : reportToTeamMembers,
       'reportPeriod' : reportPeriod,

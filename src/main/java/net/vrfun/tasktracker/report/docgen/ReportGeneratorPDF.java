@@ -34,6 +34,8 @@ public class ReportGeneratorPDF implements ReportGenerator {
     final String FOP_INPUT_FILE_DOCUMENT = "doc-template/template-document.fo.xml";
     final String FOP_INPUT_FILE_CONTENT  = "doc-template/template-progress.fo.xml";
 
+    private ReportI18n reportI18n;
+
     private FopFactory fopFactory;
     private Fop fop;
 
@@ -49,10 +51,18 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
     protected ReportGeneratorPDF() {}
 
+    public void setLocale(@NonNull final ReportI18n reportI18n) {
+        this.reportI18n = reportI18n;
+    }
+
     @Override
     public void begin() {
         if (fop != null) {
             throw new IllegalStateException("Call end() before beginning a new PDF generation!");
+        }
+
+        if (reportI18n == null) {
+            loadDefaultLocalization();
         }
 
         Resource resourceDocument = new ClassPathResource(FOP_INPUT_FILE_DOCUMENT);
@@ -72,6 +82,15 @@ public class ReportGeneratorPDF implements ReportGenerator {
         } catch (FOPException | IOException exception) {
             LOGGER.error("Could not create a FOP instance, reason: {}", exception.getMessage());
             throw new IllegalStateException("Could not create a FOP instance, reason: " + exception.getMessage());
+        }
+    }
+
+    protected void loadDefaultLocalization() {
+        LOGGER.info("Loading default localization: 'EN'");
+        try {
+            this.reportI18n = ReportI18n.build(ReportI18n.Locale.EN);
+        } catch (Exception exception) {
+            LOGGER.error("Could not load report generator's localization, reason: {}", exception.getMessage());
         }
     }
 
@@ -107,19 +126,19 @@ public class ReportGeneratorPDF implements ReportGenerator {
         final Set<String> taskNames = new HashSet<>();
 
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
-
-            String progressSection = progressTemplate.replace("@AUTHOR@", encodeFoString(progress.getOwnerName()));
-
             String dateString = LocalDateTime.ofInstant(progress.getDateCreation(),
                     ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
-            progressSection = progressSection.replace("@DATE@", encodeFoString(dateString));
 
             LocalDate date = progress.getReportWeek();
             int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
             int reportYear = date.get(IsoFields.WEEK_BASED_YEAR);
-            progressSection = progressSection.replace("@WEEK@", encodeFoString("" + reportYear + "/" + reportWeek));
 
-            progressSection = progressSection.replace("@TASK@", encodeFoString(progress.getTask().getTitle()));
+            String progressHeader =
+                            reportI18n.translate("author") + ": " + encodeFoString(progress.getOwnerName()) + ", " +
+                            reportI18n.translate("created") + ": " + encodeFoString(dateString) + ", " +
+                            reportI18n.translate("calendar.week") + ": " +  encodeFoString("" + reportYear + "/" + reportWeek);
+
+            String progressSection = progressTemplate.replace("@HEADER@", progressHeader);
 
             StringBuffer tags = new StringBuffer();
             if (progress.getTags() != null && !progress.getTags().isEmpty()) {

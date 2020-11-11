@@ -1,9 +1,6 @@
             <fo:block space-after="15pt"  text-align="left">
-                <fo:inline>Author: @AUTHOR@, Created: @DATE@, Calendar Week: @WEEK@</fo:inline>
+                <fo:inline>@HEADER@</fo:inline>
             </fo:block>
-            <!--fo:block space-after="15pt" text-align="left">
-                <fo:inline>Task: @TASK@</fo:inline>
-            </fo:block-->
             <!--fo:block space-after="15pt" text-align="left">
                 <fo:inline>Tags: @TAGS@</fo:inline>
             </fo:block-->

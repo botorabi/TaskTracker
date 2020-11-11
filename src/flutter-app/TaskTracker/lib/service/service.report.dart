@@ -25,7 +25,7 @@ class ServiceReport {
 
     String teamIDsAsString = teamIDs.join(', ');
     Response response = await get(Config.BASE_URL + '/api/report/team/' + teamIDsAsString +
-                                   deltaTime + '/' + title + '/' + subTitle,
+                                   deltaTime + '/' + title + '/' + subTitle + '/' + Config.locale,
                                   headers: ServiceCommon.HTTP_HEADERS_REST_PDF);
 
     if (response.statusCode == HttpStatus.ok) {

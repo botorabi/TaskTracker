@@ -10,8 +10,6 @@ package net.vrfun.tasktracker.report;
 import net.vrfun.tasktracker.common.BaseEntity;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.User;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -31,6 +29,8 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
     @Column(nullable=false)
     private String name;
 
+    private String language;
+
     @Column(nullable=false)
     private String mailSenderName;
 
@@ -44,7 +44,7 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
     private Collection<Team> reportingTeams;
 
     @ManyToMany(targetEntity = User.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
-    private Collection<User> masterRecipients;
+    private Collection<User> additionalRecipients;
 
     @Column(nullable=false)
     private Boolean reportToTeamLeads = true;
@@ -96,6 +96,15 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
     }
 
     @NonNull
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(@NonNull final String language) {
+        this.language = language;
+    }
+
+    @NonNull
     public String getMailSubject() {
         return mailSubject;
     }
@@ -123,12 +132,12 @@ public class ReportMailConfiguration extends BaseEntity implements Serializable 
     }
 
     @Nullable
-    public Collection<User> getMasterRecipients() {
-        return masterRecipients;
+    public Collection<User> getAdditionalRecipients() {
+        return additionalRecipients;
     }
 
-    public void setMasterRecipients(@Nullable final Collection<User> masterRecipients) {
-        this.masterRecipients = masterRecipients;
+    public void setAdditionalRecipients(@Nullable final Collection<User> additionalRecipients) {
+        this.additionalRecipients = additionalRecipients;
     }
 
     @NonNull

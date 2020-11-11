@@ -58,7 +58,6 @@ class _WidgetReportMailConfigurationListState extends State<WidgetReportMailConf
   @override
   Widget build(BuildContext context) {
     if (!Config.authStatus.isAdmin() && !Config.authStatus.isTeamLead()) {
-      print("ERROR: admin/team lead corner!");
       return Column();
     }
     else {

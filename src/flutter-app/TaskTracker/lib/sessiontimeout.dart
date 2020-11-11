@@ -21,8 +21,11 @@ class SessionTimeoutHandler {
 
   static const MAIN_CONTAINER_ID = 'tasktracker-main-content';
 
+  static const _KEEP_ALIVE_TIME = 600;
+
   final GlobalKey<NavigatorState> _navigator;
   Timer _sessionTimer;
+  Timer _keepAliveTimer;
   int   _timeoutInSeconds;
 
   static DateTime _timeOut;
@@ -57,6 +60,8 @@ class SessionTimeoutHandler {
     _timeOut = DateTime.now().add(Duration(seconds: _timeoutInSeconds));
     _sessionTimer?.cancel();
     _sessionTimer = Timer(Duration(seconds: _timeoutInSeconds), _logout);
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = Timer(Duration(seconds: _KEEP_ALIVE_TIME), _keepAlive);
   }
 
   void _logout() {
@@ -67,5 +72,9 @@ class SessionTimeoutHandler {
             NavigationLinks.NAV_HOME, (Route<dynamic> route) => false);
       });
     }
+  }
+
+  void _keepAlive() {
+    ServiceLogin().getAppInfo();
   }
 }

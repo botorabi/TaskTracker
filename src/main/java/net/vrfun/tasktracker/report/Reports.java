@@ -83,7 +83,7 @@ public class Reports {
         reportMailConfiguration.setReportTitle(reqReportMailConfiguration.getReportTitle());
         reportMailConfiguration.setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
 
-        setReportingTeamsAndMasterRecipients(reportMailConfiguration, reqReportMailConfiguration);
+        setReportingTeamsAndAdditionalRecipients(reportMailConfiguration, reqReportMailConfiguration);
 
         ReportMailConfiguration newReportMailConfiguration = reportMailConfigurationRepository.save(reportMailConfiguration);
 
@@ -121,8 +121,8 @@ public class Reports {
         }
     }
 
-    protected void setReportingTeamsAndMasterRecipients(@NonNull final ReportMailConfiguration reportMailConfiguration,
-                                                        @NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+    protected void setReportingTeamsAndAdditionalRecipients(@NonNull final ReportMailConfiguration reportMailConfiguration,
+                                                            @NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
 
         List<Team> reportingTeams = new ArrayList<>();
         reqReportMailConfiguration.getReportingTeams().forEach((teamID) -> {
@@ -134,15 +134,15 @@ public class Reports {
         });
         reportMailConfiguration.setReportingTeams(reportingTeams);
 
-        List<User> masterRecipients = new ArrayList<>();
-        reqReportMailConfiguration.getMasterRecipients().forEach((userID) -> {
+        List<User> additionalRecipients = new ArrayList<>();
+        reqReportMailConfiguration.getAdditionalRecipients().forEach((userID) -> {
             Optional<User> foundUser = userRepository.findById(userID);
             foundUser.ifPresentOrElse(
-                    (user) -> masterRecipients.add(user),
-                    () -> LOGGER.warn("Cannot setup master recipient user with ID {} for reporting configuration, it does not exist!")
+                    (user) -> additionalRecipients.add(user),
+                    () -> LOGGER.warn("Cannot setup additional recipient user with ID {} for reporting configuration, it does not exist!")
             );
         });
-        reportMailConfiguration.setMasterRecipients(masterRecipients);
+        reportMailConfiguration.setAdditionalRecipients(additionalRecipients);
     }
 
     @NonNull
@@ -152,6 +152,9 @@ public class Reports {
             throw new IllegalArgumentException("Could not find report generation configuration with given ID");
         }
 
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getLanguage())) {
+            config.get().setLanguage(reqReportMailConfiguration.getLanguage());
+        }
         if (!StringUtils.isEmpty(reqReportMailConfiguration.getMailSenderName())) {
             config.get().setMailSenderName(reqReportMailConfiguration.getMailSenderName());
         }
@@ -187,7 +190,7 @@ public class Reports {
             config.get().setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
         }
 
-        setReportingTeamsAndMasterRecipients(config.get(), reqReportMailConfiguration);
+        setReportingTeamsAndAdditionalRecipients(config.get(), reqReportMailConfiguration);
 
         reportGeneratorScheduler.addOrUpdateReportingJob(config.get());
 

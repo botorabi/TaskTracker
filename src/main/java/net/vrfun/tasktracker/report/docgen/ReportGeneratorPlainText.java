@@ -23,6 +23,8 @@ public class ReportGeneratorPlainText implements ReportGenerator {
 
     protected ReportGeneratorPlainText() {}
 
+    public void setLocale(@NonNull final ReportI18n reportI18n) {}
+
     @Override
     public void begin() {
         if (byteArrayOutputStream != null) {

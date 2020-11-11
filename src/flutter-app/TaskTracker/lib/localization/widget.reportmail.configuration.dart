@@ -7,6 +7,18 @@
  */
 
 const Translations_WidgetReportMailConfiguration = {
+  'Language': {
+    'en': 'Language',
+    'de': 'Sprache',
+  },
+  'Language_English': {
+    'en': 'English',
+    'de': 'Englisch',
+  },
+  'Language_German': {
+    'en': 'German',
+    'de': 'Deutsch',
+  },
   'Edit Report Configuration': {
     'en': 'Edit Report Configuration',
     'de': 'Berichtskonfiguration bearbeiten',

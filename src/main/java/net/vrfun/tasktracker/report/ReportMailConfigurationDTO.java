@@ -22,11 +22,12 @@ public class ReportMailConfigurationDTO {
 
     private long id;
     private String name;
+    private String language;
     private String mailSenderName;
     private String mailSubject;
     private String mailText;
     private Collection<Long> reportingTeams;
-    private Collection<Long> masterRecipients;
+    private Collection<Long> additionalRecipients;
     private Boolean reportToTeamLeads;
     private Boolean reportToTeamMembers;
     private String reportPeriod = "";
@@ -42,6 +43,7 @@ public class ReportMailConfigurationDTO {
     public ReportMailConfigurationDTO(@NonNull final ReportMailConfiguration reportMailConfiguration) {
         this.id = reportMailConfiguration.getId();
         this.name = reportMailConfiguration.getName();
+        this.language = reportMailConfiguration.getLanguage();
         this.mailSenderName = reportMailConfiguration.getMailSenderName();
         this.mailSubject = reportMailConfiguration.getMailSubject();
         this.mailText = reportMailConfiguration.getMailText();
@@ -50,8 +52,8 @@ public class ReportMailConfigurationDTO {
                     .map((team -> team.getId()))
                     .collect(Collectors.toList());
         }
-        if (reportMailConfiguration.getMasterRecipients() != null) {
-            this.masterRecipients = reportMailConfiguration.getMasterRecipients().stream()
+        if (reportMailConfiguration.getAdditionalRecipients() != null) {
+            this.additionalRecipients = reportMailConfiguration.getAdditionalRecipients().stream()
                     .map((user) -> user.getId())
                     .collect(Collectors.toList());
         }
@@ -89,6 +91,14 @@ public class ReportMailConfigurationDTO {
         this.name = name;
     }
 
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
     public String getMailSenderName() {
         return mailSenderName;
     }
@@ -121,12 +131,12 @@ public class ReportMailConfigurationDTO {
         this.reportingTeams = reportingTeams;
     }
 
-    public Collection<Long> getMasterRecipients() {
-        return masterRecipients;
+    public Collection<Long> getAdditionalRecipients() {
+        return additionalRecipients;
     }
 
-    public void setMasterRecipients(Collection<Long> masterRecipients) {
-        this.masterRecipients = masterRecipients;
+    public void setAdditionalRecipients(Collection<Long> additionalRecipients) {
+        this.additionalRecipients = additionalRecipients;
     }
 
     public Boolean getReportToTeamLeads() {

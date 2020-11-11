@@ -45,6 +45,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   final _textEditingControllerReportMinute = TextEditingController(text:'00');
   final _textEditingControllerReportTitle = TextEditingController();
   final _textEditingControllerReportSubTitle = TextEditingController();
+  String _reportLanguage = Config.locale;
   bool _reportToTeamLeads = true;
   bool _reportToTeamMembers = false;
   String _reportPeriod = "PERIOD_WEEKLY";
@@ -94,6 +95,16 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                       child: Text(
                         Translator.text('WidgetReportMailConfiguration', 'Edit Report Configuration'),
                         style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _newConfiguration == false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child:
+                          Text(Translator.text('Common', 'Name') + ': ' +
+                              ((_currentReportConfiguration != null) ? _currentReportConfiguration.name : '')
+                          ),
                       ),
                     ),
                   ],
@@ -224,6 +235,45 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Language'),
+                                      textAlign: TextAlign.left,
+                                    )
+                                ),
+                                Spacer(),
+                                SizedBox(
+                                  width: 140,
+                                  child:
+                                  ButtonTheme(
+                                    alignedDropdown: true,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    child:
+                                    DropdownButton<String>(
+                                      items: [
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('WidgetReportMailConfiguration', 'Language_English')),
+                                          value: 'en',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('WidgetReportMailConfiguration', 'Language_German')),
+                                          value: 'de',
+                                        ),
+                                      ],
+                                      onChanged: (String value) {
+                                        setState(() {
+                                          _reportLanguage = value;
+                                        });
+                                      },
+                                      value: _reportLanguage,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child:
                                     Text(Translator.text('WidgetReport', 'Report Period'),
                                       textAlign: TextAlign.left,
                                     )
@@ -252,7 +302,6 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                             _reportPeriod = value;
                                           });
                                         },
-                                        //hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Period')),
                                         value: _reportPeriod,
                                       ),
                                   ),
@@ -314,7 +363,6 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                             _reportWeekDay = value;
                                           });
                                         },
-                                        //hint: Text(Translator.text('WidgetReportMailConfiguration', 'Choose Week Day')),
                                         value: _reportWeekDay,
                                       ),
                                   ),
@@ -541,12 +589,13 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   ReportMailConfiguration _assembleConfiguration() {
     final reportConfiguration = ReportMailConfiguration();
     reportConfiguration.name = _textEditingControllerConfigName.text;
+    reportConfiguration.language = _reportLanguage;
     reportConfiguration.mailSenderName = _textEditingControllerMailSenderName.text;
     reportConfiguration.mailSubject = _textEditingControllerMailSubject.text;
     reportConfiguration.mailText = _textEditingControllerMailText.text;
     reportConfiguration.reportToTeamLeads = _reportToTeamLeads;
     reportConfiguration.reportToTeamMembers = _reportToTeamMembers;
-    reportConfiguration.masterRecipients = _widgetAdditionalRecipients.getUserIDs();
+    reportConfiguration.additionalRecipients = _widgetAdditionalRecipients.getUserIDs();
     reportConfiguration.reportingTeams = _widgetReportingTeams.getTeamIDs();
     reportConfiguration.reportPeriod = _reportPeriod;
     reportConfiguration.reportWeekDay = _reportWeekDay;
@@ -575,10 +624,11 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           _textEditingControllerReportTitle.text = _currentReportConfiguration.reportTitle;
           _textEditingControllerReportSubTitle.text = _currentReportConfiguration.reportSubTitle;
 
+          _reportLanguage = _currentReportConfiguration.language.isEmpty ? Config.locale : _currentReportConfiguration.language;
           _reportToTeamLeads = _currentReportConfiguration.reportToTeamLeads;
           _reportToTeamMembers = _currentReportConfiguration.reportToTeamMembers;
 
-          _widgetAdditionalRecipients.setUserIDs(_currentReportConfiguration.masterRecipients);
+          _widgetAdditionalRecipients.setUserIDs(_currentReportConfiguration.additionalRecipients);
           _widgetReportingTeams.setTeamIDs(_currentReportConfiguration.reportingTeams);
 
           _reportPeriod = _currentReportConfiguration.reportPeriod;

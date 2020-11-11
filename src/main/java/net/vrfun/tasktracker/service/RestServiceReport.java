@@ -115,7 +115,7 @@ public class RestServiceReport {
         }
     }
 
-    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}",
+    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}",
                 produces = MediaType.APPLICATION_PDF_VALUE)
     @ResponseBody
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
@@ -123,7 +123,8 @@ public class RestServiceReport {
                                                               @PathVariable("fromDaysSinceEpoch") final String fromDate,
                                                               @PathVariable("toDaysSinceEpoch")   final String toDate,
                                                               @PathVariable("title")              final String title,
-                                                              @PathVariable("subTitle")           final String subTitle) {
+                                                              @PathVariable("subTitle")           final String subTitle,
+                                                              @PathVariable("language")           final String language) {
 
         List<Long> ids = Arrays.stream(teamIDs.split(","))
                 .map(Long::valueOf)
@@ -142,7 +143,8 @@ public class RestServiceReport {
                              ids, fromInDaysSinceEpoch, toInDaysSinceEpoch,
                              ReportFormat.PDF,
                              StringUtils.isEmpty(title) ? "<Title>" : title,
-                             StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle)) {
+                             StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
+                             StringUtils.isEmpty(language) ? "en" : language)) {
 
             return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
         }

@@ -27,6 +27,11 @@ import java.util.List;
 public interface ReportGenerator {
 
     /**
+     * Set report generator's locale.
+     */
+    void setLocale(@NonNull final ReportI18n reportI18n);
+
+    /**
      * Begin report generation.
      */
     void begin();

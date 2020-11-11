@@ -32,7 +32,7 @@ public class ReportCommonTest {
         reqReportMailConfiguration.setReportWeekDay("WEEKDAY_FRIDAY");
         reqReportMailConfiguration.setReportTitle("Report Title");
         reqReportMailConfiguration.setReportSubTitle("Report Sub-Title");
-        reqReportMailConfiguration.setMasterRecipients(Sets.newSet(100L, 200L));
+        reqReportMailConfiguration.setAdditionalRecipients(Sets.newSet(100L, 200L));
         reqReportMailConfiguration.setReportingTeams(Sets.newSet(500L));
         reqReportMailConfiguration.setReportToTeamLeads(true);
         reqReportMailConfiguration.setReportToTeamMembers(true);
