@@ -55,10 +55,6 @@ public class Tasks {
         if (StringUtils.isEmpty(taskEdit.getTitle())) {
             throw new IllegalArgumentException("Missing task title");
         }
-        Optional<Task> task = taskRepository.findTaskByTitle(taskEdit.getTitle());
-        if (task.isPresent()) {
-            throw new IllegalArgumentException("A task with this title already exists.");
-        }
         Task newTask = new Task(taskEdit.getTitle());
         newTask.setDescription(taskEdit.getDescription());
 
@@ -141,14 +137,30 @@ public class Tasks {
                     .collect(Collectors.toList());
         }
         else {
-            List<TaskDTO> tasks = new ArrayList<>();
             final List<Task> allTasks = taskRepository.findUserTasks(userAuthenticator.getUser());
             teamRepository.findUserTeams(userAuthenticator.getUser()).forEach(((team) ->
                     allTasks.addAll(taskRepository.findTeamTasks(team))));
 
-            allTasks.forEach((task) -> tasks.add(new TaskDTO(task)));
-            return tasks;
+            return createUniqueTasks(allTasks);
         }
+    }
+
+    @NonNull
+    protected List<TaskDTO> createUniqueTasks(@NonNull final List<Task> tasks) {
+        List<TaskDTO> uniqueTasks = new ArrayList<>();
+        tasks.forEach((task) -> {
+            boolean existing = false;
+            for (TaskDTO existingTask: uniqueTasks) {
+                if (task.getId().equals(existingTask.getId())) {
+                    existing = true;
+                    break;
+                }
+            }
+            if (!existing) {
+                uniqueTasks.add(new TaskDTO(task));
+            }
+        });
+        return uniqueTasks;
     }
 
     @NonNull

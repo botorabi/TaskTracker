@@ -47,9 +47,11 @@ public class TasksTest {
 
     @Test
     public void getTasks() {
-        List<Task> allTasks = new ArrayList<>();
-        allTasks.add(new Task("Task1"));
-        allTasks.add(new Task("Task2"));
+        Task task1 = new Task("Task1");
+        task1.setId(42L);
+        Task task2 = new Task("Task2");
+        task2.setId(43L);
+        List<Task> allTasks = Arrays.asList(task1, task2);
 
         doReturn(allTasks).when(taskRepository).findUserTasks(any());
 
