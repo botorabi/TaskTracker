@@ -211,8 +211,7 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   }
 
   void _createTeam(BuildContext context) {
-    if (_textEditingControllerName.text.isEmpty) {
-      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetTeam', 'Choose a team name!'), true);
+    if (!_validateInput()) {
       return;
     }
 
@@ -242,6 +241,10 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
   }
 
   void _applyChanges(BuildContext context) {
+    if (!_validateInput()) {
+      return;
+    }
+
     Team team = new Team();
     team.id = _currentTeam.id;
     team.name = _textEditingControllerName.text;
@@ -263,6 +266,31 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
               Translator.text('Common', 'Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
+  }
+
+  bool _validateInput() {
+    if (_textEditingControllerName.text.isEmpty) {
+      DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetTeam', 'Please, choose a team name!'), true);
+      return false;
+    }
+
+    if (Config.authStatus.isTeamLead()) {
+      List<int> userIDs = _widgetTeamLeaders.getUserIDs();
+      if (!userIDs.contains(Config.authStatus.userId)) {
+        DialogModal(context).show(Translator.text('Common', 'Attention'),
+            Translator.text('WidgetTeam', 'You must be part of team leaders!'), true);
+        return false;
+      }
+    }
+    else {
+      if (_widgetTeamLeaders.getUserIDs().length == 0) {
+        DialogModal(context).show(Translator.text('Common', 'Attention'),
+            Translator.text('WidgetTeam', 'You must define at least one team leader!'), true);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   void _retrieveTeam() {

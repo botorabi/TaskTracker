@@ -19,6 +19,18 @@ const Translations_WidgetTeam = {
     'en': 'Choose a team name',
     'de': 'Teamnamen wählen',
   },
+  'Please, choose a team name!': {
+    'en': 'Please, choose a team name!',
+    'de': 'Bitte wählen Sie einen Teamnamen aus!',
+  },
+  'You must be part of team leaders!': {
+    'en': 'You must be part of team leaders!',
+    'de': 'Sie müssen ein Mitglied der Teamleiter sein!',
+  },
+  'You must define at least one team leader!': {
+    'en': 'You must define at least one team leader!',
+    'de': 'Sie müssen mindestens einen Teamleiter festlegen!',
+  },
   'New team was successfully created.': {
     'en': 'New team was successfully created.',
     'de': 'Neues Team wurde erfolgreich angelegt.',

@@ -138,8 +138,8 @@ public class ProgressesTest {
         progress.setOwnerName(userLogin);
 
         mockUser(userLogin, userId);
-        doReturn(progs).when(progressRepository).findProgressByOwnerIdOrderByReportWeekDesc(anyLong(), any());
-        doReturn((long)progs.size()).when(progressRepository).countProgressByOwnerId(anyLong());
+        doReturn(progs).when(progressRepository).findProgressByOwnerIdInOrderByReportWeekDesc(anyList(), any());
+        doReturn((long)progs.size()).when(progressRepository).countProgressByOwnerIdIn(anyList());
 
         assertThat(progresses.getAll().size()).isEqualTo((long)progs.size());
         assertThat(progresses.getAll().get(0).getOwnerId()).isEqualTo(userId);

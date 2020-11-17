@@ -208,7 +208,7 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Container(constraints: BoxConstraints(maxWidth: 350), child: Text(_progresses[index].title + userName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 330), child: Text(_progresses[index].title + userName))),
         DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(_progresses[index].reportYear.toString() + ' / ' + _progresses[index].reportWeek.toString()))),
         DataCell(
           Row(

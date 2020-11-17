@@ -197,8 +197,8 @@ class _DataProvider extends DataTableSource {
       index: index,
       cells: [
         DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(parent._tasks[index].title))),
-        DataCell(Container(constraints: BoxConstraints(maxWidth: 250), child: Text(parent._tasks[index].description))),
-        DataCell(Text(teamNames)),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 200), child: Text(parent._tasks[index].description))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(teamNames))),
         DataCell(
           Row(
             children: [

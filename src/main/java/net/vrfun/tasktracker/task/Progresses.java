@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for handling with task Progress
@@ -81,16 +82,36 @@ public class Progresses {
 
     @NonNull
     public ProgressPagedDTO getPaged(int page, int size) {
-        if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
+        if (userAuthenticator.isRoleAdmin()) {
             List<ProgressDTO> progs = new ArrayList<>();
             progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(page, size))
                     .forEach((progress -> progs.add(new ProgressDTO(progress))));
 
             return new ProgressPagedDTO(progressRepository.count(), page, progs);
         }
-        else {
-            return getUserProgressPaged(page, size);
+        else if (userAuthenticator.isRoleTeamLead()) {
+            List<Long> userIds = findAllTeamLeadRelatedUsers(userAuthenticator.getUser());
+            return getUserProgressPaged(userIds, page, size);
         }
+        else {
+            return getUserProgressPaged(Arrays.asList(userAuthenticator.getUserId()), page, size);
+        }
+    }
+
+    @NonNull
+    protected List<Long> findAllTeamLeadRelatedUsers(@NonNull final User teamLead) {
+        List<Long> userIds = new ArrayList<>();
+        teamRepository.findUserTeams(teamLead)
+                .forEach((team) -> {
+                    if (team.getUsers() != null) {
+                        team.getUsers().forEach((user) -> userIds.add(user.getId()));
+                    }
+                    if (team.getTeamLeaders() != null) {
+                        team.getTeamLeaders().forEach((user) -> userIds.add(user.getId()));
+                    }
+                });
+
+        return userIds;
     }
 
     @Nullable
@@ -116,20 +137,21 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getUserProgress() {
         List<ProgressDTO> progs = new ArrayList<>();
-        int count = (int)progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
+        int count = (int)progressRepository.countProgressByOwnerIdIn(Arrays.asList(userAuthenticator.getUserId()));
         if (count > 0) {
-            progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(0, count))
+            progressRepository.findProgressByOwnerIdInOrderByReportWeekDesc(
+                    Arrays.asList(userAuthenticator.getUserId()),PageRequest.of(0, count))
                     .forEach((progress -> progs.add(new ProgressDTO(progress))));
         }
         return progs;
     }
 
     @NonNull
-    public ProgressPagedDTO getUserProgressPaged(int page , int size) {
+    public ProgressPagedDTO getUserProgressPaged(@NonNull final List<Long> ownerIds, int page , int size) {
         List<ProgressDTO> progs = new ArrayList<>();
-        long totalCount = progressRepository.countProgressByOwnerId(userAuthenticator.getUserId());
+        long totalCount = progressRepository.countProgressByOwnerIdIn(ownerIds);
         if (totalCount > 0) {
-            progressRepository.findProgressByOwnerIdOrderByReportWeekDesc(userAuthenticator.getUserId(), PageRequest.of(page, size))
+            progressRepository.findProgressByOwnerIdInOrderByReportWeekDesc(ownerIds, PageRequest.of(page, size))
                     .forEach((progress -> progs.add(new ProgressDTO(progress))));
         }
         return new ProgressPagedDTO(totalCount, page, progs);
