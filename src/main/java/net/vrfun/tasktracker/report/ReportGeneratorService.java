@@ -9,23 +9,27 @@ package net.vrfun.tasktracker.report;
 
 import com.sun.istack.ByteArrayDataSource;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
-import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import net.vrfun.tasktracker.user.Team;
+import net.vrfun.tasktracker.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.lang.*;
-import org.springframework.mail.javamail.*;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
-import javax.mail.internet.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -56,36 +60,32 @@ public class ReportGeneratorService {
 
     public void generateReport(@NonNull final Long configurationID) {
         Optional<ReportMailConfiguration> foundConfiguration = reportMailConfigurationRepository.findById(configurationID);
-        if (!foundConfiguration.isPresent()) {
+        if (foundConfiguration.isEmpty()) {
             LOGGER.warn("Report generation configuration with ID {} no longer exists, skipping", configurationID);
             return;
         }
 
         ReportMailConfiguration configuration = foundConfiguration.get();
 
-        if (configuration.getReportingTeams() == null &&
-            configuration.getAdditionalRecipients() == null) {
-            LOGGER.info("No report recipients configured for '{}' ({}), skip reporting.", configuration.getName(), configurationID);
+        if (configuration.getReportingTeams() == null) {
+            LOGGER.info("No reporting teams configured for '{}' ({}), skip reporting.", configuration.getName(), configurationID);
             return;
         }
 
         LOGGER.info("Start generating report: '{}' ({})", configuration.getName(), configurationID);
 
-        List<Team> reportingTeams = null;
+        List<Team> reportingTeams = new ArrayList<>(configuration.getReportingTeams());
         List<User> additionalRecipients = null;
 
-        if (configuration.getReportingTeams() != null) {
-            reportingTeams = configuration.getReportingTeams().stream().collect(Collectors.toList());
-        }
         if (configuration.getAdditionalRecipients() != null) {
-            additionalRecipients = configuration.getAdditionalRecipients().stream().collect(Collectors.toList());
+            additionalRecipients = new ArrayList<>(configuration.getAdditionalRecipients());
         }
 
         sendReportMails(configuration, reportingTeams, additionalRecipients);
     }
 
     protected void sendReportMails(@NonNull final ReportMailConfiguration configuration,
-                                   @Nullable final List<Team> teams,
+                                   @NonNull final List<Team> teams,
                                    @Nullable final List<User> additionalRecipients) {
 
         LocalDate toDate = LocalDate.now();
@@ -94,16 +94,16 @@ public class ReportGeneratorService {
         teams.forEach((team) -> {
             String recipients = "";
             try {
-                recipients = getAllRecipients(team, additionalRecipients, configuration.getReportToTeamMembers());
+                recipients = getAllRecipients(team, additionalRecipients, configuration.getReportToTeamLeads(), configuration.getReportToTeamMembers());
                 if (!recipients.isEmpty()) {
                     ByteArrayOutputStream reportDocument =
                             reportComposer.createTeamReport(
-                                    Arrays.asList(team.getId()),
+                                    Collections.singletonList(team.getId()),
                                     fromDate,
                                     toDate,
                                     ReportFormat.PDF,
-                                    configuration.getReportTitle(),
-                                    configuration.getReportSubTitle(),
+                                    StringUtils.isEmpty(configuration.getReportTitle()) ? "" : configuration.getReportTitle(),
+                                    StringUtils.isEmpty(configuration.getReportSubTitle()) ? "" : configuration.getReportSubTitle(),
                                     configuration.getLanguage());
 
                     String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
@@ -142,10 +142,10 @@ public class ReportGeneratorService {
     }
 
     @NonNull
-    protected String getAllRecipients(@Nullable final Team team, @Nullable final List<User> additionalRecipients, boolean addAllMembers) {
+    protected String getAllRecipients(@Nullable final Team team, @Nullable final List<User> additionalRecipients, boolean addTeamLeaders, boolean addAllMembers) {
         Set<String> allRecipients = new HashSet<>();
         if (team != null) {
-            if (team.getTeamLeaders() != null) {
+            if (addTeamLeaders && (team.getTeamLeaders() != null)) {
                 team.getTeamLeaders().forEach((user) -> appendUserEmailAddress(allRecipients, user));
             }
             if (addAllMembers && (team.getUsers() != null)) {

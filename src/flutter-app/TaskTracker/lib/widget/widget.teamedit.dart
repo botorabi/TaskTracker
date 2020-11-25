@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/divider.horizontal.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.team.dart';
@@ -178,18 +179,21 @@ class _WidgetTeamEditState extends State<WidgetTeamEdit> {
                 ),
               ],
             ),
+            SizedBox(height: 20.0),
+
+            HorizontalDivider(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 15.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(Translator.text('Common', 'Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 15.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(_newTeam ? Translator.text('Common', ButtonID.CREATE) : Translator.text('Common', ButtonID.APPLY)),
                     onPressed: () {

@@ -47,6 +47,10 @@ const Translations_Common = {
     'en': 'Create',
     'de': 'Erstellen',
   },
+  'Created': {
+    'en': 'Created',
+    'de': 'Erstellt',
+  },
   'Choose': {
     'en': 'Choose',
     'de': 'Wählen',

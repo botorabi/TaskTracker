@@ -47,17 +47,21 @@ class DialogChooseTeams {
               title: Text(title),
               content: _createTeamsUI(text, setState),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(Translator.text('Common', ButtonID.CANCEL)),
-                  onPressed: () {
-                    Navigator.of(_context).pop(List<Team>());
-                  },
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CANCEL)),
+                    onPressed: () => Navigator.of(_context).pop(List<Team>()),
+                  ),
                 ),
-                FlatButton(
-                  child: Text(Translator.text('Common', ButtonID.CHOOSE)),
-                  onPressed: () {
-                    Navigator.of(_context).pop(_chosenTeams);
-                  },
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CHOOSE)),
+                    onPressed: () => Navigator.of(_context).pop(_chosenTeams),
+                  ),
                 ),
               ],
             );

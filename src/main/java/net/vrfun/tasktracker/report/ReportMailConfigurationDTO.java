@@ -7,6 +7,8 @@
  */
 package net.vrfun.tasktracker.report;
 
+import net.vrfun.tasktracker.user.Team;
+import net.vrfun.tasktracker.user.User;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
@@ -30,15 +32,12 @@ public class ReportMailConfigurationDTO {
     private Collection<Long> additionalRecipients;
     private Boolean reportToTeamLeads;
     private Boolean reportToTeamMembers;
-    private String reportPeriod = "";
-    private String reportWeekDay = "";
-    private Long reportHour = 0L;
-    private Long reportMinute = 0L;
+    private String reportPeriod;
+    private String reportWeekDay;
+    private Long reportHour;
+    private Long reportMinute;
     private String reportTitle;
     private String reportSubTitle;
-
-
-    public ReportMailConfigurationDTO() {}
 
     public ReportMailConfigurationDTO(@NonNull final ReportMailConfiguration reportMailConfiguration) {
         this.id = reportMailConfiguration.getId();
@@ -49,28 +48,20 @@ public class ReportMailConfigurationDTO {
         this.mailText = reportMailConfiguration.getMailText();
         if (reportMailConfiguration.getReportingTeams() != null) {
             this.reportingTeams = reportMailConfiguration.getReportingTeams().stream()
-                    .map((team -> team.getId()))
+                    .map((Team::getId))
                     .collect(Collectors.toList());
         }
         if (reportMailConfiguration.getAdditionalRecipients() != null) {
             this.additionalRecipients = reportMailConfiguration.getAdditionalRecipients().stream()
-                    .map((user) -> user.getId())
+                    .map(User::getId)
                     .collect(Collectors.toList());
         }
         this.reportToTeamLeads = reportMailConfiguration.getReportToTeamLeads();
         this.reportToTeamMembers = reportMailConfiguration.getReportToTeamMembers();
-        if (reportMailConfiguration.getReportPeriod() != null) {
-            this.reportPeriod = reportMailConfiguration.getReportPeriod().name();
-        }
-        if (reportMailConfiguration.getReportWeekDay() != null) {
-            this.reportWeekDay = reportMailConfiguration.getReportWeekDay().name();
-        }
-        if (reportMailConfiguration.getReportHour() != null) {
-            this.reportHour = reportMailConfiguration.getReportHour();
-        }
-        if (reportMailConfiguration.getReportMinute() != null) {
-            this.reportMinute = reportMailConfiguration.getReportMinute();
-        }
+        this.reportPeriod = reportMailConfiguration.getReportPeriod().name();
+        this.reportWeekDay = reportMailConfiguration.getReportWeekDay().name();
+        this.reportHour = reportMailConfiguration.getReportHour();
+        this.reportMinute = reportMailConfiguration.getReportMinute();
         this.setReportTitle(reportMailConfiguration.getReportTitle());
         this.setReportSubTitle(reportMailConfiguration.getReportSubTitle());
     }

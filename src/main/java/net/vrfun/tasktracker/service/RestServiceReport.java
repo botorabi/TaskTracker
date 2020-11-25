@@ -127,7 +127,7 @@ public class RestServiceReport {
                                                               @PathVariable("language")           final String language) {
 
         List<Long> ids = Arrays.stream(teamIDs.split(","))
-                .map(Long::valueOf)
+                .map((val) -> Long.valueOf(val.trim()))
                 .collect(Collectors.toList());
 
         if (!reports.validateUserAccess(ids)) {

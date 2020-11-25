@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/divider.horizontal.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/progress.dart';
@@ -17,6 +18,7 @@ import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.calendarweek.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 class WidgetProgressEdit extends StatefulWidget {
@@ -86,6 +88,15 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                       child: Text( _newProgress ?
                         Translator.text('WidgetProgressEdit', 'Progress Entry') : Translator.text('WidgetProgressEdit', 'Edit Progress Entry'),
                         style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _newProgress == false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: Text(Translator.text('Common', 'Created') + ': ' +
+                            ((_currentProgress != null) ? DateFormat('d. MMMM yyyy - HH:mm').format(_currentProgress.dateCreation) : "")
+                        ),
                       ),
                     ),
                     Column(
@@ -161,18 +172,20 @@ class _WidgetProgressEditState extends State<WidgetProgressEdit> {
                 ),
               ],
             ),
+
+            HorizontalDivider(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 15.0, right: 10.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(Translator.text('Common', ButtonID.CANCEL)),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 15.0, left: 10.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(Translator.text('Common', _newProgress ? ButtonID.CREATE : ButtonID.APPLY)),
                     onPressed: () {

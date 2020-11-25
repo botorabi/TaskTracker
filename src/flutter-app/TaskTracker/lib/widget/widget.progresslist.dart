@@ -15,8 +15,11 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
+import 'package:TaskTracker/service/service.task.dart';
+import 'package:TaskTracker/service/task.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 class WidgetProgressList extends StatefulWidget {
@@ -262,9 +265,13 @@ class _DataProvider extends DataTableSource {
   int get selectedRowCount => 0;
 
   void _showProgressEntry(Progress progress) {
-    String text = Translator.text('Common', 'Calendar Week') + ' ' + progress.reportWeek.toString() + ' / ' + progress.reportYear.toString() + '\n';
-    text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
-    text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
-    DialogModal(parent.context).show( progress.title, text, false);
+    ServiceTask().getTask(progress.task).then((Task task) {
+      String text = Translator.text('Common', 'Task') + ': ' + task.title + '\n';
+      text += '\n' + Translator.text('Common', 'Calendar Week') + ': ' + progress.reportWeek.toString() + '/' + progress.reportYear.toString() + '\n';
+      text += '\n' + Translator.text('Common', 'Created') + ': ' + DateFormat('d. MMMM yyyy - HH:mm').format(progress.dateCreation) + '\n';
+      text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
+      text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
+      DialogModal(parent.context).show( progress.title, text, false);
+    });
   }
 }

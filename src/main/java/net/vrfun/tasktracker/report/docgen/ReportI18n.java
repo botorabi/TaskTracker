@@ -8,10 +8,13 @@
 
 package net.vrfun.tasktracker.report.docgen;
 
-import org.slf4j.*;
-import org.springframework.core.io.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,7 +28,7 @@ public class ReportI18n {
         DE
     }
 
-    private Map<String, String> translations = new HashMap<>();
+    private final Map<String, String> translations = new HashMap<>();
 
     static public ReportI18n build(@NonNull final Locale locale) throws Exception {
         ReportI18n reportI18n = new ReportI18n();
@@ -40,7 +43,7 @@ public class ReportI18n {
         if (translations.containsKey(token)) {
             return translations.get(token);
         }
-        LOGGER.warn("Localization token '{}' not found!");
+        LOGGER.warn("Localization token '{}' not found!", token);
         return null;
     }
 
@@ -58,9 +61,7 @@ public class ReportI18n {
     protected void loadLocalizationFile(@NonNull final String resourceFileName) throws IOException {
         Resource resource = new ClassPathResource(resourceFileName);
         Properties loadedProperties = PropertiesLoaderUtils.loadProperties(resource);
-        loadedProperties.forEach((key, value) -> {
-            translations.put(key.toString(), value.toString());
-        });
-        LOGGER.debug("Localization file '{}' successfully loaded");
+        loadedProperties.forEach((key, value) -> translations.put(key.toString(), value.toString()));
+        LOGGER.debug("Localization file '{}' successfully loaded", resourceFileName);
     }
 }

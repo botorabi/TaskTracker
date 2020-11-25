@@ -47,17 +47,21 @@ class DialogChooseUsers {
               title: Text(title),
               content: _createUsersUI(text, setState),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(Translator.text('Common', ButtonID.CANCEL)),
-                  onPressed: () {
-                    Navigator.of(_context).pop(List<UserInfo>());
-                  },
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CANCEL)),
+                    onPressed: () => Navigator.of(_context).pop(List<UserInfo>()),
+                  ),
                 ),
-                FlatButton(
-                  child: Text(Translator.text('Common', ButtonID.CHOOSE)),
-                  onPressed: () {
-                    Navigator.of(_context).pop(_chosenUsers);
-                  },
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CHOOSE)),
+                    onPressed: () => Navigator.of(_context).pop(_chosenUsers),
+                  ),
                 ),
               ],
             );

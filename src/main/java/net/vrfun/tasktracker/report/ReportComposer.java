@@ -8,9 +8,7 @@
 package net.vrfun.tasktracker.report;
 
 import net.vrfun.tasktracker.report.docgen.*;
-import net.vrfun.tasktracker.task.Progress;
-import net.vrfun.tasktracker.task.ProgressRepository;
-import net.vrfun.tasktracker.task.TaskRepository;
+import net.vrfun.tasktracker.task.*;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.TeamRepository;
 import org.apache.commons.lang.StringUtils;
@@ -18,14 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -49,7 +47,7 @@ public class ReportComposer {
     @Value("${company.name: ''}")
     private String companyName;
 
-    public final static String REPORT_DATE_FORMAT = "dd.MM.yyyy";
+    public final static String REPORT_DATE_FORMAT = "d. MMMM yyyy";
 
     private final ProgressRepository progressRepository;
     private final TeamRepository teamRepository;

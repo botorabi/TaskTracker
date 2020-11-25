@@ -9,6 +9,7 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/divider.horizontal.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
@@ -180,19 +181,19 @@ class _WidgetUserEditState extends State<WidgetUserEdit> {
                 ),
               ],
             ),
-
+            HorizontalDivider(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(Translator.text('Common', 'Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
                     child: Text(_newUser ? Translator.text('Common', ButtonID.CREATE) : Translator.text('Common', ButtonID.APPLY)),
                     onPressed: () {

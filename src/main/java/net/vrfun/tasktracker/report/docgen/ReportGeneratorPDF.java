@@ -31,8 +31,9 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    final String FOP_INPUT_FILE_DOCUMENT = "doc-template/template-document.fo.xml";
-    final String FOP_INPUT_FILE_CONTENT  = "doc-template/template-progress.fo.xml";
+    private final String REPORT_DATE_FORMAT = "d. MMMM yyyy";
+    private final String FOP_INPUT_FILE_DOCUMENT = "doc-template/template-document.fo.xml";
+    private final String FOP_INPUT_FILE_CONTENT  = "doc-template/template-progress.fo.xml";
 
     private ReportI18n reportI18n;
 
@@ -127,7 +128,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
         sortedProgressByOwnerAndCalendarWeek.forEach((progress) -> {
             String dateString = LocalDateTime.ofInstant(progress.getDateCreation(),
-                    ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern("MM.dd.yyyy - HH:mm"));
+                    ZoneOffset.systemDefault()).format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT + " - HH:mm"));
 
             LocalDate date = progress.getReportWeek();
             int reportWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
@@ -136,7 +137,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
             String progressHeader =
                             reportI18n.translate("author") + ": " + encodeFoString(progress.getOwnerName()) + ", " +
                             reportI18n.translate("created") + ": " + encodeFoString(dateString) + ", " +
-                            reportI18n.translate("calendar.week") + ": " +  encodeFoString("" + reportYear + "/" + reportWeek);
+                            reportI18n.translate("calendar.week") + ": " +  encodeFoString("" + reportWeek + "/" + reportYear);
 
             String progressSection = progressTemplate.replace("@HEADER@", progressHeader);
 
