@@ -10,7 +10,7 @@
     </parent>
     <groupId>net.vrfun</groupId>
     <artifactId>tasktracker</artifactId>
-    <version>0.8.4</version>
+    <version>0.8.5</version>
     <name>Task Tracker</name>
     <description>Web application for task tracking</description>
 

@@ -24,6 +24,7 @@ import 'package:TaskTracker/service/authstatus.dart';
 import 'package:TaskTracker/sessiontimeout.dart';
 import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'config.dart';
 import 'navigation.links.dart';
@@ -72,8 +73,10 @@ class _AppTaskTrackerState extends State<AppTaskTracker> {
 
   @override
   Widget build(BuildContext context) {
+    final shortcutsWithNoESC = Map.of(WidgetsApp.defaultShortcuts)..remove(LogicalKeySet(LogicalKeyboardKey.escape));
     return MaterialApp(
       title: Translator.text('AppTaskTracker', 'Task Tracker'),
+      shortcuts: shortcutsWithNoESC,
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,

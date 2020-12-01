@@ -80,7 +80,7 @@ public class ProgressesTest {
         Task userTask = new Task();
         userTask.setId(taskId);
 
-        doReturn(Arrays.asList(userTask)).when(taskRepository).findUserTasks(any());
+        doReturn(Collections.singletonList(userTask)).when(taskRepository).findUserTasks(any());
 
         return userTask;
     }
@@ -90,8 +90,8 @@ public class ProgressesTest {
         Task task = new Task();
         task.setId(taskId);
 
-        doReturn(Arrays.asList(new Team())).when(teamRepository).findUserTeams(any());
-        doReturn(Arrays.asList(task)).when(taskRepository).findTeamTasks(any());
+        doReturn(Collections.singletonList(new Team())).when(teamRepository).findUserTeams(any());
+        doReturn(Collections.singletonList(task)).when(taskRepository).findTeamTasks(any());
 
         return task;
     }
@@ -150,7 +150,7 @@ public class ProgressesTest {
         Progress progress = new Progress();
         progress.setOwnerId(42L);
 
-        Optional result = Optional.of(progress);
+        Optional<Progress> result = Optional.of(progress);
 
         doReturn(result).when(progressRepository).findById(anyLong());
 
@@ -164,7 +164,7 @@ public class ProgressesTest {
         Progress progress = new Progress();
         progress.setOwnerId(42L);
 
-        Optional result = Optional.of(progress);
+        Optional<Progress> result = Optional.of(progress);
 
         doReturn(result).when(progressRepository).findById(anyLong());
 
@@ -178,7 +178,7 @@ public class ProgressesTest {
         Progress progress = new Progress();
         progress.setOwnerId(42L);
 
-        Optional result = Optional.of(progress);
+        Optional<Progress> result = Optional.of(progress);
 
         doReturn(result).when(progressRepository).findById(anyLong());
 
@@ -280,7 +280,7 @@ public class ProgressesTest {
 
         mockUser("MyLogin", 42L);
 
-        doReturn(Arrays.asList(userTask)).when(taskRepository).findUserTasks(any());
+        doReturn(Collections.singletonList(userTask)).when(taskRepository).findUserTasks(any());
         doReturn(Optional.of(userTask)).when(taskRepository).findById(anyLong());
         doAnswer((invocationOnMock) -> invocationOnMock.getArgument(0))
                 .when(progressRepository).save(any());
@@ -364,8 +364,8 @@ public class ProgressesTest {
 
         mockUser("MyLogin", 42L);
 
-        final Integer setWeek = currentWeek;
-        final Integer setYear = currentYear;
+        final int setWeek = currentWeek;
+        final int setYear = currentYear;
 
         assertThatThrownBy(() -> progresses.setReportWeek(progress, setWeek, setYear))
                 .as("Did not detect unauthorized report week setting! Report week is too far in future!")
@@ -388,8 +388,8 @@ public class ProgressesTest {
 
         mockUser("MyLogin", 42L);
 
-        final Integer setWeek = currentWeek;
-        final Integer setYear = currentYear;
+        final int setWeek = currentWeek;
+        final int setYear = currentYear;
 
         assertThatThrownBy(() -> progresses.setReportWeek(progress, setWeek, setYear))
                 .as("Did not detect unauthorized report week setting! Report week is too far in the past!")
@@ -413,8 +413,8 @@ public class ProgressesTest {
         mockUserAsAdmin();
         mockUserAsTeamLead();
 
-        final Integer setWeek = currentWeek;
-        final Integer setYear = currentYear;
+        final int setWeek = currentWeek;
+        final int setYear = currentYear;
 
         progresses.setReportWeek(progress, setWeek, setYear);
 
@@ -648,7 +648,7 @@ public class ProgressesTest {
 
         assertThat(progress.getTask().getTitle()).isEqualTo("My Task");
 
-        List<Tag> taskTags = new ArrayList<Tag>(progress.getTags());
+        List<Tag> taskTags = new ArrayList<>(progress.getTags());
 
         assertThat(taskTags.size()).isEqualTo(2);
         assertThat(taskTags.get(0).getName()).isEqualTo("tag1");
@@ -749,7 +749,6 @@ public class ProgressesTest {
         verify(progressRepository, times(1)).delete(any());
     }
 
-
     @Test
     public void deleteAuthorizedUserInvalidWeekDistance() {
         LocalDate date = LocalDate.now();
@@ -767,5 +766,71 @@ public class ProgressesTest {
         assertThatThrownBy(() -> progresses.delete(100L))
                 .as("Did not detect deleting a progress outside of allowed week range!")
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void getPagedAsAdmin() {
+        mockUserAsAdmin();
+        List<Progress> progs = new ArrayList<>();
+        progs.add(new Progress());
+
+        doReturn(progs).when(progressRepository).findAllByOrderByReportWeekDesc(any());
+        doReturn(Long.valueOf(progs.size())).when(progressRepository).count();
+
+        ProgressPagedDTO progressPagedDTO = progresses.getPaged(0, 10);
+
+        assertThat(progressPagedDTO.getTotalCount()).isEqualTo(1L);
+        assertThat(progressPagedDTO.getProgressList()).hasSize(1);
+
+    }
+
+    @Test
+    public void getPagedAsTeamLead() {
+        mockUserAsTeamLead();
+
+        ProgressPagedDTO progressPagedDTO = progresses.getPaged(0, 10);
+
+        assertThat(progressPagedDTO.getTotalCount()).isEqualTo(0L);
+    }
+
+    @Test
+    public void getPagedEmpty() {
+        ProgressPagedDTO progressPagedDTO = progresses.getPaged(0, 10);
+
+        assertThat(progressPagedDTO.getTotalCount()).isEqualTo(0L);
+    }
+
+    @Test
+    public void getPagedNoEmpty() {
+        final long EXPECTED_ENTRIES = 4L;
+        List<Progress> progs = new ArrayList<>();
+        for (long i = 0; i < EXPECTED_ENTRIES; i++) {
+            progs.add(new Progress());
+        }
+        doReturn(EXPECTED_ENTRIES).when(progressRepository).countProgressByOwnerIdIn(anyList());
+        doReturn(progs).when(progressRepository).findProgressByOwnerIdInOrderByReportWeekDesc(anyList(), any());
+
+        ProgressPagedDTO progressPagedDTO = progresses.getPaged(0, 10);
+
+        assertThat(progressPagedDTO.getTotalCount()).isEqualTo(EXPECTED_ENTRIES);
+    }
+
+    @Test
+    public void findAllTeamLeadRelatedUsers() {
+        User teamLead = new User();
+        teamLead.setId(42L);
+        List<Team> teams = new ArrayList<>();
+
+        doReturn(teams).when(teamRepository).findUserTeams(any());
+
+        assertThat(progresses.findAllTeamLeadRelatedUsers(teamLead)).isEmpty();
+
+        Team team = new Team("team", "great team");
+        team.setId(100L);
+        team.setTeamLeaders(Collections.singletonList(teamLead));
+        team.setUsers(Collections.singletonList(teamLead));
+        teams.add(team);
+
+        assertThat(progresses.findAllTeamLeadRelatedUsers(teamLead)).hasSize(2);
     }
 }
