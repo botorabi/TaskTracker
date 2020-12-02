@@ -23,6 +23,8 @@ class Progress {
   List<String> tags = [];
   int task;
 
+  String taskName = '';
+
   Progress();
 
   factory Progress.fromMap(final Map<String, dynamic> fields) {

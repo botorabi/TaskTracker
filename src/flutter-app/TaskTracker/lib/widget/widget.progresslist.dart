@@ -6,6 +6,8 @@
  *          main directory for more details.
  */
 
+import 'dart:async';
+
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/common/calendar.utils.dart';
@@ -127,6 +129,12 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
         ),
         DataColumn(
           label: Text(
+            Translator.text('Common', 'Task'),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
+        ),
+        DataColumn(
+          label: Text(
             Translator.text('Common', 'Calendar Week'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
@@ -158,7 +166,7 @@ class _DataProvider extends DataTableSource {
 
   _DataProvider(this.parent, this.maxRowCount);
 
-  void sortProgress(bool ascending) {
+  void _sortProgress(bool ascending) {
     _progresses.sort((progressA, progressB) => progressA.dateCreation?.compareTo(progressB?.dateCreation));
     if (!ascending) {
       _progresses = _progresses.reversed.toList();
@@ -173,18 +181,32 @@ class _DataProvider extends DataTableSource {
     _fetchingData = true;
     parent._serviceProgress
         .getPagedProgress(page, maxRowCount)
-        .then((progressPaged) {
+        .then((progressPaged) async {
           _rowCount = progressPaged.totalCount;
           _currentPage = progressPaged.currentPage;
           _progresses = progressPaged.progressList;
           _fetchingData = false;
-          sortProgress(false);
+          await _fetchTaskInfo(_progresses);
+          _sortProgress(false);
           notifyListeners();
         },
         onError: (err) {
           print("Failed to retrieve progress entries, reason: " + err.toString());
           _fetchingData = false;
         });
+  }
+
+  Future<void> _fetchTaskInfo(List<Progress> progresses) async {
+    for(Progress progress in progresses) {
+      try {
+        Task task = await ServiceTask().getTask(progress.task);
+        progress.taskName = task.title;
+      }
+      catch(exception){ print ("Could not get task " +
+          progress.task.toString() +
+          " for progress '" + progress.title + "' (" + progress.id.toString() + ")" +
+          ", reason: " + exception.toString()); }
+    }
   }
 
   @override
@@ -211,7 +233,8 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Container(constraints: BoxConstraints(maxWidth: 330), child: Text(_progresses[index].title + userName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 200), child: Text(_progresses[index].title + userName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(_progresses[index].taskName))),
         DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(_progresses[index].reportYear.toString() + ' / ' + _progresses[index].reportWeek.toString()))),
         DataCell(
           Row(
@@ -265,13 +288,11 @@ class _DataProvider extends DataTableSource {
   int get selectedRowCount => 0;
 
   void _showProgressEntry(Progress progress) {
-    ServiceTask().getTask(progress.task).then((Task task) {
-      String text = Translator.text('Common', 'Task') + ': ' + task.title + '\n';
-      text += '\n' + Translator.text('Common', 'Calendar Week') + ': ' + progress.reportWeek.toString() + '/' + progress.reportYear.toString() + '\n';
-      text += '\n' + Translator.text('Common', 'Created') + ': ' + DateFormat('d. MMMM yyyy - HH:mm').format(progress.dateCreation) + '\n';
-      text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
-      text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
-      DialogModal(parent.context).show( progress.title, text, false);
-    });
+    String text = Translator.text('Common', 'Task') + ': ' + progress.taskName + '\n';
+    text += '\n' + Translator.text('Common', 'Calendar Week') + ': ' + progress.reportWeek.toString() + '/' + progress.reportYear.toString() + '\n';
+    text += '\n' + Translator.text('Common', 'Created') + ': ' + DateFormat('d. MMMM yyyy - HH:mm').format(progress.dateCreation) + '\n';
+    text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
+    text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
+    DialogModal(parent.context).show( progress.title, text, false);
   }
 }
