@@ -13,6 +13,7 @@ import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/common/calendar.utils.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
+import 'package:TaskTracker/dialog/dialog.viewprogress.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/progress.dart';
@@ -84,6 +85,32 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
           if (value != ButtonID.CANCEL) {
             _dataProvider.updateCurrentPage();
           }
+    });
+  }
+
+  void copyProgress(Progress progress) async {
+    Progress copyOfProgress = Progress();
+    copyOfProgress.ownerId = Config.authStatus.userId;
+    copyOfProgress.tags = progress.tags;
+    copyOfProgress.task = progress.task;
+    copyOfProgress.taskName = progress.taskName;
+    copyOfProgress.title = progress.title;
+    copyOfProgress.text = progress.text;
+    copyOfProgress.reportYear = CalendarUtils.getCurrentCalendarYear();
+    copyOfProgress.reportWeek = CalendarUtils.getCurrentCalendarWeek();
+    await _serviceProgress.createProgress(copyOfProgress).then((int progressId) {
+      if (progressId == 0) {
+        DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a progress title!'), true);
+      }
+      else {
+        Navigator.pushNamed(
+            context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: progressId)
+            .then((value) {
+          if (value != ButtonID.CANCEL) {
+            _dataProvider.updateCurrentPage();
+          }
+        });
+      }
     });
   }
 
@@ -202,7 +229,8 @@ class _DataProvider extends DataTableSource {
         Task task = await ServiceTask().getTask(progress.task);
         progress.taskName = task.title;
       }
-      catch(exception){ print ("Could not get task " +
+      catch(exception){
+        print ("Could not get task " +
           progress.task.toString() +
           " for progress '" + progress.title + "' (" + progress.id.toString() + ")" +
           ", reason: " + exception.toString()); }
@@ -293,6 +321,10 @@ class _DataProvider extends DataTableSource {
     text += '\n' + Translator.text('Common', 'Created') + ': ' + DateFormat('d. MMMM yyyy - HH:mm').format(progress.dateCreation) + '\n';
     text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
     text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
-    DialogModal(parent.context).show( progress.title, text, false);
+    DialogViewProgress(parent.context).show(progress.title, text).then((buttonID) {
+      if (buttonID == ButtonID.COPY) {
+        parent.copyProgress(progress);
+      }
+    });
   }
 }

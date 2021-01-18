@@ -39,6 +39,10 @@ const Translations_Common = {
     'en': 'Close',
     'de': 'Schließen',
   },
+  'Copy': {
+    'en': 'Copy',
+    'de': 'Kopie',
+  },
   'Attention': {
     'en': 'Attention',
     'de': 'Achtung',

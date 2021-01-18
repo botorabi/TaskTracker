@@ -9,17 +9,18 @@ package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.lang.*;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Utilities for handling with task Progress
@@ -239,10 +240,20 @@ public class Progresses {
             throw new IllegalArgumentException("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
         }
 
-        LocalDate date = LocalDate.of(reportYear, 1, 1);
+        LocalDate date = LocalDate.of(reportYear, 1, getFirstThursdayInYear(reportYear));
         date = date.plusWeeks(reportWeek - 1);
 
         newProgress.setReportWeek(date);
+    }
+
+    protected int getFirstThursdayInYear(int reportYear) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+        calendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.YEAR, reportYear);
+        int dateFirstMonday = calendar.get(Calendar.DATE);
+        return dateFirstMonday;
     }
 
     @NonNull

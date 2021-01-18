@@ -47,6 +47,10 @@ const Translations_WidgetProgressEdit = {
     'en': 'Please enter a progress description!',
     'de': 'Bitte geben Sie eine Beschreibung für den Aufgabenfortschritt an!',
   },
+  'Problem occurred while creating a copy of progress!': {
+    'en': 'Problem occurred while creating a copy of progress!',
+    'de': 'Während der Erstellung der Kopie trat ein Fehler auf!',
+  },
   'Edit Progress': {
     'en': 'Edit Progress',
     'de': 'Aufgabenfortschritt bearbeiten',
