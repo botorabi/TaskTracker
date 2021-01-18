@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -400,28 +400,19 @@ public class ProgressesTest {
     public void setReportWeekAsAdmin() {
         Progress progress = new Progress();
 
-        LocalDate date = LocalDate.now();
+        LocalDate date = LocalDate.now().minusWeeks(Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
         int currentWeek = date.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR);
         int currentYear = date.get(IsoFields.WEEK_BASED_YEAR);
-
-        currentWeek -= (Progresses.MAX_CALENDAR_WEEK_DISTANCE + 1);
-        if (currentWeek <= 0) {
-            currentYear -= 1;
-            currentWeek += Progresses.MAX_CALENDAR_WEEKS;
-        }
 
         mockUserAsAdmin();
         mockUserAsTeamLead();
 
-        final int setWeek = currentWeek;
-        final int setYear = currentYear;
-
-        progresses.setReportWeek(progress, setWeek, setYear);
+        progresses.setReportWeek(progress, currentWeek, currentYear);
 
         LocalDate reportWeek = progress.getReportWeek();
 
-        assertThat(reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)).isEqualTo(setWeek);
-        assertThat(reportWeek.get(IsoFields.WEEK_BASED_YEAR)).isEqualTo(setYear);
+        assertThat(reportWeek.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)).isEqualTo(currentWeek);
+        assertThat(reportWeek.get(IsoFields.WEEK_BASED_YEAR)).isEqualTo(currentYear);
     }
 
     @Test
