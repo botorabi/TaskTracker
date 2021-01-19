@@ -38,7 +38,7 @@ class Progress {
     progress.reportYear = fields['reportYear'];
 
     if (fields['dateCreation'] != null) {
-      progress.dateCreation = DateTime.parse(fields['dateCreation'].toString());
+      progress.dateCreation = DateTime.parse(fields['dateCreation'].toString()).toLocal();
     }
     if (fields.containsKey('tags')) {
       progress.tags = List.from(fields['tags']);

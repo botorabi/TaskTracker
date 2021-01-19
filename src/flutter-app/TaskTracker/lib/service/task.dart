@@ -29,7 +29,7 @@ class Task {
     task.title = Utf8Utils.fromUtf8(fields['title']);
     task.description = Utf8Utils.fromUtf8(fields['description']);
     if (fields['dateCreation'] != null) {
-      task.dateCreation = DateTime.parse(fields['dateCreation'].toString());
+      task.dateCreation = DateTime.parse(fields['dateCreation'].toString()).toLocal();
     }
     if (fields['dateClosed'] != null) {
       task.dateClosed = DateTime.parse(fields['dateClosed'].toString());

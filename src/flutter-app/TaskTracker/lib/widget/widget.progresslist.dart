@@ -106,10 +106,18 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
         Navigator.pushNamed(
             context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: progressId)
             .then((value) {
-          if (value != ButtonID.CANCEL) {
-            _dataProvider.updateCurrentPage();
-          }
-        });
+              if (value == ButtonID.CANCEL) {
+                _serviceProgress
+                    .deleteProgress(progressId)
+                    .then((status) {},
+                      onError: (err) {
+                        print(Translator.text('WidgetProgressList', 'Failed to delete progress entry, reason: ') + err.toString());
+                      });
+              }
+              else {
+                _dataProvider.updateCurrentPage();
+              }
+           });
       }
     });
   }
