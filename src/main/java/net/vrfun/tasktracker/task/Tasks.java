@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.task;
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Utilities for handling with Tasks
@@ -28,28 +30,30 @@ public class Tasks {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private TaskRepository taskRepository;
-    private UserRepository userRepository;
-    private TeamRepository teamRepository;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
+    private final TeamRepository teamRepository;
+    private final ProgressRepository progressRepository;
+    private final UserAuthenticator userAuthenticator;
 
     @Autowired
     public Tasks(@NonNull final TaskRepository taskRepository,
                  @NonNull final UserRepository userRepository,
-                 @NonNull final TeamRepository teamRepository) {
+                 @NonNull final TeamRepository teamRepository,
+                 @NonNull final ProgressRepository progressRepository,
+                 @NonNull final UserAuthenticator userAuthenticator) {
 
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
+        this.progressRepository = progressRepository;
+        this.userAuthenticator = userAuthenticator;
     }
 
     @NonNull
     public Task create(@NonNull final ReqTaskEdit taskEdit) throws IllegalArgumentException {
         if (StringUtils.isEmpty(taskEdit.getTitle())) {
             throw new IllegalArgumentException("Missing task title");
-        }
-        Optional<Task> task = taskRepository.findTaskByTitle(taskEdit.getTitle());
-        if (task.isPresent()) {
-            throw new IllegalArgumentException("A task with this title already exists.");
         }
         Task newTask = new Task(taskEdit.getTitle());
         newTask.setDescription(taskEdit.getDescription());
@@ -62,12 +66,7 @@ public class Tasks {
     @NonNull
     public Task getOrCreate(@NonNull final String title) {
         Optional<Task> task = taskRepository.findTaskByTitle(title);
-        if (task.isPresent()) {
-            return task.get();
-        }
-        else {
-            return taskRepository.save(new Task(title));
-        }
+        return task.orElseGet(() -> taskRepository.save(new Task(title)));
     }
 
     @NonNull
@@ -77,7 +76,7 @@ public class Tasks {
         }
 
         Optional<Task> task = taskRepository.findById(taskEdit.getId());
-        if (!task.isPresent()) {
+        if (task.isEmpty()) {
             throw new IllegalArgumentException("Task does not exists.");
         }
         task.get().setTitle(taskEdit.getTitle());
@@ -96,7 +95,7 @@ public class Tasks {
         Collection<Team> teams = new ArrayList<>();
 
         if (taskEdit.getUsers() != null) {
-            taskEdit.getUsers().stream().forEach((userID) -> {
+            taskEdit.getUsers().forEach((userID) -> {
                 Optional<User> user = userRepository.findById(userID);
                 user.ifPresentOrElse(
                         (foundUser) -> users.add(user.get()),
@@ -105,7 +104,7 @@ public class Tasks {
         }
 
         if (taskEdit.getTeams() != null) {
-            taskEdit.getTeams().stream().forEach((teamID) -> {
+            taskEdit.getTeams().forEach((teamID) -> {
                 Optional<Team> team = teamRepository.findById(teamID);
                 team.ifPresentOrElse(
                         (foundTeam) -> teams.add(team.get()),
@@ -120,6 +119,9 @@ public class Tasks {
     public void delete(long id) throws IllegalArgumentException {
         Optional<Task> task = taskRepository.findById(id);
         if (task.isPresent()) {
+            if (progressRepository.countProgressByTaskId(id) > 0L) {
+                throw new IllegalArgumentException("Task '" + task.get().getTitle() + "' is in use!");
+            }
             taskRepository.delete(task.get());
         }
         else {
@@ -129,15 +131,36 @@ public class Tasks {
 
     @NonNull
     public List<TaskDTO> getTasks() {
-        List<TaskDTO> tasks = new ArrayList<>();
-        Iterable<Task> allTasks = taskRepository.findAll();
-        if (allTasks != null) {
-            allTasks.forEach((task) -> {
-                TaskDTO t = new TaskDTO(task);
-                tasks.add(t);
-            });
+        if (userAuthenticator.isRoleAdmin()) {
+            return taskRepository.findAll().stream()
+                    .map(TaskDTO::new)
+                    .collect(Collectors.toList());
         }
-        return tasks;
+        else {
+            final List<Task> allTasks = taskRepository.findUserTasks(userAuthenticator.getUser());
+            teamRepository.findUserTeams(userAuthenticator.getUser()).forEach(((team) ->
+                    allTasks.addAll(taskRepository.findTeamTasks(team))));
+
+            return createUniqueTasks(allTasks);
+        }
+    }
+
+    @NonNull
+    protected List<TaskDTO> createUniqueTasks(@NonNull final List<Task> tasks) {
+        List<TaskDTO> uniqueTasks = new ArrayList<>();
+        tasks.forEach((task) -> {
+            boolean existing = false;
+            for (TaskDTO existingTask: uniqueTasks) {
+                if (task.getId().equals(existingTask.getId())) {
+                    existing = true;
+                    break;
+                }
+            }
+            if (!existing) {
+                uniqueTasks.add(new TaskDTO(task));
+            }
+        });
+        return uniqueTasks;
     }
 
     @NonNull
@@ -146,7 +169,17 @@ public class Tasks {
         if (foundTask.isEmpty()) {
             throw new IllegalArgumentException("Task with ID '" + id + "' does not exist!");
         }
-        return new TaskDTO(foundTask.get());
+        if (userAuthenticator.isRoleAdmin()) {
+            return new TaskDTO(foundTask.get());
+        } else {
+            List<TaskDTO> userTasks = getTasks();
+            for (TaskDTO userTask: userTasks) {
+                if (id.equals(userTask.getId())) {
+                    return userTask;
+                }
+            }
+            throw new IllegalArgumentException("Unauthorized access to task, not your Task!");
+        }
     }
 
     @NonNull

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -9,9 +9,12 @@ package net.vrfun.tasktracker.task;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -65,11 +68,12 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getAll() {
         if (userAuthenticator.isRoleAdmin() || userAuthenticator.isRoleTeamLead()) {
-
             List<ProgressDTO> progs = new ArrayList<>();
-            progressRepository.findAll()
-                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
-
+            int count = (int)progressRepository.count();
+            if (count > 0) {
+                progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(0, count))
+                        .forEach((progress -> progs.add(new ProgressDTO(progress))));
+            }
             return progs;
         }
         else {
@@ -77,10 +81,44 @@ public class Progresses {
         }
     }
 
+    @NonNull
+    public ProgressPagedDTO getPaged(int page, int size) {
+        if (userAuthenticator.isRoleAdmin()) {
+            List<ProgressDTO> progs = new ArrayList<>();
+            progressRepository.findAllByOrderByReportWeekDesc(PageRequest.of(page, size))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+
+            return new ProgressPagedDTO(progressRepository.count(), page, progs);
+        }
+        else if (userAuthenticator.isRoleTeamLead()) {
+            List<Long> userIds = findAllTeamLeadRelatedUsers(userAuthenticator.getUser());
+            return getUserProgressPaged(userIds, page, size);
+        }
+        else {
+            return getUserProgressPaged(Arrays.asList(userAuthenticator.getUserId()), page, size);
+        }
+    }
+
+    @NonNull
+    protected List<Long> findAllTeamLeadRelatedUsers(@NonNull final User teamLead) {
+        List<Long> userIds = new ArrayList<>();
+        teamRepository.findUserTeams(teamLead)
+                .forEach((team) -> {
+                    if (team.getUsers() != null) {
+                        team.getUsers().forEach((user) -> userIds.add(user.getId()));
+                    }
+                    if (team.getTeamLeaders() != null) {
+                        team.getTeamLeaders().forEach((user) -> userIds.add(user.getId()));
+                    }
+                });
+
+        return userIds;
+    }
+
     @Nullable
     public ProgressDTO get(long id) {
         Optional<Progress> progress = progressRepository.findById(id);
-        if (!progress.isPresent()) {
+        if (progress.isEmpty()) {
             return null;
         }
 
@@ -100,10 +138,24 @@ public class Progresses {
     @NonNull
     public List<ProgressDTO> getUserProgress() {
         List<ProgressDTO> progs = new ArrayList<>();
-        progressRepository.findProgressByOwnerId(userAuthenticator.getUserId())
-                .forEach((progress -> progs.add(new ProgressDTO(progress))));
-
+        int count = (int)progressRepository.countProgressByOwnerIdIn(Arrays.asList(userAuthenticator.getUserId()));
+        if (count > 0) {
+            progressRepository.findProgressByOwnerIdInOrderByReportWeekDesc(
+                    Arrays.asList(userAuthenticator.getUserId()),PageRequest.of(0, count))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+        }
         return progs;
+    }
+
+    @NonNull
+    public ProgressPagedDTO getUserProgressPaged(@NonNull final List<Long> ownerIds, int page , int size) {
+        List<ProgressDTO> progs = new ArrayList<>();
+        long totalCount = progressRepository.countProgressByOwnerIdIn(ownerIds);
+        if (totalCount > 0) {
+            progressRepository.findProgressByOwnerIdInOrderByReportWeekDesc(ownerIds, PageRequest.of(page, size))
+                    .forEach((progress -> progs.add(new ProgressDTO(progress))));
+        }
+        return new ProgressPagedDTO(totalCount, page, progs);
     }
 
     @NonNull
@@ -188,10 +240,20 @@ public class Progresses {
             throw new IllegalArgumentException("Invalid calendar week or year! Max allowed distance is " + MAX_CALENDAR_WEEK_DISTANCE + " weeks.");
         }
 
-        LocalDate date = LocalDate.of(reportYear, 1, 1);
+        LocalDate date = LocalDate.of(reportYear, 1, getFirstThursdayInYear(reportYear));
         date = date.plusWeeks(reportWeek - 1);
 
         newProgress.setReportWeek(date);
+    }
+
+    protected int getFirstThursdayInYear(int reportYear) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+        calendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
+        calendar.set(Calendar.MONTH, Calendar.JANUARY);
+        calendar.set(Calendar.YEAR, reportYear);
+        int dateFirstMonday = calendar.get(Calendar.DATE);
+        return dateFirstMonday;
     }
 
     @NonNull
@@ -220,7 +282,7 @@ public class Progresses {
 
     protected void setProgressTaskAndTags(@NonNull final Progress newProgress, @NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());
-        if (!task.isPresent()) {
+        if (task.isEmpty()) {
             LOGGER.debug("Cannot set progress task. Task with given ID does not exist!");
             throw new IllegalArgumentException("Cannot set progress task. Task with given ID does not exist!");
         }
@@ -228,9 +290,7 @@ public class Progresses {
 
         Collection<Tag> progressTags = new ArrayList<>();
         if (reqProgressEdit.getTags() != null) {
-            reqProgressEdit.getTags()
-                    .stream()
-                    .forEach((tagName) -> progressTags.add(tags.getOrCreate(tagName)));
+            reqProgressEdit.getTags().forEach((tagName) -> progressTags.add(tags.getOrCreate(tagName)));
         }
         newProgress.setTags(progressTags);
     }
@@ -238,7 +298,7 @@ public class Progresses {
     @NonNull
     public Progress editProgress(@NonNull final ReqProgressEdit reqProgressEdit) {
         Optional<Progress> foundProgress = progressRepository.findById(reqProgressEdit.getId());
-        if (!foundProgress.isPresent()) {
+        if (foundProgress.isEmpty()) {
             throw new IllegalArgumentException("A progress entry with given ID does not exist!");
         }
 
@@ -260,7 +320,7 @@ public class Progresses {
             foundProgress.get().setText(reqProgressEdit.getText());
         }
 
-        if ((reqProgressEdit.getTask() != null) &&
+        if ((reqProgressEdit.getTask() != null) && (foundProgress.get().getTask() != null) &&
                 (!foundProgress.get().getTask().getId().equals(reqProgressEdit.getTask()))) {
 
             Optional<Task> task = taskRepository.findById(reqProgressEdit.getTask());

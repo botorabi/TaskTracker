@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -8,6 +8,7 @@
 package net.vrfun.tasktracker.task;
 
 
+import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -30,6 +31,10 @@ public class TasksTest {
     private UserRepository userRepository;
     @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private ProgressRepository progressRepository;
+    @Mock
+    private UserAuthenticator userAuthenticator;
 
     private Tasks tasks;
 
@@ -37,16 +42,18 @@ public class TasksTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        tasks = new Tasks(taskRepository, userRepository, teamRepository);
+        tasks = new Tasks(taskRepository, userRepository, teamRepository, progressRepository, userAuthenticator);
     }
 
     @Test
     public void getTasks() {
-        List<Task> allTasks = new ArrayList<>();
-        allTasks.add(new Task("Task1"));
-        allTasks.add(new Task("Task2"));
+        Task task1 = new Task("Task1");
+        task1.setId(42L);
+        Task task2 = new Task("Task2");
+        task2.setId(43L);
+        List<Task> allTasks = Arrays.asList(task1, task2);
 
-        doReturn(allTasks).when(taskRepository).findAll();
+        doReturn(allTasks).when(taskRepository).findUserTasks(any());
 
         assertThat(tasks.getTasks()).hasSize(allTasks.size());
     }

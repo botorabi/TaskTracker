@@ -11,6 +11,7 @@ import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -46,17 +47,21 @@ class DialogChooseUsers {
               title: Text(title),
               content: _createUsersUI(text, setState),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(ButtonID.CANCEL),
-                  onPressed: () {
-                    Navigator.of(_context).pop(List<UserInfo>());
-                  },
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CANCEL)),
+                    onPressed: () => Navigator.of(_context).pop(List<UserInfo>()),
+                  ),
                 ),
-                FlatButton(
-                  child: Text(ButtonID.CHOOSE),
-                  onPressed: () {
-                    Navigator.of(_context).pop(_chosenUsers);
-                  },
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CHOOSE)),
+                    onPressed: () => Navigator.of(_context).pop(_chosenUsers),
+                  ),
                 ),
               ],
             );
@@ -81,12 +86,12 @@ class DialogChooseUsers {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Find User',
+                Text(Translator.text('WidgetUser', 'Find User'),
                     style: TextStyle(fontWeight: FontWeight.w500)
                 ),
                 TextField(
                   decoration: InputDecoration(
-                      hintText: 'Enter a user search string'
+                      hintText: Translator.text('WidgetUser', 'Enter a user search string')
                   ),
                   onChanged: (value) {
                     _searchUser(value).then((value) {
@@ -113,7 +118,7 @@ class DialogChooseUsers {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Found Users',
+                        child: Text(Translator.text('WidgetTeam', 'Found Users'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -127,8 +132,8 @@ class DialogChooseUsers {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             shrinkWrap: true,
@@ -152,7 +157,7 @@ class DialogChooseUsers {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Chosen Users',
+                        child: Text(Translator.text('WidgetTeam', 'Chosen Users'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -166,8 +171,8 @@ class DialogChooseUsers {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             controller: _controller,
@@ -196,7 +201,7 @@ class DialogChooseUsers {
             ListTile(
               dense: true,
               title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
-              trailing: CircleButton.create(24, Icons.arrow_right, () {
+              trailing: CircleButton.create(18, Icons.add_circle_rounded, () {
                 if (_addNewChosenUser(userInfo)) {
                   _updateChosenUsersUI();
                   _scrollToLastChosenUser();
@@ -217,7 +222,7 @@ class DialogChooseUsers {
           ListTile(
               dense: true,
               title: Text(userInfo.realName, style: TextStyle(fontSize: 14.0)),
-              trailing: CircleButton.create(16, Icons.delete, () {
+              trailing: CircleButton.create(18, Icons.remove_circle_outlined, () {
                 _chosenUsers.remove(userInfo);
                 _updateChosenUsersUI();
               }),

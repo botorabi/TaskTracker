@@ -11,6 +11,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.chooseteams.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -109,8 +110,8 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
                       Padding(
                         padding: const EdgeInsets.all(0.0),
                         child:
-                        CircleButton.create(20, Icons.add, () {
-                          DialogChooseTeams(context).show('Teams', 'Add New Team')
+                        CircleButton.create(18, Icons.add_circle_rounded, () {
+                          DialogChooseTeams(context).show(Translator.text('Common', 'Teams'), Translator.text('WidgetTeam', 'Add New Team'))
                               .then((chosenTeams) {
                               if (chosenTeams != null && chosenTeams.length > 0) {
                                 chosenTeams.forEach((chosenTeam) {
@@ -139,8 +140,8 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
                     height: 180,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
-                      border: Border.all(color: Config.listBorderColor,),
-                      color: Config.listBackgroundColor,
+                      border: Border.all(color: Config.LIST_BORDER_COLOR,),
+                      color: Config.LIST_BACKGROUND_COLOR,
                     ),
                     child: ListView(
                       children: <Widget>[
@@ -165,7 +166,7 @@ class _WidgetTeamChooserState extends State<WidgetTeamChooser> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(team.name),
-              CircleButton.create(16, Icons.delete, () {
+              CircleButton.create(18, Icons.remove_circle_outlined, () {
                 _teams.remove(team);
                 _createUI();
               }),

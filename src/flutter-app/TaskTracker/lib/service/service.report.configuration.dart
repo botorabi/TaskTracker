@@ -20,7 +20,7 @@ import 'package:http/http.dart';
 class ServiceReportConfiguration {
 
   Future<List<ReportMailConfiguration>> getConfigurations() async {
-    Response response = await get(Config.baseURL + '/api/report/generator-configuration',
+    Response response = await get(Config.BASE_URL + '/api/report/generator-configuration',
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -33,7 +33,7 @@ class ServiceReportConfiguration {
   }
 
   Future<ReportMailConfiguration> getConfiguration(int configurationId) async {
-    Response response = await get(Config.baseURL + '/api/report/generator-configuration/' + configurationId.toString(),
+    Response response = await get(Config.BASE_URL + '/api/report/generator-configuration/' + configurationId.toString(),
                                   headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {
@@ -45,7 +45,7 @@ class ServiceReportConfiguration {
   }
 
   Future<int> createConfiguration(ReportMailConfiguration configuration) async {
-    Response response = await post(Config.baseURL + '/api/report/generator-configuration/create',
+    Response response = await post(Config.BASE_URL + '/api/report/generator-configuration/create',
         headers: ServiceCommon.HTTP_HEADERS_REST,
         body: jsonEncode(configuration));
 
@@ -58,7 +58,7 @@ class ServiceReportConfiguration {
   }
 
   Future<bool> editConfiguration(ReportMailConfiguration configuration) async {
-    Response response = await put(Config.baseURL + '/api/report/generator-configuration/edit',
+    Response response = await put(Config.BASE_URL + '/api/report/generator-configuration/edit',
                                   headers: ServiceCommon.HTTP_HEADERS_REST,
                                   body: jsonEncode(configuration));
 
@@ -71,7 +71,7 @@ class ServiceReportConfiguration {
   }
 
   Future<bool> deleteConfiguration(int id) async {
-    Response response = await delete(Config.baseURL + '/api/report/generator-configuration/delete/' + id.toString(),
+    Response response = await delete(Config.BASE_URL + '/api/report/generator-configuration/delete/' + id.toString(),
                                      headers: ServiceCommon.HTTP_HEADERS_REST);
 
     if (response.statusCode == HttpStatus.ok) {

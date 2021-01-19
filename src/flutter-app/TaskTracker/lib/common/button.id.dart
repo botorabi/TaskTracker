@@ -16,5 +16,6 @@ abstract class ButtonID {
   static const String DISMISS = 'Dismiss';
   static const String APPLY = 'Apply';
   static const String CREATE = 'Create';
+  static const String COPY = 'Copy';
   static const String CHOOSE = 'Choose';
 }

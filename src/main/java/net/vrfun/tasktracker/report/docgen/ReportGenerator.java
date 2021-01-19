@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -25,6 +25,11 @@ import java.util.List;
  * Creation Date    September 2020
  */
 public interface ReportGenerator {
+
+    /**
+     * Set report generator's locale.
+     */
+    void setLocale(@NonNull final ReportI18n reportI18n);
 
     /**
      * Begin report generation.

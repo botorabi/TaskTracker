@@ -6,21 +6,27 @@
  *          main directory for more details.
  */
 
+import 'dart:async';
+
 import 'package:TaskTracker/common/button.circle.dart';
 import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/common/calendar.utils.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
+import 'package:TaskTracker/dialog/dialog.viewprogress.dart';
 import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/progress.dart';
 import 'package:TaskTracker/service/service.progress.dart';
+import 'package:TaskTracker/service/service.task.dart';
+import 'package:TaskTracker/service/task.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 class WidgetProgressList extends StatefulWidget {
-  WidgetProgressList({Key key, this.title = 'Progress'
-      ''}) : super(key: key);
+  WidgetProgressList({Key key, this.title = 'Progress'}) : super(key: key);
 
   final String title;
   final _WidgetProgressListState _widgetProgressListState = _WidgetProgressListState();
@@ -31,15 +37,15 @@ class WidgetProgressList extends StatefulWidget {
 
 class _WidgetProgressListState extends State<WidgetProgressList> {
 
+  static const MAX_ROWS_PER_PAGE = 10;
+
   final _serviceProgress = ServiceProgress();
   PaginatedDataTable _dataTable;
-  List<Progress> _progresses = [];
-  bool _sortAscending = false;
+  _DataProvider _dataProvider;
 
   @override
   void initState() {
     super.initState();
-    _retrieveProgresses();
   }
 
   @override
@@ -49,6 +55,7 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 
   @override
   Widget build(BuildContext context) {
+    _dataProvider = _DataProvider(this, MAX_ROWS_PER_PAGE);
     _dataTable = _createDataTable();
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
@@ -73,13 +80,53 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
   }
 
   void _addProgress() async {
-    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS);
-    _retrieveProgresses();
+    await Navigator.pushNamed(context, NavigationLinks.NAV_NEW_PROGRESS)
+        .then((value) {
+          if (value != ButtonID.CANCEL) {
+            _dataProvider.updateCurrentPage();
+          }
+    });
+  }
+
+  void copyProgress(Progress progress) async {
+    Progress copyOfProgress = Progress();
+    copyOfProgress.ownerId = Config.authStatus.userId;
+    copyOfProgress.tags = progress.tags;
+    copyOfProgress.task = progress.task;
+    copyOfProgress.taskName = progress.taskName;
+    copyOfProgress.title = progress.title;
+    copyOfProgress.text = progress.text;
+    copyOfProgress.reportYear = CalendarUtils.getCurrentCalendarYear();
+    copyOfProgress.reportWeek = CalendarUtils.getCurrentCalendarWeek();
+    await _serviceProgress.createProgress(copyOfProgress).then((int progressId) {
+      if (progressId == 0) {
+        DialogModal(context).show(Translator.text('Common', 'Attention'), Translator.text('WidgetProgressEdit', 'Please enter a progress title!'), true);
+      }
+      else {
+        Navigator.pushNamed(
+            context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: progressId)
+            .then((value) {
+              if (value == ButtonID.CANCEL) {
+                _serviceProgress
+                    .deleteProgress(progressId)
+                    .then((status) {},
+                      onError: (err) {
+                        print(Translator.text('WidgetProgressList', 'Failed to delete progress entry, reason: ') + err.toString());
+                      });
+              }
+              else {
+                _dataProvider.updateCurrentPage();
+              }
+           });
+      }
+    });
   }
 
   void _deleteProgress(int id) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete the progress entry?", ButtonID.YES, ButtonID.NO);
+        .show(Translator.text('Common', 'Attention'),
+              Translator.text('WidgetProgressList', 'Do you really want to delete the progress entry?'),
+              ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
@@ -88,70 +135,54 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
     _serviceProgress
       .deleteProgress(id)
       .then((status) {
-          DialogModal(context).show('Progress Deletion', 'Progress entry was successfully deleted.', false);
-          _retrieveProgresses();
+          DialogModal(context).show(Translator.text('WidgetProgressList', 'Progress Deletion'),
+              Translator.text('WidgetProgressList', 'Progress entry was successfully deleted.'), false)
+              .then((value) { _dataProvider.updateCurrentPage(); });
         },
         onError: (err) {
-          print('Failed to delete progress entry, reason: ' + err.toString());
+          print(Translator.text('WidgetProgressList','Failed to delete progress entry, reason: ') + err.toString());
       });
   }
 
-  void _sortProgress(bool ascending) {
-    _progresses.sort((progressA, progressB) => progressA.reportWeek?.compareTo(progressB?.reportWeek));
-    if (!ascending) {
-      _progresses = _progresses.reversed.toList();
-    }
-  }
-
-  void _retrieveProgresses() {
-    _serviceProgress
-        .getAllProgress()
-        .then((listTasks) {
-            _progresses = listTasks;
-            _sortProgress(_sortAscending);
-            setState(() {});
-          },
-          onError: (err) {
-            print("Failed to retrieve progress entries, reason: " + err.toString());
-          });
-  }
-
   PaginatedDataTable _createDataTable() {
-    String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     String currentYear = CalendarUtils.getCurrentCalendarYear().toString();
+    String currentWeek = CalendarUtils.getCurrentCalendarWeek().toString();
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text('Calendar Week ' + currentYear + ' / ' + currentWeek),
+      header: Column(
+        children: [
+          Text(Translator.text('WidgetProgressList', 'Progress Entries')),
+          Text(Translator.text('WidgetProgressList', 'Current Calendar Week') + ': ' + currentWeek+ ' / ' + currentYear,
+               style: TextStyle(fontSize: 12)),
+        ],
+      ),
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Title',
+            Translator.text('Common', 'Title'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Calendar Week',
+            Translator.text('Common', 'Task'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
-          onSort:(columnIndex, ascending) {
-            setState(() {
-              _sortAscending = !_sortAscending;
-              _sortProgress(_sortAscending);
-              _dataTable = _createDataTable();
-            });
-          },
+        ),
+        DataColumn(
+          label: Text(
+            Translator.text('Common', 'Calendar Week'),
+            style: TextStyle(fontStyle: FontStyle.italic),
+          ),
         ),
         DataColumn(
           label: Text(''),
         ),
       ],
-      rowsPerPage: 10,
-      onRowsPerPageChanged: null,
-      source: _DataProvider(this),
+      rowsPerPage: MAX_ROWS_PER_PAGE,
+      source: _dataProvider,
       sortColumnIndex: 0,
-      sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), "Add New Progress"),
+        CircleButton.create(24, Icons.add_box_rounded, () => _addProgress(), Translator.text('WidgetProgressList', 'Add New Progress Entry')),
       ],
     );
 
@@ -160,23 +191,87 @@ class _WidgetProgressListState extends State<WidgetProgressList> {
 }
 
 class _DataProvider extends DataTableSource {
-
   _WidgetProgressListState parent;
+  int maxRowCount;
 
-  _DataProvider(this.parent);
+  int  _currentPage = -1;
+  int  _rowCount = 1;
+  bool _fetchingData = false;
+  List<Progress> _progresses = [];
+
+  _DataProvider(this.parent, this.maxRowCount);
+
+  void _sortProgress(bool ascending) {
+    _progresses.sort((progressA, progressB) => progressA.dateCreation?.compareTo(progressB?.dateCreation));
+    if (!ascending) {
+      _progresses = _progresses.reversed.toList();
+    }
+  }
+
+  void updateCurrentPage() {
+    _fetchEntries(_currentPage);
+  }
+
+  void _fetchEntries(int page) async {
+    _fetchingData = true;
+    parent._serviceProgress
+        .getPagedProgress(page, maxRowCount)
+        .then((progressPaged) async {
+          _rowCount = progressPaged.totalCount;
+          _currentPage = progressPaged.currentPage;
+          _progresses = progressPaged.progressList;
+          _fetchingData = false;
+          await _fetchTaskInfo(_progresses);
+          _sortProgress(false);
+          notifyListeners();
+        },
+        onError: (err) {
+          print("Failed to retrieve progress entries, reason: " + err.toString());
+          _fetchingData = false;
+        });
+  }
+
+  Future<void> _fetchTaskInfo(List<Progress> progresses) async {
+    for(Progress progress in progresses) {
+      try {
+        Task task = await ServiceTask().getTask(progress.task);
+        progress.taskName = task.title;
+      }
+      catch(exception){
+        print ("Could not get task " +
+          progress.task.toString() +
+          " for progress '" + progress.title + "' (" + progress.id.toString() + ")" +
+          ", reason: " + exception.toString()); }
+    }
+  }
 
   @override
   DataRow getRow(int index) {
-    bool modifiable = Config.authStatus.isAdmin() ||
-        CalendarUtils.checkCurrentWeekDistance(parent._progresses[index].reportWeek, parent._progresses[index].reportYear);
+    if (_fetchingData) {
+      return null;
+    }
 
-    String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + parent._progresses[index].ownerName + ']') : '';
+    int minIndex = _currentPage * maxRowCount;
+    int maxIndex = (_currentPage + 1) * maxRowCount - 1;
+    if ((_currentPage < 0) || (index < minIndex) || (index > maxIndex)) {
+      int page = (index / maxRowCount).floor();
+      _fetchEntries(page);
+      return null;
+    }
+
+    index = (index % maxRowCount);
+
+    bool modifiable = Config.authStatus.isAdmin() ||
+        CalendarUtils.checkCurrentWeekDistance(_progresses[index].reportWeek, _progresses[index].reportYear);
+
+    String userName = (Config.authStatus.isAdmin() || Config.authStatus.isTeamLead()) ? (' [' + _progresses[index].ownerName + ']') : '';
 
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._progresses[index].title + userName)),
-        DataCell(Text(parent._progresses[index].reportYear.toString() + ' / ' + parent._progresses[index].reportWeek.toString())),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 200), child: Text(_progresses[index].title + userName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(_progresses[index].taskName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(_progresses[index].reportYear.toString() + ' / ' + _progresses[index].reportWeek.toString()))),
         DataCell(
           Row(
             children: [
@@ -185,31 +280,31 @@ class _DataProvider extends DataTableSource {
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.visibility, () {
-                    _showProgressEntry(parent._progresses[index]);
+                    _showProgressEntry(_progresses[index]);
                   },
-                  'View Progress'),
+                  Translator.text('Common', 'View')),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.edit, !modifiable ? null : () {
-                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: parent._progresses[index].id)
+                    Navigator.pushNamed(parent.context, NavigationLinks.NAV_EDIT_PROGRESS, arguments: _progresses[index].id)
                         .then((value) {
                       if (value != ButtonID.CANCEL) {
-                        parent._retrieveProgresses();
+                        _fetchEntries(_currentPage);
                       }
                      }
                     );
                   },
-                  'Edit Progress'
+                  Translator.text('Common', 'Edit'),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.all(4.0),
                 child:
                   CircleButton.create(24, Icons.delete,
-                    !modifiable ? null :  () => parent._deleteProgress(parent._progresses[index].id),
-                    'Delete Progress'
+                    !modifiable ? null :  () => parent._deleteProgress(_progresses[index].id),
+                    Translator.text('Common', 'Delete'),
                 ),
               ),
             ],
@@ -223,15 +318,21 @@ class _DataProvider extends DataTableSource {
   bool get isRowCountApproximate => false;
 
   @override
-  int get rowCount => parent._progresses.length;
+  int get rowCount => _rowCount;
 
   @override
   int get selectedRowCount => 0;
 
   void _showProgressEntry(Progress progress) {
-    String text = 'Report Week ' + progress.reportWeek.toString() + ' / ' + progress.reportYear.toString() + '\n';
-    text += '\nUser: ' + progress.ownerName + '\n';
-    text += '\nText:\n\n' + progress.text;
-    DialogModal(parent.context).show( progress.title, text, false);
+    String text = Translator.text('Common', 'Task') + ': ' + progress.taskName + '\n';
+    text += '\n' + Translator.text('Common', 'Calendar Week') + ': ' + progress.reportWeek.toString() + '/' + progress.reportYear.toString() + '\n';
+    text += '\n' + Translator.text('Common', 'Created') + ': ' + DateFormat('d. MMMM yyyy - HH:mm').format(progress.dateCreation) + '\n';
+    text += '\n' + Translator.text('Common', 'User') + ': ' + progress.ownerName + '\n';
+    text += '\n' + Translator.text('Common', 'Text') + ':\n\n' + progress.text;
+    DialogViewProgress(parent.context).show(progress.title, text).then((buttonID) {
+      if (buttonID == ButtonID.COPY) {
+        parent.copyProgress(progress);
+      }
+    });
   }
 }

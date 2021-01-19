@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -62,7 +62,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
 
                 .authorizeRequests()
-                .antMatchers("/*", "/assets/**", "/icons/**", "/api/user/login", "/api/user/logout", "/api/user/status").permitAll();
+                .antMatchers("/*", "/assets/**", "/icons/**", "/api/app/info", "/api/user/login",
+                                "/api/user/logout", "/api/user/status").permitAll();
 
         if (developmentModeEnabled) {
             //! NOTE we enable CORS during development

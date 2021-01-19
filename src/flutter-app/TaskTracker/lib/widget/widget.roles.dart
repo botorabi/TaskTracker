@@ -9,6 +9,7 @@
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -36,6 +37,7 @@ class WidgetRoles extends StatefulWidget {
 
 class _WidgetRolesState extends State<WidgetRoles> {
 
+  bool _stateReady = false;
   final _serviceUser = ServiceUser();
   List<Container> _rolesWidget = List<Container>();
   List<String> _userRoles = List<String>();
@@ -49,9 +51,8 @@ class _WidgetRolesState extends State<WidgetRoles> {
   }
 
   void setUserRoles(List<String> roles) {
-    setState(() {
-      _userRoles = roles;
-    });
+    _userRoles = roles;
+    _createRolesUI(_availableRoles);
   }
 
   List<String> getUserRoles() {
@@ -59,18 +60,25 @@ class _WidgetRolesState extends State<WidgetRoles> {
   }
 
   void setReadOnly(bool readOnly) {
-    setState(() {
-      this._readOnly = readOnly;
-    });
+    this._readOnly = readOnly;
+    _createRolesUI(_availableRoles);
   }
 
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    _stateReady = true;
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,14 +108,19 @@ class _WidgetRolesState extends State<WidgetRoles> {
           _createRolesUI(roles);
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve user Roles! Reason: " + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common', 'Attention'),
+              Translator.text('WidgetRoles', 'Could not retrieve user Roles! Reason: ') + err.toString(), true);
         }
     );
   }
 
-  void _createRolesUI(List<String> roles) {
+  void _createRolesUI(List<String> availableRoles) {
+    if (availableRoles == null) {
+      return;
+    }
     _rolesWidget = List<Container>();
-    roles.forEach((element) {
+    availableRoles.forEach((element) {
       _rolesWidget.add(Container(
         child:
           Row(
@@ -131,6 +144,7 @@ class _WidgetRolesState extends State<WidgetRoles> {
         )
       );
     });
-    setState(() {});
+
+    _updateState();
   }
 }

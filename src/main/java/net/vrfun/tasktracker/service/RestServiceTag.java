@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -34,7 +34,7 @@ public class RestServiceTag {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private Tags tags;
+    private final Tags tags;
 
     @Autowired
     public RestServiceTag(@NonNull final Tags tags) {

@@ -15,6 +15,7 @@ import 'package:TaskTracker/dialog/dialogtwobuttons.modal.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/userinfo.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 
@@ -22,23 +23,17 @@ class WidgetUserList extends StatefulWidget {
   WidgetUserList({Key key, this.title = 'Users'}) : super(key: key);
 
   final String title;
-  final _WidgetUserListState _widgetUserListState = _WidgetUserListState();
 
   @override
-  _WidgetUserListState createState() => _widgetUserListState;
-
-  WidgetUserList setExpanded(bool expanded) {
-    _widgetUserListState.setExpanded(expanded);
-    return this;
-  }
+  _WidgetUserListState createState() => _WidgetUserListState();
 }
 
 class _WidgetUserListState extends State<WidgetUserList> {
 
+  bool _stateReady = false;
   final _serviceUser = ServiceUser();
   PaginatedDataTable _dataTable;
   List<UserInfo> _users = [];
-  bool _expanded = false;
   bool _sortAscending = true;
 
   @override
@@ -47,46 +42,48 @@ class _WidgetUserListState extends State<WidgetUserList> {
     _retrieveUsers();
   }
 
-  void setExpanded(bool expanded) {
-    _expanded = expanded;
-  }
-
   @override
   void dispose() {
+    _stateReady = false;
     super.dispose();
+  }
+
+  void _updateState() {
+    if (_stateReady) {
+      setState(() {});
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!Config.authStatus.isAdmin()) {
-      print("ERROR: admin corner!");
-      return Column();
-    }
-    else {
-      _dataTable = _createDataTable();
-      return LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: Card(
-            elevation: 5,
-            margin: EdgeInsets.all(10.0),
-            child:
-            ExpansionTile(
-                title: Text(widget.title),
-                initiallyExpanded: _expanded,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      child: _dataTable,
-                    ),
-                  )
-                ]
-            ),
+    _dataTable = _createDataTable();
+    _stateReady = true;
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Card(
+          elevation: 5,
+          margin: EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              Visibility(
+                visible: widget.title != null && widget.title != '',
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(widget.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  child: _dataTable,
+                ),
+              )
+            ]
           ),
         ),
-      );
-    }
+      ),
+    );
   }
 
   void _addUser() async {
@@ -96,7 +93,8 @@ class _WidgetUserListState extends State<WidgetUserList> {
 
   void _deleteUser(int id, String realName) async {
     var button = await DialogTwoButtonsModal(context)
-        .show('Attention', "You really want to delete user '$realName'?", ButtonID.YES, ButtonID.NO);
+        .show(Translator.text('Common', 'Attention'), Translator.text('WidgetUser', 'Do you really want to delete user ') + realName + '?',
+        ButtonID.YES, ButtonID.NO);
 
     if (button != ButtonID.YES) {
       return;
@@ -105,11 +103,11 @@ class _WidgetUserListState extends State<WidgetUserList> {
     _serviceUser
       .deleteUser(id)
       .then((status) {
-          DialogModal(context).show('User Deletion', 'User was successfully deleted.', false);
+          DialogModal(context).show(Translator.text('WidgetUser', 'User Deletion'), Translator.text('WidgetUser', 'User was successfully deleted.'), false);
           _retrieveUsers();
         },
         onError: (err) {
-          print('Failed to delete user, reason: ' + err.toString());
+          print(Translator.text('WidgetUser', 'Failed to delete user, reason: ') + err.toString());
       });
   }
 
@@ -126,10 +124,10 @@ class _WidgetUserListState extends State<WidgetUserList> {
         .then((listUserInfo) {
             _users = listUserInfo;
             _sortUsers(_sortAscending);
-            setState(() {});
+            _updateState();
           },
           onError: (err) {
-            print("Failed to retrieve users, reason: " + err.toString());
+            print(Translator.text('WidgetUser', 'Failed to retrieve users, reason: ') + err.toString());
           });
   }
 
@@ -139,7 +137,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       columns: <DataColumn>[
         DataColumn(
           label: Text(
-            'Name',
+            Translator.text('Common', 'Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -152,19 +150,19 @@ class _WidgetUserListState extends State<WidgetUserList> {
         ),
         DataColumn(
           label: Text(
-            'Login',
+            Translator.text('WidgetUser', 'Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Last Login',
+            Translator.text('WidgetUser', 'Last Login'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Roles',
+            Translator.text('WidgetRoles', 'Roles'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
@@ -178,7 +176,7 @@ class _WidgetUserListState extends State<WidgetUserList> {
       sortColumnIndex: 0,
       sortAscending: _sortAscending,
       actions: [
-        CircleButton.create(24, Icons.add, () => _addUser()),
+        CircleButton.create(24, Icons.add_circle_rounded, () => _addUser()),
       ],
     );
 
@@ -197,8 +195,8 @@ class _DataProvider extends DataTableSource {
     return DataRow.byIndex(
       index: index,
       cells: [
-        DataCell(Text(parent._users[index].realName)),
-        DataCell(Text(parent._users[index].login)),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 100), child: Text(parent._users[index].realName))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 80), child: Text(parent._users[index].login))),
         DataCell(
           Text(
             DateAndTimeFormatter.formatDate(parent._users[index].lastLogin) +
@@ -206,7 +204,7 @@ class _DataProvider extends DataTableSource {
             textAlign: TextAlign.center
           ),
         ),
-        DataCell(Text(parent._users[index].roles.join("\n").replaceAll(UserInfo.ROLE_PREFIX,''))),
+        DataCell(Container(constraints: BoxConstraints(maxWidth: 90), child: Text(parent._users[index].roles.join('\n').replaceAll(UserInfo.ROLE_PREFIX, '')))),
         DataCell(
           Row(
             children: [

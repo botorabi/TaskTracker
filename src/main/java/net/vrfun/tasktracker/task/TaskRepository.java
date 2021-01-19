@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -20,6 +20,8 @@ import java.util.*;
 public interface TaskRepository extends CrudRepository<Task, Long> {
 
     Optional<Task> findTaskByTitle(@NonNull final String title);
+
+    List<Task> findAll();
 
     @Query("select entry " +
             "from net.vrfun.tasktracker.task.Progress entry inner join " +

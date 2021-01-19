@@ -38,7 +38,7 @@ class UserInfo {
       userInfo.email = Utf8Utils.fromUtf8(fields['email']);
     }
     if (fields['dateCreation'] != null) {
-      userInfo.dateCreation = DateTime.parse(fields['dateCreation'].toString());
+      userInfo.dateCreation = DateTime.parse(fields['dateCreation'].toString()).toLocal();
     }
     if (fields['lastLogin'] != null) {
       userInfo.lastLogin = DateTime.parse(fields['lastLogin'].toString());

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -33,7 +33,6 @@ public class RestServiceTeam {
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     private final Teams teams;
-
     private final UserAuthenticator userAuthenticator;
 
 
@@ -87,6 +86,7 @@ public class RestServiceTeam {
     }
 
     @GetMapping("/team/search/{filter}")
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<List<TeamDTO>> searchTeam(@PathVariable("filter") String filter) {
         if (filter.equals("*")) {
             return new ResponseEntity<>(teams.getTeams(), HttpStatus.OK);

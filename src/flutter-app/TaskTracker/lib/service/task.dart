@@ -19,6 +19,7 @@ class Task {
   DateTime dateClosed;
   List<int> users = [];
   List<int> teams = [];
+  List<String> teamNames = [];
 
   Task();
 
@@ -28,7 +29,7 @@ class Task {
     task.title = Utf8Utils.fromUtf8(fields['title']);
     task.description = Utf8Utils.fromUtf8(fields['description']);
     if (fields['dateCreation'] != null) {
-      task.dateCreation = DateTime.parse(fields['dateCreation'].toString());
+      task.dateCreation = DateTime.parse(fields['dateCreation'].toString()).toLocal();
     }
     if (fields['dateClosed'] != null) {
       task.dateClosed = DateTime.parse(fields['dateClosed'].toString());
@@ -38,6 +39,11 @@ class Task {
     }
     if (fields.containsKey('teams')) {
       task.teams = List.from(fields['teams']);
+    }
+    if (fields.containsKey('teamNames')) {
+      task.teamNames = List.from(fields['teamNames'])
+          .map((name) => Utf8Utils.fromUtf8(name))
+          .toList();
     }
     return task;
   }

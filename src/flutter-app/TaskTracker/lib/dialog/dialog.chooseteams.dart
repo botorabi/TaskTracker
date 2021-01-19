@@ -11,6 +11,7 @@ import 'package:TaskTracker/common/button.id.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/service/service.team.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -46,17 +47,21 @@ class DialogChooseTeams {
               title: Text(title),
               content: _createTeamsUI(text, setState),
               actions: <Widget>[
-                FlatButton(
-                  child: Text(ButtonID.CANCEL),
-                  onPressed: () {
-                    Navigator.of(_context).pop(List<Team>());
-                  },
+                Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CANCEL)),
+                    onPressed: () => Navigator.of(_context).pop(List<Team>()),
+                  ),
                 ),
-                FlatButton(
-                  child: Text(ButtonID.CHOOSE),
-                  onPressed: () {
-                    Navigator.of(_context).pop(_chosenTeams);
-                  },
+                Padding(
+                  padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
+                  child: RaisedButton(
+                    padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+                    child: Text(Translator.text('Common', ButtonID.CHOOSE)),
+                    onPressed: () => Navigator.of(_context).pop(_chosenTeams),
+                  ),
                 ),
               ],
             );
@@ -81,12 +86,12 @@ class DialogChooseTeams {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Find Team',
+                Text(Translator.text('WidgetTeam', 'Find Team'),
                     style: TextStyle(fontWeight: FontWeight.w500)
                 ),
                 TextField(
                   decoration: InputDecoration(
-                      hintText: 'Enter at least 3 characters'
+                      hintText: Translator.text('Common', 'Enter at least 3 characters')
                   ),
                   onChanged: (value) {
                     _searchTeam(value).then((value) {
@@ -113,7 +118,7 @@ class DialogChooseTeams {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Found Teams',
+                        child: Text(Translator.text('WidgetTeam', 'Found Teams'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -127,8 +132,8 @@ class DialogChooseTeams {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             shrinkWrap: true,
@@ -152,7 +157,7 @@ class DialogChooseTeams {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(5.0),
-                        child: Text('Chosen Teams',
+                        child: Text(Translator.text('WidgetTeam', 'Chosen Teams'),
                           style: TextStyle(
                               fontWeight: FontWeight.w500),
                           textAlign: TextAlign.left,
@@ -166,8 +171,8 @@ class DialogChooseTeams {
                           height: 154,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            border: Border.all(color: Config.listBorderColor),
-                            color: Config.listBackgroundColor,
+                            border: Border.all(color: Config.LIST_BORDER_COLOR),
+                            color: Config.LIST_BACKGROUND_COLOR,
                           ),
                           child: ListView(
                             controller: _controller,
@@ -196,7 +201,7 @@ class DialogChooseTeams {
           ListTile(
             dense: true,
             title: Text(team.name, style: TextStyle(fontSize: 14.0)),
-            trailing: CircleButton.create(24, Icons.arrow_right, () {
+            trailing: CircleButton.create(18, Icons.add_circle_rounded, () {
               if (_addNewChosenTeam(team)) {
                 _updateChosenTeamsUI();
                 _scrollToLastChosenTeam();
@@ -217,7 +222,7 @@ class DialogChooseTeams {
           ListTile(
             dense: true,
             title: Text(team.name, style: TextStyle(fontSize: 14.0)),
-            trailing: CircleButton.create(16, Icons.delete, () {
+            trailing: CircleButton.create(18, Icons.remove_circle_outlined, () {
               _chosenTeams.remove(team);
               _updateChosenTeamsUI();
             }),

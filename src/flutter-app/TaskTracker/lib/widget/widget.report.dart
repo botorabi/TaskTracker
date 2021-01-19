@@ -12,6 +12,7 @@ import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/service.report.dart';
 import 'package:TaskTracker/service/service.user.dart';
 import 'package:TaskTracker/service/team.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.calendarweek.dart';
 import 'package:flutter/material.dart';
 
@@ -35,8 +36,8 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
   List<Team> _teams = [];
   List<bool> _selectedTeams = List<bool>();
   bool _sortAscending = true;
-  WidgetCalendarWeek _widgetCalendarWeekFrom = WidgetCalendarWeek(title: 'From');
-  WidgetCalendarWeek _widgetCalendarWeekTo = WidgetCalendarWeek(title: 'To',);
+  WidgetCalendarWeek _widgetCalendarWeekFrom = WidgetCalendarWeek(title: Translator.text('WidgetReport', 'From'));
+  WidgetCalendarWeek _widgetCalendarWeekTo = WidgetCalendarWeek(title: Translator.text('WidgetReport', 'To'));
 
   @override
   void initState() {
@@ -85,7 +86,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Report Period',
+                              Text(Translator.text('WidgetReport', 'Report Period'),
                                 textAlign: TextAlign.left,
                                 style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18),
                               ),
@@ -117,7 +118,7 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
                     children: [
                       Spacer(),
                       RaisedButton(
-                      child: Text(ButtonID.CREATE),
+                      child: Text(Translator.text('Common', ButtonID.CREATE)),
                         onPressed: () {
                           _createReport();
                         },
@@ -139,24 +140,38 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
     DateTime toDate = DateTime(_widgetCalendarWeekTo.getYear(), 1,
         ((_widgetCalendarWeekTo.getWeek()) * 7));
 
-    if (fromDate.isAfter(toDate)) {
-      DialogModal(context).show("Attention", "Please choose a date for 'From' less than 'To'.", true);
+    if (fromDate.isAfter(toDate) || (fromDate.millisecondsSinceEpoch == toDate.millisecondsSinceEpoch)) {
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReport', 'Please choose a date for \'From\' less than \'To\'.'), true);
       return;
     }
 
-    String fileName = "Report.pdf";
-    String teamNames = "Teams: ";
+    String fileName = Translator.text('Common', 'Report') + ".pdf";
+    String teamNames = Translator.text('Common', 'Teams') + ': ';
     List<int> teamIDs = List<int>();
+    int countSelectedTeams = 0;
     for (int i = 0; i < _selectedTeams.length; i++) {
       if (_selectedTeams[i]) {
+        countSelectedTeams++;
         teamIDs.add(_teams[i].id);
         teamNames += "'" + _teams[i].name + "' ";
       }
     }
+    if (countSelectedTeams < 1) {
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReport', 'Please select at least one team.'), true);
+      return;
+    }
 
-    bool success = await _serviceReport.createReportDocument(teamIDs, fromDate, toDate, 'Progress Report', teamNames, fileName);
+    bool success = await _serviceReport.createReportDocument(teamIDs, fromDate, toDate,
+        Translator.text('Common', 'Progress Report'), teamNames, fileName);
+
     if (!success) {
-      DialogModal(context).show("Attention", "Report document could not be created!", true);
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReport', 'Report document could not be created!'), true);
     }
   }
 
@@ -188,11 +203,11 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
 
   PaginatedDataTable _createDataTable() {
     PaginatedDataTable dataTable = PaginatedDataTable(
-      header: Text('Select Teams for Report Creation'),
+      header: Text(Translator.text('WidgetReport', 'Select Teams for Report Creation')),
       columns: <DataColumn>[
       DataColumn(
           label: Text(
-            'Name',
+            Translator.text('Common', 'Name'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
           onSort:(columnIndex, ascending) {
@@ -205,13 +220,13 @@ class _WidgetTeamReportState extends State<WidgetTeamReport> {
         ),
         DataColumn(
           label: Text(
-            'Description',
+            Translator.text('Common', 'Description'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),
         DataColumn(
           label: Text(
-            'Team Lead',
+            Translator.text('Common', 'Team Lead'),
             style: TextStyle(fontStyle: FontStyle.italic),
           ),
         ),

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -77,6 +77,11 @@ public class RestServiceProgress {
     @GetMapping("/progress/all")
     public ResponseEntity<List<ProgressDTO>> getProgressAll() {
         return new ResponseEntity<>(progresses.getAll(), HttpStatus.OK);
+    }
+
+    @GetMapping("/progress/paged/{page}/{size}")
+    public ResponseEntity<ProgressPagedDTO> getProgressPaged(@PathVariable("page") final Integer page, @PathVariable("size") final Integer size) {
+        return new ResponseEntity<>(progresses.getPaged(page, size), HttpStatus.OK);
     }
 
     @GetMapping("/progress/team/{id}")

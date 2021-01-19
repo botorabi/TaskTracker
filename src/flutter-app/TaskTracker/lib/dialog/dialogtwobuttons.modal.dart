@@ -6,6 +6,7 @@
  *          main directory for more details.
  */
 
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 /*
@@ -33,17 +34,21 @@ class DialogTwoButtonsModal {
           style: TextStyle(fontWeight: FontWeight.w300),
         ),
         actions: <Widget>[
-          FlatButton(
-            child: Text(buttonLabel2),
-            onPressed: () {
-              Navigator.of(_context).pop(buttonLabel2);
-            },
+          Padding(
+            padding: EdgeInsets.all(10.0),
+            child: RaisedButton(
+              padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+              child: Text(Translator.text('Common', buttonLabel2)),
+              onPressed: () => Navigator.of(_context).pop(buttonLabel2),
+            ),
           ),
-          FlatButton(
-            child: Text(buttonLabel1),
-            onPressed: () {
-              Navigator.of(_context).pop(buttonLabel1);
-            },
+          Padding(
+            padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
+            child: RaisedButton(
+              padding: EdgeInsets.only(top: 10.0, right: 20.0, left: 20.0, bottom: 10.0),
+              child: Text(Translator.text('Common', buttonLabel1)),
+              onPressed: () => Navigator.of(_context).pop(buttonLabel1),
+            ),
           ),
         ],
       )

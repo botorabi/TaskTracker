@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -33,7 +33,7 @@ public class RestServiceTask {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private Tasks tasks;
+    private final Tasks tasks;
 
     @Autowired
     public RestServiceTask(@NonNull final Tasks tasks) {
@@ -84,12 +84,12 @@ public class RestServiceTask {
 
     @GetMapping("/task/{id}")
     public ResponseEntity<TaskDTO> getTask(@PathVariable("id") Long id) {
-        TaskDTO task = tasks.getTaskById(id);
-        if (task == null) {
+        try {
+            return new ResponseEntity<>(tasks.getTaskById(id), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<>(task, HttpStatus.OK);
     }
 
     @GetMapping("/task/search/{filter}")

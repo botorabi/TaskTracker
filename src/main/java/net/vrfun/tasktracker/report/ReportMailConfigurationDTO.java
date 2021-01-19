@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -7,6 +7,8 @@
  */
 package net.vrfun.tasktracker.report;
 
+import net.vrfun.tasktracker.user.Team;
+import net.vrfun.tasktracker.user.User;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
@@ -22,53 +24,44 @@ public class ReportMailConfigurationDTO {
 
     private long id;
     private String name;
+    private String language;
     private String mailSenderName;
     private String mailSubject;
     private String mailText;
     private Collection<Long> reportingTeams;
-    private Collection<Long> masterRecipients;
+    private Collection<Long> additionalRecipients;
     private Boolean reportToTeamLeads;
     private Boolean reportToTeamMembers;
-    private String reportPeriod = "";
-    private String reportWeekDay = "";
-    private Long reportHour = 0L;
-    private Long reportMinute = 0L;
+    private String reportPeriod;
+    private String reportWeekDay;
+    private Long reportHour;
+    private Long reportMinute;
     private String reportTitle;
     private String reportSubTitle;
-
-
-    public ReportMailConfigurationDTO() {}
 
     public ReportMailConfigurationDTO(@NonNull final ReportMailConfiguration reportMailConfiguration) {
         this.id = reportMailConfiguration.getId();
         this.name = reportMailConfiguration.getName();
+        this.language = reportMailConfiguration.getLanguage();
         this.mailSenderName = reportMailConfiguration.getMailSenderName();
         this.mailSubject = reportMailConfiguration.getMailSubject();
         this.mailText = reportMailConfiguration.getMailText();
         if (reportMailConfiguration.getReportingTeams() != null) {
             this.reportingTeams = reportMailConfiguration.getReportingTeams().stream()
-                    .map((team -> team.getId()))
+                    .map((Team::getId))
                     .collect(Collectors.toList());
         }
-        if (reportMailConfiguration.getMasterRecipients() != null) {
-            this.masterRecipients = reportMailConfiguration.getMasterRecipients().stream()
-                    .map((user) -> user.getId())
+        if (reportMailConfiguration.getAdditionalRecipients() != null) {
+            this.additionalRecipients = reportMailConfiguration.getAdditionalRecipients().stream()
+                    .map(User::getId)
                     .collect(Collectors.toList());
         }
         this.reportToTeamLeads = reportMailConfiguration.getReportToTeamLeads();
         this.reportToTeamMembers = reportMailConfiguration.getReportToTeamMembers();
-        if (reportMailConfiguration.getReportPeriod() != null) {
-            this.reportPeriod = reportMailConfiguration.getReportPeriod().name();
-        }
-        if (reportMailConfiguration.getReportWeekDay() != null) {
-            this.reportWeekDay = reportMailConfiguration.getReportWeekDay().name();
-        }
-        if (reportMailConfiguration.getReportHour() != null) {
-            this.reportHour = reportMailConfiguration.getReportHour();
-        }
-        if (reportMailConfiguration.getReportMinute() != null) {
-            this.reportMinute = reportMailConfiguration.getReportMinute();
-        }
+        this.reportPeriod = reportMailConfiguration.getReportPeriod().name();
+        this.reportWeekDay = reportMailConfiguration.getReportWeekDay().name();
+        this.reportHour = reportMailConfiguration.getReportHour();
+        this.reportMinute = reportMailConfiguration.getReportMinute();
         this.setReportTitle(reportMailConfiguration.getReportTitle());
         this.setReportSubTitle(reportMailConfiguration.getReportSubTitle());
     }
@@ -87,6 +80,14 @@ public class ReportMailConfigurationDTO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public String getMailSenderName() {
@@ -121,12 +122,12 @@ public class ReportMailConfigurationDTO {
         this.reportingTeams = reportingTeams;
     }
 
-    public Collection<Long> getMasterRecipients() {
-        return masterRecipients;
+    public Collection<Long> getAdditionalRecipients() {
+        return additionalRecipients;
     }
 
-    public void setMasterRecipients(Collection<Long> masterRecipients) {
-        this.masterRecipients = masterRecipients;
+    public void setAdditionalRecipients(Collection<Long> additionalRecipients) {
+        this.additionalRecipients = additionalRecipients;
     }
 
     public Boolean getReportToTeamLeads() {

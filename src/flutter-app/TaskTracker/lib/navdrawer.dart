@@ -10,6 +10,7 @@ import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/navigation.links.dart';
 import 'package:TaskTracker/service/authstatus.dart';
 import 'package:TaskTracker/service/service.login.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:flutter/material.dart';
 
 class NavDrawer extends StatelessWidget {
@@ -25,28 +26,52 @@ class NavDrawer extends StatelessWidget {
           DrawerHeader(
             child: Column(
               children: [
+                SizedBox(height: 10.0),
                 Text(
-                  'Menu',
+                  Config.appInfo.name,
                   style: TextStyle(color: Colors.white, fontSize: 25),
+                  textAlign: TextAlign.left,
                 ),
+                SizedBox(height: 10.0),
                 Text(
-                  Config.authStatus.loginName,
-                  style: TextStyle(color: Colors.white, fontSize: 20),
+                  Translator.text('Common', 'Version') + " " + Config.appInfo.version,
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  textAlign: TextAlign.left,
+                ),
+                SizedBox(height: 5.0),
+                Visibility(
+                  visible: (Config.authStatus.authenticated == true),
+                  child:
+                  Column(
+                    children: [
+                      Text(
+                        Config.authStatus.loginName,
+                        style: TextStyle(color: Colors.white, fontSize: 20),
+                        textAlign: TextAlign.left,
+                      ),
+                    ]
+                  ),
                 ),
               ],
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: AssetImage('images/cover.jpg'),
-                )
+                color: Colors.blue,
             ),
           ),
           ListTile(
             leading: Icon(Icons.home),
-            title: Text('Welcome'),
+            title: Text(Translator.text('NavDrawer', 'Welcome')),
             onTap: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.language),
+            title: Text(Translator.text('NavDrawer', 'Language')),
+            onTap: () {
+              Config.locale = (Config.locale == 'de') ? 'en' : 'de';
+              Translator.setLocale(Config.locale);
               Navigator.of(context).pop();
               Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
             },
@@ -55,7 +80,7 @@ class NavDrawer extends StatelessWidget {
             visible: (Config.authStatus.authenticated == false),
             child: ListTile(
               leading: Icon(Icons.exit_to_app),
-              title: Text('Login'),
+              title: Text(Translator.text('NavDrawer', 'Login')),
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.pushNamed(context, NavigationLinks.NAV_HOME);
@@ -68,7 +93,7 @@ class NavDrawer extends StatelessWidget {
               children:[
                 ListTile(
                   leading: Icon(Icons.face),
-                  title: Text('Profile'),
+                  title: Text(Translator.text('AppTaskTracker', 'User Profile')),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.pushNamed(context, NavigationLinks.NAV_PROFILE);
@@ -78,7 +103,7 @@ class NavDrawer extends StatelessWidget {
                   visible: Config.authStatus.isAdmin(),
                   child: ListTile(
                     leading: Icon(Icons.settings),
-                    title: Text('Administration'),
+                    title: Text(Translator.text('NavDrawer', 'Administration')),
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, NavigationLinks.NAV_ADMIN);
@@ -86,10 +111,21 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 Visibility(
+                  visible: Config.authStatus.isTeamLead(),
+                  child: ListTile(
+                    leading: Icon(Icons.settings),
+                    title: Text(Translator.text('NavDrawer', 'Team Management')),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.pushNamed(context, NavigationLinks.NAV_TEAM_LEAD);
+                    },
+                  ),
+                ),
+                Visibility(
                 visible: (Config.authStatus.isTeamLead() || Config.authStatus.isAdmin()),
                   child: ListTile(
                     leading: Icon(Icons.insert_chart),
-                    title: Text('Progress Report'),
+                    title: Text(Translator.text('Common', 'Progress Report')),
                     onTap: () {
                       Navigator.of(context).pop();
                       Navigator.pushNamed(context, NavigationLinks.NAV_REPORT);
@@ -98,7 +134,7 @@ class NavDrawer extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
-                  title: Text('Logout'),
+                  title: Text(Translator.text('NavDrawer', 'Logout')),
                   onTap: () => {
                     this._serviceLogin.logoutUser().then((result) {
                       Config.authStatus = AuthStatus();
@@ -107,8 +143,23 @@ class NavDrawer extends StatelessWidget {
                     }),
                   },
                 ),
-              ],
+            ],
             ),
+          ),
+          Divider(
+            color: Colors.grey,
+            height: 20,
+            thickness: 1,
+            indent: 20,
+            endIndent: 20,
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text(Translator.text('AppTaskTracker', 'About')),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(context, NavigationLinks.NAV_ABOUT);
+            },
           ),
         ],
       ),

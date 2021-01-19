@@ -9,5 +9,6 @@ source ../../misc/setup-env.sh
 
 cd TaskTracker
 
-flutter run -d Chrome --web-hostname=127.0.0.1 --web-port=8200
+#flutter run -d Chrome --web-hostname=127.0.0.1 --web-port=8200
+flutter run  --web-hostname=127.0.0.1 --web-port=8200
 

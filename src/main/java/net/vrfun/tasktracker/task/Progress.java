@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -13,8 +13,7 @@ import org.springframework.lang.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.*;
-import java.time.temporal.TemporalField;
-import java.util.*;
+import java.util.Collection;
 
 @Entity
 public class Progress extends BaseEntity implements Serializable {

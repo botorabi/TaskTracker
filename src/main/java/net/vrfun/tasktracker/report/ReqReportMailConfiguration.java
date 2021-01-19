@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -21,11 +21,12 @@ public class ReqReportMailConfiguration {
 
     private long id;
     private String name;
+    private String language;
     private String mailSenderName;
     private String mailSubject;
     private String mailText;
     private Set<Long> reportingTeams;
-    private Set<Long> masterRecipients;
+    private Set<Long> additionalRecipients;
     private Boolean reportToTeamLeads;
     private Boolean reportToTeamMembers;
     private String reportPeriod;
@@ -53,6 +54,16 @@ public class ReqReportMailConfiguration {
     @JsonProperty("name")
     public void setName(String name) {
         this.name = name;
+    }
+
+
+    public String getLanguage() {
+        return language;
+    }
+
+    @JsonProperty("language")
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
     public String getMailSenderName() {
@@ -91,13 +102,13 @@ public class ReqReportMailConfiguration {
         this.reportingTeams = reportingTeams;
     }
 
-    public Set<Long> getMasterRecipients() {
-        return masterRecipients;
+    public Set<Long> getAdditionalRecipients() {
+        return additionalRecipients;
     }
 
-    @JsonProperty("masterRecipients")
-    public void setMasterRecipients(Set<Long> masterRecipients) {
-        this.masterRecipients = masterRecipients;
+    @JsonProperty("additionalRecipients")
+    public void setAdditionalRecipients(Set<Long> additionalRecipients) {
+        this.additionalRecipients = additionalRecipients;
     }
 
     public Boolean getReportToTeamLeads() {

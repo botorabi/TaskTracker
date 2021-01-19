@@ -9,8 +9,10 @@
 abstract class NavigationLinks {
 
   static const String NAV_HOME            = '/';
+  static const String NAV_ABOUT           = '/about';
   static const String NAV_PROFILE         = '/profile';
   static const String NAV_ADMIN           = '/admin';
+  static const String NAV_TEAM_LEAD       = '/teamlead';
   static const String NAV_NEW_USER        = '/newuser';
   static const String NAV_EDIT_USER       = '/edituser';
   static const String NAV_NEW_TEAM        = '/newteam';

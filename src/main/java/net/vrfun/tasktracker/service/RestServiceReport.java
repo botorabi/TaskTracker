@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -22,7 +22,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -56,7 +55,7 @@ public class RestServiceReport {
     }
 
     @PostMapping("/report/generator-configuration/create")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> createGeneratorConfiguration(@RequestBody ReqReportMailConfiguration reqReportMailConfiguration) {
         try {
             return new ResponseEntity<>(reports.createMailConfiguration(reqReportMailConfiguration).getId(), HttpStatus.OK);
@@ -68,7 +67,7 @@ public class RestServiceReport {
     }
 
     @PutMapping("/report/generator-configuration/edit")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Long> editGeneratorConfiguration(@RequestBody ReqReportMailConfiguration reqReportMailConfiguration) {
         try {
             return new ResponseEntity<>(reports.editMailConfiguration(reqReportMailConfiguration).getId(), HttpStatus.OK);
@@ -80,7 +79,7 @@ public class RestServiceReport {
     }
 
     @DeleteMapping("/report/generator-configuration/delete/{id}")
-    @Secured({Role.ROLE_NAME_ADMIN})
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
     public ResponseEntity<Void> deleteGeneratorConfiguration(@PathVariable("id") Long id) {
         try {
             reports.deleteMailConfiguration(id);
@@ -116,7 +115,7 @@ public class RestServiceReport {
         }
     }
 
-    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}",
+    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}",
                 produces = MediaType.APPLICATION_PDF_VALUE)
     @ResponseBody
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
@@ -124,10 +123,11 @@ public class RestServiceReport {
                                                               @PathVariable("fromDaysSinceEpoch") final String fromDate,
                                                               @PathVariable("toDaysSinceEpoch")   final String toDate,
                                                               @PathVariable("title")              final String title,
-                                                              @PathVariable("subTitle")           final String subTitle) throws IOException {
+                                                              @PathVariable("subTitle")           final String subTitle,
+                                                              @PathVariable("language")           final String language) {
 
-        List<Long> ids = Arrays.asList(teamIDs.split(",")).stream()
-                .map((idAsString) -> Long.valueOf(idAsString))
+        List<Long> ids = Arrays.stream(teamIDs.split(","))
+                .map((val) -> Long.valueOf(val.trim()))
                 .collect(Collectors.toList());
 
         if (!reports.validateUserAccess(ids)) {
@@ -143,7 +143,8 @@ public class RestServiceReport {
                              ids, fromInDaysSinceEpoch, toInDaysSinceEpoch,
                              ReportFormat.PDF,
                              StringUtils.isEmpty(title) ? "<Title>" : title,
-                             StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle)) {
+                             StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
+                             StringUtils.isEmpty(language) ? "en" : language)) {
 
             return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -46,29 +46,8 @@ public class ProgressDTO {
         }
         if (progress.getTags() != null) {
             this.tags = new ArrayList<>();
-            progress.getTags().stream().forEach((tag) -> this.tags.add(tag.getName()));
+            progress.getTags().forEach((tag) -> this.tags.add(tag.getName()));
         }
-    }
-
-    public ProgressDTO(long id,
-                       final String title,
-                       final String text,
-                       final Long ownerId,
-                       final String ownerName,
-                       final Instant dateCreation,
-                       final LocalDate reportWeek,
-                       final Collection<String> tags,
-                       final Long taskId) {
-
-        this.id = id;
-        this.title = title;
-        this.text = text;
-        this.dateCreation = dateCreation;
-        this.reportWeek = reportWeek;
-        this.ownerId = ownerId;
-        this.ownerName = ownerName;
-        this.tags = tags;
-        this.task = taskId;
     }
 
     public long getId() {

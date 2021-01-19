@@ -9,13 +9,16 @@
 import 'dart:io';
 
 import 'package:TaskTracker/common/button.id.dart';
+import 'package:TaskTracker/common/divider.horizontal.dart';
 import 'package:TaskTracker/config.dart';
 import 'package:TaskTracker/dialog/dialog.modal.dart';
 import 'package:TaskTracker/service/report.configuration.dart';
 import 'package:TaskTracker/service/service.report.configuration.dart';
+import 'package:TaskTracker/translator.dart';
 import 'package:TaskTracker/widget/widget.teamchooser.dart';
 import 'package:TaskTracker/widget/widget.userchooser.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 
 class WidgetReportConfigurationEdit extends StatefulWidget {
@@ -43,13 +46,14 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   final _textEditingControllerReportMinute = TextEditingController(text:'00');
   final _textEditingControllerReportTitle = TextEditingController();
   final _textEditingControllerReportSubTitle = TextEditingController();
+  String _reportLanguage = Config.locale;
   bool _reportToTeamLeads = true;
   bool _reportToTeamMembers = false;
   String _reportPeriod = "PERIOD_WEEKLY";
   String _reportWeekDay = "WEEKDAY_FRIDAY";
 
-  WidgetUserChooser _widgetMasterRecipients = WidgetUserChooser(title: 'Master Recipients');
-  WidgetTeamChooser _widgetReportingTeams = WidgetTeamChooser(title: 'Reporting Teams');
+  WidgetUserChooser _widgetAdditionalRecipients = WidgetUserChooser(title: Translator.text('WidgetReportMailConfiguration', 'Additional Recipients'));
+  WidgetTeamChooser _widgetReportingTeams = WidgetTeamChooser(title: Translator.text('WidgetReportMailConfiguration', 'Reporting Teams'));
 
   _WidgetReportConfigurationEditState({this.configurationId}) {
     if (configurationId != 0) {
@@ -79,7 +83,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
       elevation: 4.0,
       margin: const EdgeInsets.all(30.0),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: Config.defaultEditorWidth),
+        constraints: BoxConstraints(maxWidth: Config.DEFAULT_EDITOR_WIDTH),
         child: Column(
           children: <Widget>[
             ListView(
@@ -90,8 +94,18 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                     Padding(
                       padding: const EdgeInsets.only(top: 20.0),
                       child: Text(
-                        'Edit Report Configuration',
+                        Translator.text('WidgetReportMailConfiguration', 'Edit Report Configuration'),
                         style: Theme.of(context).textTheme.headline6,
+                      ),
+                    ),
+                    Visibility(
+                      visible: _newConfiguration == false,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child:
+                          Text(Translator.text('Common', 'Name') + ': ' +
+                              ((_currentReportConfiguration != null) ? _currentReportConfiguration.name : '')
+                          ),
                       ),
                     ),
                   ],
@@ -114,7 +128,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                   controller: _textEditingControllerConfigName,
                                   autofocus: true,
                                   decoration: InputDecoration(
-                                    labelText: 'Configuration Name',
+                                    labelText: Translator.text('WidgetReportMailConfiguration', 'Configuration Name'),
                                   ),
                                 ),
                               ),
@@ -124,7 +138,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerMailSenderName,
                                 decoration: InputDecoration(
-                                  labelText: 'Mail Sender',
+                                  labelText: Translator.text('WidgetReportMailConfiguration', 'Mail Sender'),
                                 ),
                               ),
                             ),
@@ -133,7 +147,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerMailSubject,
                                 decoration: InputDecoration(
-                                  labelText: 'Mail Subject',
+                                  labelText: Translator.text('WidgetReportMailConfiguration', 'Mail Subject'),
                                 ),
                               ),
                             ),
@@ -147,8 +161,8 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 maxLength: 1024,
                                 showCursor: true,
                                 decoration: InputDecoration(
-                                  labelText: 'Optional Mail Body Text',
-                                  hintText: '\nThis is an automatically generated report mail...',
+                                  labelText: Translator.text('WidgetReportMailConfiguration', 'Optional Mail Body Text'),
+                                  hintText: Translator.text('WidgetReportMailConfiguration', '\nThis is an automatically generated report mail...'),
                                   border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(0.0))),
                                 ),
                               ),
@@ -158,7 +172,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerReportTitle,
                                 decoration: InputDecoration(
-                                  labelText: 'Report Title',
+                                  labelText: Translator.text('WidgetReportMailConfiguration', 'Report Title'),
                                 ),
                               ),
                             ),
@@ -167,7 +181,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                               child: TextFormField(
                                 controller: _textEditingControllerReportSubTitle,
                                 decoration: InputDecoration(
-                                  labelText: 'Report Sub-Title',
+                                  labelText: Translator.text('WidgetReportMailConfiguration', 'Report Sub-Title'),
                                 ),
                               ),
                             ),
@@ -176,7 +190,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10, right: 20.0),
                                     child:
-                                    Text('Report to Team Leads',
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Report to Team Leads'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -199,7 +213,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10, right: 20.0),
                                     child:
-                                    Text('Report to Team Members',
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Report to Team Members'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -222,33 +236,37 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Period',
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Language'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
                                 Spacer(),
-                                DropdownButton<String>(
-                                  items: [
-                                    DropdownMenuItem<String>(
-                                      child: Text(''),
-                                      value: '',
+                                SizedBox(
+                                  width: 140,
+                                  child:
+                                  ButtonTheme(
+                                    alignedDropdown: true,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    child:
+                                    DropdownButton<String>(
+                                      items: [
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('WidgetReportMailConfiguration', 'Language_English')),
+                                          value: 'en',
+                                        ),
+                                        DropdownMenuItem<String>(
+                                          child: Text(Translator.text('WidgetReportMailConfiguration', 'Language_German')),
+                                          value: 'de',
+                                        ),
+                                      ],
+                                      onChanged: (String value) {
+                                        setState(() {
+                                          _reportLanguage = value;
+                                        });
+                                      },
+                                      value: _reportLanguage,
                                     ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Weekly'),
-                                      value: 'PERIOD_WEEKLY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Monthly'),
-                                      value: 'PERIOD_MONTHLY',
-                                    ),
-                                  ],
-                                  onChanged: (String value) {
-                                    setState(() {
-                                      _reportPeriod = value;
-                                    });
-                                  },
-                                  hint: Text('Choose Period'),
-                                  value: _reportPeriod,
+                                  ),
                                 ),
                               ],
                             ),
@@ -257,62 +275,108 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Week Day',
+                                    Text(Translator.text('WidgetReport', 'Report Period'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
                                 Spacer(),
-                                DropdownButton<String>(
-                                  items: [
-                                    DropdownMenuItem<String>(
-                                      child: Text(''),
-                                      value: '',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Monday'),
-                                      value: 'WEEKDAY_MONDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Tuesday'),
-                                      value: 'WEEKDAY_TUESDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Wednesday'),
-                                      value: 'WEEKDAY_WEDNESDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Thursday'),
-                                      value: 'WEEKDAY_THURSDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Friday'),
-                                      value: 'WEEKDAY_FRIDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Saturday'),
-                                      value: 'WEEKDAY_SATURDAY',
-                                    ),
-                                    DropdownMenuItem<String>(
-                                      child: Text('Sunday'),
-                                      value: 'WEEKDAY_SUNDAY',
-                                    ),
-                                  ],
-                                  onChanged: (String value) {
-                                    setState(() {
-                                      _reportWeekDay = value;
-                                    });
-                                  },
-                                  hint: Text('Choose Week Day'),
-                                  value: _reportWeekDay,
+                                SizedBox(
+                                  width: 140,
+                                  child:
+                                  ButtonTheme(
+                                    alignedDropdown: true,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    child:
+                                      DropdownButton<String>(
+                                        items: [
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Weekly')),
+                                            value: 'PERIOD_WEEKLY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Monthly')),
+                                            value: 'PERIOD_MONTHLY',
+                                          ),
+                                        ],
+                                        onChanged: (String value) {
+                                          setState(() {
+                                            _reportPeriod = value;
+                                          });
+                                        },
+                                        value: _reportPeriod,
+                                      ),
+                                  ),
                                 ),
-                              ],
+                             ],
                             ),
+                            SizedBox(height: 10),
                             Row(
                               children: [
                                 Padding(
                                     padding: EdgeInsets.only(left: 10),
                                     child:
-                                    Text('Report Time',
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Report Week Day'),
+                                      textAlign: TextAlign.left,
+                                    )
+                                ),
+                                Spacer(),
+                                SizedBox(
+                                  width: 140,
+                                  child:
+                                  ButtonTheme(
+                                    alignedDropdown: true,
+                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    child:
+                                      DropdownButton<String>(
+                                        isDense: true,
+                                        items: [
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Monday')),
+                                            value: 'WEEKDAY_MONDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Tuesday')),
+                                            value: 'WEEKDAY_TUESDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Wednesday')),
+                                            value: 'WEEKDAY_WEDNESDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Thursday')),
+                                            value: 'WEEKDAY_THURSDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Friday')),
+                                            value: 'WEEKDAY_FRIDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Saturday')),
+                                            value: 'WEEKDAY_SATURDAY',
+                                          ),
+                                          DropdownMenuItem<String>(
+                                            child: Text(Translator.text('Common', 'Sunday')),
+                                            value: 'WEEKDAY_SUNDAY',
+                                          ),
+                                        ],
+                                        onChanged: (String value) {
+                                          setState(() {
+                                            _reportWeekDay = value;
+                                          });
+                                        },
+                                        value: _reportWeekDay,
+                                      ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(left: 10),
+                                    child:
+                                    Text(Translator.text('WidgetReportMailConfiguration', 'Report Time'),
                                       textAlign: TextAlign.left,
                                     )
                                 ),
@@ -325,6 +389,11 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                         width: 20.0,
                                         child: TextFormField(
                                           controller: _textEditingControllerReportHour,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.digitsOnly,
+                                            LengthLimitingTextInputFormatter(2),
+                                          ],
                                         ),
                                       )
                                     ),
@@ -335,6 +404,11 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                         width: 20.0,
                                         child: TextFormField(
                                           controller: _textEditingControllerReportMinute,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [
+                                            FilteringTextInputFormatter.digitsOnly,
+                                            LengthLimitingTextInputFormatter(2),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -349,7 +423,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                     LayoutBuilder(
                         builder: (BuildContext context, BoxConstraints constraints) {
                           double topPadding = constraints.maxWidth < 535 ? 0.0 : 50.0;
-                          double w = constraints.maxWidth < 535 ? 350 : 220;
+                          double w = constraints.maxWidth < 535 ? 350 : 230;
                           return ConstrainedBox(
                             constraints: BoxConstraints(maxWidth: w),
                             child:
@@ -361,7 +435,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(left: 5, top: 5),
-                                  child: _widgetMasterRecipients,
+                                  child: _widgetAdditionalRecipients,
                                 ),
                             ]
                           ),
@@ -373,20 +447,21 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
               ],
             ),
 
+            HorizontalDivider(),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
-                    child: Text('Cancel'),
+                    child: Text(Translator.text('Common', 'Cancel')),
                     onPressed: () => { Navigator.of(context).pop(ButtonID.CANCEL) },
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, right: 15.0, bottom: 15.0),
                   child: RaisedButton(
-                    child: Text(_newConfiguration ? ButtonID.CREATE : ButtonID.APPLY),
+                    child: Text(_newConfiguration ? Translator.text('Common', ButtonID.CREATE) : Translator.text('Common', ButtonID.APPLY)),
                     onPressed: () {
                       if (_newConfiguration) {
                         _createReportConfiguration(context);
@@ -406,65 +481,109 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   }
 
   void _createReportConfiguration(BuildContext context) {
-    if (!validateInput()) {
+    if (!_validateInput()) {
       return;
     }
 
     final reportConfiguration = _assembleConfiguration();
+    if (reportConfiguration.reportingTeams.length < 1) {
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration', 'Please choose at least one team.'), true);
+      return;
+    }
 
     _serviceReportConfiguration
         .createConfiguration(reportConfiguration)
         .then((id) {
-          DialogModal(context).show("New Report Configuration", "New report configuration was successfully created.", false)
+          DialogModal(context).show(
+              Translator.text('WidgetReportMailConfiguration', 'New Report Configuration'),
+              Translator.text('WidgetReportMailConfiguration', 'New report configuration was successfully created.'), false)
               .then((value) => Navigator.of(context).pop(ButtonID.OK));
         },
         onError: (err) {
           String text;
           if (err == HttpStatus.notAcceptable) {
-            text = "Could not create new report configuration!";
+            text = Translator.text('WidgetReportMailConfiguration', 'Could not create new report configuration!');
           }
           else {
-            text = "Could not create new report configuration!\nReason:" + err.toString();
+            text = Translator.text('WidgetReportMailConfiguration', 'Could not create new report configuration!\nReason: ') + err.toString();
           }
-          DialogModal(context).show("Attention", text, true);
+          DialogModal(context).show(Translator.text('Common', 'Attention'), text, true);
         }
     );
   }
 
-  bool validateInput() {
+  bool _validateInput() {
     if (_textEditingControllerConfigName.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a configuration name!", true);
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration', 'Please choose a configuration name!'), true);
       return false;
     }
     if (_textEditingControllerMailSenderName.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a name for mail sender!", true);
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration', 'Please choose a name for mail sender!'), true);
       return false;
     }
     if (_textEditingControllerMailSubject.text.isEmpty) {
-      DialogModal(context).show("Attention", "Please choose a subject for report mail!", true);
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration', 'Please choose a subject for report mail!'), true);
       return false;
     }
+
+    bool validReportTime = true;
+    try {
+      int hour = int.parse(_textEditingControllerReportHour.text);
+      int minute = int.parse(_textEditingControllerReportMinute.text);
+      if (!((hour >= 0) && (hour < 24)) || !((minute >= 0) && (minute < 60))) {
+        validReportTime = false;
+      }
+    } catch(ignored) {
+      validReportTime = false;
+    }
+
+    if (!validReportTime) {
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration',
+              'Please choose a valid Report Time!'), true);
+      return false;
+    }
+
     return true;
   }
 
   void _applyChanges(BuildContext context) {
-    if (!validateInput()) {
+    if (!_validateInput()) {
       return;
     }
 
     final reportConfiguration = _assembleConfiguration();
     reportConfiguration.id = _currentReportConfiguration.id;
+    if (reportConfiguration.reportingTeams.length < 1) {
+      DialogModal(context).show(
+          Translator.text('Common', 'Attention'),
+          Translator.text('WidgetReportMailConfiguration', 'Please choose at least one team.'), true);
+      return;
+    }
 
     _serviceReportConfiguration
       .editConfiguration(reportConfiguration)
       .then((success) {
           if (success) {
-            DialogModal(context).show("Edit Report Configuration", "All changes successfully applied.", false)
+            DialogModal(context).show(
+                Translator.text('WidgetReportMailConfiguration', 'Edit Report Configuration'),
+                Translator.text('Common', 'All changes successfully applied.'), false)
             .then((value) => Navigator.of(context).pop());
           }
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not apply changes! Reason:" + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common', 'Attention'),
+              Translator.text('Common', 'Could not apply changes! Reason: ') + err.toString(), true);
         }
       );
   }
@@ -472,12 +591,13 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
   ReportMailConfiguration _assembleConfiguration() {
     final reportConfiguration = ReportMailConfiguration();
     reportConfiguration.name = _textEditingControllerConfigName.text;
+    reportConfiguration.language = _reportLanguage;
     reportConfiguration.mailSenderName = _textEditingControllerMailSenderName.text;
     reportConfiguration.mailSubject = _textEditingControllerMailSubject.text;
     reportConfiguration.mailText = _textEditingControllerMailText.text;
     reportConfiguration.reportToTeamLeads = _reportToTeamLeads;
     reportConfiguration.reportToTeamMembers = _reportToTeamMembers;
-    reportConfiguration.masterRecipients = _widgetMasterRecipients.getUserIDs();
+    reportConfiguration.additionalRecipients = _widgetAdditionalRecipients.getUserIDs();
     reportConfiguration.reportingTeams = _widgetReportingTeams.getTeamIDs();
     reportConfiguration.reportPeriod = _reportPeriod;
     reportConfiguration.reportWeekDay = _reportWeekDay;
@@ -490,7 +610,7 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
 
   void _retrieveReportConfiguration() {
     if(configurationId == 0) {
-      print('Internal error, use this widget for an authenticated user');
+      print(Translator.text('Common', 'Internal error, use this widget for an authenticated user'));
       return;
     }
 
@@ -506,10 +626,11 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           _textEditingControllerReportTitle.text = _currentReportConfiguration.reportTitle;
           _textEditingControllerReportSubTitle.text = _currentReportConfiguration.reportSubTitle;
 
+          _reportLanguage = _currentReportConfiguration.language.isEmpty ? Config.locale : _currentReportConfiguration.language;
           _reportToTeamLeads = _currentReportConfiguration.reportToTeamLeads;
           _reportToTeamMembers = _currentReportConfiguration.reportToTeamMembers;
 
-          _widgetMasterRecipients.setUserIDs(_currentReportConfiguration.masterRecipients);
+          _widgetAdditionalRecipients.setUserIDs(_currentReportConfiguration.additionalRecipients);
           _widgetReportingTeams.setTeamIDs(_currentReportConfiguration.reportingTeams);
 
           _reportPeriod = _currentReportConfiguration.reportPeriod;
@@ -526,7 +647,10 @@ class _WidgetReportConfigurationEditState extends State<WidgetReportConfiguratio
           setState(() {});
         },
         onError: (err) {
-          DialogModal(context).show("Attention", "Could not retrieve report configuration! Reason: " + err.toString(), true);
+          DialogModal(context).show(
+              Translator.text('Common', 'Attention'),
+              Translator.text('WidgetReportMailConfiguration', 'Could not retrieve report configuration! Reason: ') + err.toString(),
+              true);
         }
     );
   }

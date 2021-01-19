@@ -8,9 +8,15 @@
 
 abstract class CalendarUtils {
 
+  static int isoWeekNumber(DateTime date) {
+    int daysToAdd = DateTime.thursday - date.weekday;
+    DateTime thursdayDate = daysToAdd > 0 ? date.add(Duration(days: daysToAdd)) : date.subtract(Duration(days: daysToAdd.abs()));
+    int dayOfYearThursday = thursdayDate.difference(DateTime(thursdayDate.year, 1, 1)).inDays;
+    return 1 + ((dayOfYearThursday - 1) / 7).floor();
+  }
+
   static int getCalendarWeek(DateTime dateTime) {
-    final days = dateTime.difference(DateTime(dateTime.year)).inDays;
-    return ((days + 1) / 7).ceil();
+    return isoWeekNumber(dateTime);
   }
 
   static int getCalendarYear(DateTime dateTime) {

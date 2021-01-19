@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -27,6 +27,7 @@ public class TaskDTO {
     private Instant dateClosed;
     private Collection<Long> users;
     private Collection<Long> teams;
+    private Collection<String> teamNames;
 
     public TaskDTO() {}
 
@@ -38,11 +39,15 @@ public class TaskDTO {
         this.dateClosed = task.getDateClosed();
         if (task.getUsers() != null) {
             this.users = new ArrayList<>();
-            task.getUsers().stream().forEach((user) -> this.users.add(user.getId()));
+            task.getUsers().forEach((user) -> this.users.add(user.getId()));
         }
         if (task.getTeams() != null) {
             this.teams = new ArrayList<>();
-            task.getTeams().stream().forEach((team) -> this.teams.add(team.getId()));
+            this.setTeamNames(new ArrayList<>());
+            task.getTeams().forEach((team) -> {
+                this.teams.add(team.getId());
+                this.getTeamNames().add(team.getName());
+            });
         }
     }
 
@@ -119,4 +124,12 @@ public class TaskDTO {
     public void setTeams(Collection<Long> teams) {
         this.teams = teams;
     }
- }
+
+    public Collection<String> getTeamNames() {
+        return teamNames;
+    }
+
+    public void setTeamNames(Collection<String> teamNames) {
+        this.teamNames = teamNames;
+    }
+}

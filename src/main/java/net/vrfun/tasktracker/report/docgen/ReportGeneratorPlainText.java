@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -23,12 +23,12 @@ public class ReportGeneratorPlainText implements ReportGenerator {
 
     protected ReportGeneratorPlainText() {}
 
+    public void setLocale(@NonNull final ReportI18n reportI18n) {}
+
     @Override
     public void begin() {
         if (byteArrayOutputStream != null) {
-            try {
-                byteArrayOutputStream.close();
-            } catch (IOException ignore) {}
+            throw new IllegalStateException("Call end() before beginning a new Pain Text generation!");
         }
 
         byteArrayOutputStream = new ByteArrayOutputStream();

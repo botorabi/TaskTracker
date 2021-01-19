@@ -7,6 +7,8 @@
  */
 
 import 'package:TaskTracker/config.dart';
+import 'package:TaskTracker/page/pagedrawer.dart';
+import 'package:TaskTracker/page/pagefooter.dart';
 import 'package:TaskTracker/widget/widget.useredit.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +28,9 @@ class _PageLoginState extends State<PageLogin> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: PageDrawer.buildNavigateBack(),
       ),
+      persistentFooterButtons: PageFooter.build(),
       body: ListView(
         shrinkWrap: true,
         children: [

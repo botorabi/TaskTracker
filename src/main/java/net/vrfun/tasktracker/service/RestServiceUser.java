@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -106,7 +106,7 @@ public class RestServiceUser {
             }
             else {
                 return new ResponseEntity<>(
-                        Arrays.asList(users.getUserByLogin(userAuthenticator.getUserLogin())), HttpStatus.OK);
+                        Collections.singletonList(users.getUserByLogin(userAuthenticator.getUserLogin())), HttpStatus.OK);
             }
         }
         catch(Throwable throwable) {
@@ -178,7 +178,7 @@ public class RestServiceUser {
         }
         else if (userAuthenticator.loginLDAPUser(reqLogin.getLogin(), reqLogin.getPassword())) {
             LOGGER.info("LDAP user {} successfully logged in", reqLogin.getLogin());
-            LOGGER.info("  Creating a local user for ", reqLogin.getLogin());
+            LOGGER.info("  Creating a local user for {}", reqLogin.getLogin());
             users.getOrCreateLocalUserFromLdap(reqLogin);
             if (!userAuthenticator.loginLocalUser(reqLogin.getLogin(), reqLogin.getPassword())) {
                 LOGGER.error("  Failed to login local user {}!", reqLogin.getLogin());

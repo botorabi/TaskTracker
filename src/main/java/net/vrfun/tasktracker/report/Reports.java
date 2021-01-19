@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -8,7 +8,6 @@
 package net.vrfun.tasktracker.report;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
-import net.vrfun.tasktracker.task.ProgressRepository;
 import net.vrfun.tasktracker.user.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ public class Reports {
 
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
-    private final ProgressRepository progressRepository;
     private final UserRepository userRepository;
     private final TeamRepository teamRepository;
     private final ReportMailConfigurationRepository reportMailConfigurationRepository;
@@ -41,14 +39,12 @@ public class Reports {
 
 
     @Autowired
-    public Reports(@NonNull final ProgressRepository progressRepository,
-                   @NonNull final UserRepository userRepository,
+    public Reports(@NonNull final UserRepository userRepository,
                    @NonNull final TeamRepository teamRepository,
                    @NonNull final ReportMailConfigurationRepository reportMailConfigurationRepository,
                    @NonNull final ReportGeneratorScheduler reportGeneratorScheduler,
                    @NonNull final UserAuthenticator userAuthenticator) {
 
-        this.progressRepository = progressRepository;
         this.userRepository = userRepository;
         this.teamRepository = teamRepository;
         this.reportMailConfigurationRepository = reportMailConfigurationRepository;
@@ -62,7 +58,7 @@ public class Reports {
         }
 
         List<Long> userTeamIDs = teamRepository.findTeamLeadTeams(userAuthenticator.getUser()).stream()
-                .map((user) -> user.getId())
+                .map((team) -> team.getId())
                 .collect(Collectors.toList());
 
         return userTeamIDs.containsAll(teamIDs);
@@ -87,7 +83,7 @@ public class Reports {
         reportMailConfiguration.setReportTitle(reqReportMailConfiguration.getReportTitle());
         reportMailConfiguration.setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
 
-        setReportingTeamsAndMasterRecipients(reportMailConfiguration, reqReportMailConfiguration);
+        setReportingTeamsAndAdditionalRecipients(reportMailConfiguration, reqReportMailConfiguration);
 
         ReportMailConfiguration newReportMailConfiguration = reportMailConfigurationRepository.save(reportMailConfiguration);
 
@@ -125,8 +121,8 @@ public class Reports {
         }
     }
 
-    protected void setReportingTeamsAndMasterRecipients(@NonNull final ReportMailConfiguration reportMailConfiguration,
-                                                        @NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
+    protected void setReportingTeamsAndAdditionalRecipients(@NonNull final ReportMailConfiguration reportMailConfiguration,
+                                                            @NonNull final ReqReportMailConfiguration reqReportMailConfiguration) {
 
         List<Team> reportingTeams = new ArrayList<>();
         reqReportMailConfiguration.getReportingTeams().forEach((teamID) -> {
@@ -138,15 +134,15 @@ public class Reports {
         });
         reportMailConfiguration.setReportingTeams(reportingTeams);
 
-        List<User> masterRecipients = new ArrayList<>();
-        reqReportMailConfiguration.getMasterRecipients().forEach((userID) -> {
+        List<User> additionalRecipients = new ArrayList<>();
+        reqReportMailConfiguration.getAdditionalRecipients().forEach((userID) -> {
             Optional<User> foundUser = userRepository.findById(userID);
             foundUser.ifPresentOrElse(
-                    (user) -> masterRecipients.add(user),
-                    () -> LOGGER.warn("Cannot setup master recipient user with ID {} for reporting configuration, it does not exist!")
+                    (user) -> additionalRecipients.add(user),
+                    () -> LOGGER.warn("Cannot setup additional recipient user with ID {} for reporting configuration, it does not exist!")
             );
         });
-        reportMailConfiguration.setMasterRecipients(masterRecipients);
+        reportMailConfiguration.setAdditionalRecipients(additionalRecipients);
     }
 
     @NonNull
@@ -156,6 +152,9 @@ public class Reports {
             throw new IllegalArgumentException("Could not find report generation configuration with given ID");
         }
 
+        if (!StringUtils.isEmpty(reqReportMailConfiguration.getLanguage())) {
+            config.get().setLanguage(reqReportMailConfiguration.getLanguage());
+        }
         if (!StringUtils.isEmpty(reqReportMailConfiguration.getMailSenderName())) {
             config.get().setMailSenderName(reqReportMailConfiguration.getMailSenderName());
         }
@@ -191,7 +190,7 @@ public class Reports {
             config.get().setReportSubTitle(reqReportMailConfiguration.getReportSubTitle());
         }
 
-        setReportingTeamsAndMasterRecipients(config.get(), reqReportMailConfiguration);
+        setReportingTeamsAndAdditionalRecipients(config.get(), reqReportMailConfiguration);
 
         reportGeneratorScheduler.addOrUpdateReportingJob(config.get());
 
@@ -199,15 +198,23 @@ public class Reports {
     }
 
     public void deleteMailConfiguration(@NonNull final Long configurationID) {
-        Optional<ReportMailConfiguration> config = reportMailConfigurationRepository.findById(configurationID);
-        if (!config.isPresent()) {
-            throw new IllegalArgumentException("Could not find report generation configuration with given ID");
+        Optional<ReportMailConfiguration> configuration = Optional.empty();
+        if (userAuthenticator.isRoleAdmin()) {
+            configuration = reportMailConfigurationRepository.findById(configurationID);
+        } else if (userAuthenticator.isRoleTeamLead()) {
+            configuration = reportMailConfigurationRepository.findTeamLeadConfiguration(userAuthenticator.getUser(), configurationID);
         }
-        reportMailConfigurationRepository.delete(config.get());
 
-        reportGeneratorScheduler.removeReportingJob(configurationID);
+        if (configuration.isPresent()) {
+            reportMailConfigurationRepository.delete(configuration.get());
+            reportGeneratorScheduler.removeReportingJob(configurationID);
+        }
+        else {
+            throw new IllegalArgumentException("Could not access report mail configuration for deletion");
+        }
     }
 
+    @NonNull
     public List<ReportMailConfigurationDTO> getReportMailConfigurations() {
         if (userAuthenticator.isRoleAdmin()) {
             return reportMailConfigurationRepository.findAll().stream()
@@ -223,6 +230,7 @@ public class Reports {
         }
     }
 
+    @NonNull
     public ReportMailConfigurationDTO getReportMailConfiguration(@NonNull final Long id) {
         Optional<ReportMailConfiguration> configuration;
         if (userAuthenticator.isRoleAdmin()) {
