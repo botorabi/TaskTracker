@@ -5,6 +5,7 @@ import net.vrfun.tasktracker.task.Task;
 import net.vrfun.tasktracker.user.Team;
 import org.springframework.lang.NonNull;
 
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -13,23 +14,23 @@ import java.util.stream.Stream;
 public interface ReportSorter {
 
     @NonNull
-    static List<ReportSection> sortByTeam(@NonNull Stream<Progress> progressStream) {
-        return sortByTitle(progressStream, ReportSorter::getTeamTitles);
+    static List<ReportSection> sortByTeam(@NonNull Collection<Progress> progresses) {
+        return sortByTitle(progresses, ReportSorter::getTeamTitles);
     }
 
     @NonNull
-    static List<ReportSection> sortByUser(@NonNull Stream<Progress> progressStream) {
-        return sortByTitle(progressStream, ReportSorter::getUserTitle);
+    static List<ReportSection> sortByUser(@NonNull Collection<Progress> progresses) {
+        return sortByTitle(progresses, ReportSorter::getUserTitle);
     }
 
     @NonNull
-    static List<ReportSection> sortByTask(@NonNull Stream<Progress> progressStream) {
-        return sortByTitle(progressStream, ReportSorter::getTaskTitle);
+    static List<ReportSection> sortByTask(@NonNull Collection<Progress> progresses) {
+        return sortByTitle(progresses, ReportSorter::getTaskTitle);
     }
 
     @NonNull
-    static List<ReportSection> sortByWeek(@NonNull Stream<Progress> progressStream) {
-        return sortByTitle(progressStream, ReportSorter::getWeekTitle);
+    static List<ReportSection> sortByWeek(@NonNull Collection<Progress> progresses) {
+        return sortByTitle(progresses, ReportSorter::getWeekTitle);
     }
 
     static private Set<String> getTeamTitles(Progress progress) {
@@ -62,21 +63,22 @@ public interface ReportSorter {
 
     static private Set<String> getWeekTitle(Progress progress) {
         Set<String> returnSet = new HashSet<>();
-        returnSet.add(progress.getReportWeek().toString());
+        String yearWeek = progress.getReportWeek().get(ChronoField.YEAR) + " - W" +
+                progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        returnSet.add(yearWeek);
         return returnSet;
     };
 
-    static private List<ReportSection> sortByTitle(Stream<Progress> stream, Function<Progress, Set<String>> titleExtractor) {
+    static private List<ReportSection> sortByTitle(Collection<Progress> progresses, Function<Progress, Set<String>> titleExtractor) {
         List<ReportSection> sections = new ArrayList<>();
         Set<String> titles = new HashSet<>();
-
-        stream.forEach(s -> titles.addAll(titleExtractor.apply(s)));
+        progresses.forEach(s -> titles.addAll(titleExtractor.apply(s)));
 
         List<String> sortedTitles = new ArrayList<>(titles);
         Collections.sort(sortedTitles);
 
         sortedTitles.forEach(title -> {
-            Stream<Progress> subStream = stream.filter(
+            Stream<Progress> subStream = progresses.stream().filter(
                 s -> {
                     Set<String> progressTitles = titleExtractor.apply(s);
                     return progressTitles.stream().anyMatch(title::equals);
