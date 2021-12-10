@@ -13,75 +13,37 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Report {
+public interface ReportSectionGenerator {
 
-    private List<ReportSection> sections;
-
-    private Stream<Progress> progresses;
-
-    private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
-    public Report()
-    {
-        sections = new ArrayList<>();
-        progresses = new ArrayList<Progress>().stream();
-    }
-
-    public Report(@NonNull Stream<Progress> progresses)
-    {
-        this.sections = new ArrayList<>();
-        this.progresses = progresses;
-    }
-
-    @NonNull
-    public List<ReportSection> getSections() {
-        return sections;
-    }
-
-    public void addProgress(@NonNull Stream<Progress> progress)
-    {
-        try {
-            this.progresses = Stream.concat(this.progresses, progress);
-        } catch (IllegalStateException e) {
-            LOGGER.debug("Cannot concatenate progress, because previous progress stream has already been used. Resetting report progresses instead! ");
-            resetProgress(progress);
-        }
-    }
-
-    public void resetProgress(@NonNull Stream<Progress> progresses) {
-        this.progresses = progresses;
-    }
-
-    public void sortSectionsBy(ReportSortType type) throws IllegalStateException
-    {
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull ReportSortType sortByType) {
         Function<Progress, Stream<String>> titleExtractor;
-        switch (type)
+        switch (sortByType)
         {
             case REPORT_SORT_TYPE_TASK: {
-                titleExtractor = Report::getTaskTitle;
+                titleExtractor = ReportSectionGenerator::getTaskTitle;
                 break;
             }
 
             case REPORT_SORT_TYPE_TEAM: {
-                titleExtractor = Report::getTeamTitles;
+                titleExtractor = ReportSectionGenerator::getTeamTitles;
                 break;
             }
 
             case REPORT_SORT_TYPE_USER: {
-                titleExtractor = Report::getUserTitle;
+                titleExtractor = ReportSectionGenerator::getUserTitle;
                 break;
             }
 
             case REPORT_SORT_TYPE_WEEK: {
-                titleExtractor = Report::getWeekTitle;
+                titleExtractor = ReportSectionGenerator::getWeekTitle;
                 break;
             }
 
             default: {
-                return;
+                return new ArrayList<>();
             }
         }
-        sections = sortByTitle(progresses.collect(Collectors.toList()), titleExtractor);
+        return sortByTitle(progresses.collect(Collectors.toList()), titleExtractor);
     }
 
     static private Stream<String> getTeamTitles(Progress progress) {

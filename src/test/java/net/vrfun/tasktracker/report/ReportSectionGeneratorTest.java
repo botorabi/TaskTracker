@@ -10,96 +10,17 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-class ReportTest {
-
-    static private List<Progress> getEmptyProgresses(int amount) {
-        List<Progress> progresses = new ArrayList<>();
-        for(int i = 0; i < 10; ++i) {
-            progresses.add(new Progress());
-        }
-        return progresses;
-    }
-
-    @Test
-    void emptyConstructor() {
-        assertThat((new Report())).isNotNull();
-    }
-
-    @Test
-    void progressConstructor() {
-        assertThat((new Report(getEmptyProgresses(10).stream()))).isNotNull();
-    }
-
-    @Test
-    void addProgress() {
-        Report report = new Report();
-        report.addProgress(getEmptyProgresses(10).stream());
-    }
-
-    @Test
-    void resetProgress() {
-        List<Progress> progresses = getEmptyProgresses(10);
-        Report report = new Report();
-        report.resetProgress(progresses.stream());
-        Report report2 = new Report(progresses.stream());
-        report2.resetProgress(progresses.stream());
-    }
-
-    @Test
-    void multiAddProgress() {
-        List<Progress> progresses = getEmptyProgresses(10);
-        for(Progress progress : progresses) {
-            progress.setOwnerName("Dummy");
-        }
-        Report report = new Report(progresses.stream());
-        report.addProgress(progresses.stream());
-        report.addProgress(progresses.stream());
-        report.sortSectionsBy(ReportSortType.REPORT_SORT_TYPE_USER);
-        assertThat(report.getSections()).isNotEmpty();
-        assertThat(report.getSections().get(0).getSectionProgess().collect(Collectors.toList())).hasSize(progresses.size() * 3);
-    }
-
-    @Test
-    void getSectionsEmpty() {
-        Report report = new Report();
-        assertThat(report.getSections()).isEmpty();
-    }
-
-    @Test
-    void getSectionsUnsorted() {
-        List<Progress> progresses = new ArrayList<>();
-        for(int i = 0; i < 10; ++i) {
-            progresses.add(new Progress());
-        }
-        Report report = new Report(progresses.stream());
-        assertThat(report.getSections()).isEmpty();
-    }
-
-    @Test
-    void getSectionsEmptyTaskProgresses() {
-        List<Progress> progresses = new ArrayList<>();
-        for(int i = 0; i < 10; ++i) {
-            progresses.add(new Progress());
-        }
-        Report report = new Report(progresses.stream());
-        report.sortSectionsBy(ReportSortType.REPORT_SORT_TYPE_TASK);
-        assertThat(report.getSections()).isEmpty();
-    }
+class ReportSectionGeneratorTest {
 
     private static boolean compareWith(List<String> testNames, List<Progress> progresses, ReportSortType type) {
-        Report report = new Report(progresses.stream());
-        report.sortSectionsBy(type);
-        List<ReportSection> sections =  report.getSections();
+        List<ReportSection> sections =  ReportSectionGenerator.getSections(progresses.stream(), type);
         List<String> sectionsNames = sections.stream().map(ReportSection::getSectionTitle).collect(Collectors.toList());
 
         Collections.sort(testNames);
-//        testNames.forEach(System.out::println);
         return sectionsNames.equals(testNames);
     }
 
