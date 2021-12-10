@@ -27,6 +27,12 @@ public class Report {
         progresses = new ArrayList<Progress>().stream();
     }
 
+    public Report(@NonNull Stream<Progress> progresses)
+    {
+        this.sections = new ArrayList<>();
+        this.progresses = progresses;
+    }
+
     @NonNull
     public List<ReportSection> getSections() {
         return sections;
@@ -46,28 +52,28 @@ public class Report {
         this.progresses = progresses;
     }
 
-    public void sortSectionsBy(ReportSortType type)
+    public void sortSectionsBy(ReportSortType type) throws IllegalStateException
     {
-        Function<Collection<Progress>, List<ReportSection>> sorter;
+        Function<Progress, Stream<String>> titleExtractor;
         switch (type)
         {
             case REPORT_SORT_TYPE_TASK: {
-                sorter = Report::sortByTask;
+                titleExtractor = Report::getTaskTitle;
                 break;
             }
 
             case REPORT_SORT_TYPE_TEAM: {
-                sorter = Report::sortByTeam;
+                titleExtractor = Report::getTeamTitles;
                 break;
             }
 
             case REPORT_SORT_TYPE_USER: {
-                sorter = Report::sortByUser;
+                titleExtractor = Report::getUserTitle;
                 break;
             }
 
             case REPORT_SORT_TYPE_WEEK: {
-                sorter = Report::sortByWeek;
+                titleExtractor = Report::getWeekTitle;
                 break;
             }
 
@@ -75,89 +81,60 @@ public class Report {
                 return;
             }
         }
-        Collection<Progress> progressCollection;
-        try {
-            progressCollection = progresses.collect(Collectors.toList());
-        } catch (IllegalStateException e) {
-            LOGGER.error("Cannot resort the Report! Try resetting the progress stream first.");
-            return;
-        }
-        sections = sorter.apply(progressCollection);
+        sections = sortByTitle(progresses.collect(Collectors.toList()), titleExtractor);
     }
 
-    @NonNull
-    private static List<ReportSection> sortByTeam(@NonNull Collection<Progress> progresses) {
-        return sortByTitle(progresses, Report::getTeamTitles);
-    }
-
-    @NonNull
-    private static List<ReportSection> sortByUser(@NonNull Collection<Progress> progresses) {
-        return sortByTitle(progresses, Report::getUserTitle);
-    }
-
-    @NonNull
-    private static List<ReportSection> sortByTask(@NonNull Collection<Progress> progresses) {
-        return sortByTitle(progresses, Report::getTaskTitle);
-    }
-
-    @NonNull
-    private static List<ReportSection> sortByWeek(@NonNull Collection<Progress> progresses) {
-        return sortByTitle(progresses, Report::getWeekTitle);
-    }
-
-    static private Set<String> getTeamTitles(Progress progress) {
+    static private Stream<String> getTeamTitles(Progress progress) {
         Task task = progress.getTask();
         if (task != null) {
             Collection<Team> teams = task.getTeams();
             if (teams != null) {
-                return teams.stream().map(Team::getName).collect(Collectors.toSet());
+                return teams.stream().map(Team::getName);
             }
         }
-        return new HashSet<>();
+        return (new ArrayList<String>().stream());
     };
 
-    static private Set<String> getTaskTitle(Progress progress) {
-        String title = "";
+    static private Stream<String> getTaskTitle(Progress progress) {
+        String title;
         Task task = progress.getTask();
+        List<String> returnList = new ArrayList<>();
         if (task != null) {
             title = task.getTitle();
+            returnList.add(title);
         }
-        Set<String> returnSet = new HashSet<>();
-        returnSet.add(title);
-        return returnSet;
+        return returnList.stream();
     };
 
-    static private Set<String> getUserTitle(Progress progress) {
-        Set<String> returnSet = new HashSet<>();
-        returnSet.add(progress.getOwnerName());
-        return returnSet;
+    static private Stream<String> getUserTitle(Progress progress) {
+        List<String> returnList = new ArrayList<>();
+        returnList.add(progress.getOwnerName());
+        return returnList.stream();
     };
 
-    static private Set<String> getWeekTitle(Progress progress) {
-        Set<String> returnSet = new HashSet<>();
+    static private Stream<String> getWeekTitle(Progress progress) {
+        List<String> returnList = new ArrayList<>();
         String yearWeek = progress.getReportWeek().get(ChronoField.YEAR) + " - W" +
                 progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-        returnSet.add(yearWeek);
-        return returnSet;
+        returnList.add(yearWeek);
+        return returnList.stream();
     };
 
-    static private List<ReportSection> sortByTitle(Collection<Progress> progresses, Function<Progress, Set<String>> titleExtractor) {
+    static private List<ReportSection> sortByTitle(List<Progress> progresses, Function<Progress, Stream<String>> titleExtractor) {
         List<ReportSection> sections = new ArrayList<>();
-        Set<String> titles = new HashSet<>();
-        progresses.forEach(s -> titles.addAll(titleExtractor.apply(s)));
-
-        List<String> sortedTitles = new ArrayList<>(titles);
-        Collections.sort(sortedTitles);
-
-        sortedTitles.forEach(title -> {
-            Stream<Progress> subStream = progresses.stream().filter(
-                    s -> {
-                        Set<String> progressTitles = titleExtractor.apply(s);
-                        return progressTitles.stream().anyMatch(title::equals);
-                    }
-            );
-            sections.add(new ReportSection(title, subStream));
-        });
+        progresses.sort(Comparator.comparing(Progress::getDateCreation));
+        Set<String> titles = progresses.stream().flatMap(titleExtractor).collect(Collectors.toSet());
+        if (!titles.isEmpty())
+        {
+            List<String> sortedTitles = new ArrayList<>(titles);
+            Collections.sort(sortedTitles);
+            sortedTitles.forEach(title -> {
+                Stream<Progress> subStream = progresses.stream().filter(
+                        s -> titleExtractor.apply(s).anyMatch(title::equals)
+                );
+                sections.add(new ReportSection(title, subStream));
+            });
+        }
         return sections;
     }
 }
