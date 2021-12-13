@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.Null;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,17 @@ public class Reports {
                 .collect(Collectors.toList());
 
         return userTeamIDs.containsAll(teamIDs);
+    }
+
+    public boolean validateUserId(@NonNull final Long userId) {
+
+        Optional<UserDTO> userDTO = userRepository.getUserById(userId);
+        boolean returnValue = false;
+        if (userDTO.isPresent())
+        {
+            returnValue = userDTO.get().getId() == userId;
+        }
+        return returnValue;
     }
 
     @NonNull

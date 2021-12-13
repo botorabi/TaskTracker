@@ -33,6 +33,8 @@ public class ReportComposerTest {
     private TeamRepository teamRepository;
     @Mock
     private TaskRepository taskRepository;
+    @Mock
+    private UserRepository userRepository;
 
     private ReportComposer reportComposer;
     private ReportCommonTest reportCommonTest;
@@ -44,7 +46,8 @@ public class ReportComposerTest {
         reportComposer = new ReportComposer(
                 progressRepository,
                 teamRepository,
-                taskRepository);
+                taskRepository,
+                userRepository);
 
         reportCommonTest = new ReportCommonTest();
     }
