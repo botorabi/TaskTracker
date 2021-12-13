@@ -93,20 +93,17 @@ public class ReportEncoderFop {
     }
 
     public void addSectionTitle(String text) {
-        String textContent = contentTitleTemplate.replace("@TEXT@", text);
-        content.append("\n");
+        String textContent = contentTitleTemplate.replace("@TEXT@", ("\n" + text));
         content.append(textContent);
 
     }
     public void addText(String text) {
-        String textContent = textTemplate.replace("@TEXT@", text);
-        content.append("\n");
+        String textContent = textTemplate.replace("@TEXT@", ("\n" + text));
         content.append(textContent);
     }
 
     public void addImage(String imageUri) {
         String imageContent = imageTemplate.replace("@IMAGE@", imageUri);
-        content.append("\n");
         content.append(imageContent);
     }
 
@@ -127,7 +124,6 @@ public class ReportEncoderFop {
         }
         prefix.append(";base64,");
         String imageContent = imageTemplate.replace("@IMAGE@", prefix.toString() + base64EncodedString);
-        content.append("\n");
         content.append(imageContent);
     }
 

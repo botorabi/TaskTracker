@@ -123,31 +123,76 @@ public interface ReportSectionGenerator {
         return secondaryFieldExtractors;
     }
 
-    static private List<ReportSection> sortByField(List<Progress> progresses, ReportSortType sortByType) {
+    static private List<Progress> getMatchingProgresses(List<Progress> progresses,
+                                                        Function<Progress, Stream<String>> fieldExtractor,
+                                                        String key)
+    {
+        return progresses.stream().filter(
+                        p -> fieldExtractor.apply(p).anyMatch(key::equals))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     *  Sorts the Progress List according to the field extractors in DECLINING priority
+     */
+    static private List<Progress> extractAndSubSort(List<Progress> progresses,
+                                                    List<Function<Progress, Stream<String>>> extractors)
+    {
+        if (extractors.isEmpty())
+        {
+            return progresses;
+        }
+        Function<Progress, Stream<String>> primaryExtractor = extractors.get(0);
+
+        HashSet<String> keys = progresses.stream().flatMap(primaryExtractor).collect(Collectors.toCollection(HashSet::new));
+        List<String> sortedKeys = keys.stream().sorted().collect(Collectors.toList());
+        List<Progress> sortedProgresses = new ArrayList<>();
+        sortedKeys.forEach(key -> {
+            List<Progress> subProgresses = getMatchingProgresses(progresses, primaryExtractor, key);
+            if (extractors.size() > 1)
+            {
+                sortedProgresses.addAll(extractAndSubSort(subProgresses, extractors.subList(1, extractors.size())));
+            }
+            else
+            {
+                sortedProgresses.addAll(subProgresses);
+            }
+        });
+        return sortedProgresses;
+    }
+
+
+    static private List<ReportSection> sortByField(List<Progress> progresses, ReportSortType sortByType)
+    {
         Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortByType);
         List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortByType);
 
         List<ReportSection> sections = new ArrayList<>();
-        progresses.sort(Comparator.comparing(Progress::getDateCreation));
-        Set<String> fields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
-        if (!fields.isEmpty())
+        Set<String> primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
+        if (!primaryFields.isEmpty())
         {
-            List<String> sortedFields = new ArrayList<>(fields);
+            List<String> sortedFields = new ArrayList<>(primaryFields);
             Collections.sort(sortedFields);
             sortedFields.forEach(field -> {
-                List<String> progressList = progresses.stream().filter(
+                List<Progress> progressList = progresses.stream().filter(
                         s -> primaryFieldExtractor.apply(s).anyMatch(field::equals)
-                ).map( progress -> {
+                ).collect(Collectors.toList());
+                progressList = extractAndSubSort(progressList, secondaryFieldExtractors);
+
+                ///Extracts each progress text and prepends the secondary fields
+                List<String> progressStrings =  progressList.stream().map( progress -> {
                     StringBuffer buffer = new StringBuffer();
                     secondaryFieldExtractors.forEach(extractor -> {
-                        buffer.append(extractor.apply(progress).collect(Collectors.joining()));
+                        buffer.append(extractor.apply(progress).collect(Collectors.joining(", ")));
+                        buffer.append("  ");
                     });
                     buffer.append("\n");
                     buffer.append(progress.getText());
                     buffer.append("\n");
                     return buffer.toString();
                 }).collect(Collectors.toList());
-                sections.add(new ReportSection(field, progressList));
+
+                sections.add(new ReportSection(field, progressStrings));
             });
         }
         return sections;
