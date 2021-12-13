@@ -10,11 +10,11 @@ import java.util.stream.Stream;
 public class ReportSection {
 
     private String sectionTitle;
-    private Stream<Progress> sectionProgess;
+    private List<String> sectionBody;
 
-    public ReportSection(@NonNull String sectionTitle, @NonNull Stream<Progress> sectionProgess)
+    public ReportSection(@NonNull String sectionTitle, @NonNull List<String> sectionBody)
     {
-        this.sectionProgess = sectionProgess;
+        this.sectionBody = sectionBody;
         this.sectionTitle = sectionTitle;
     }
 
@@ -24,19 +24,10 @@ public class ReportSection {
         return sectionTitle;
     }
 
-    public void setSectionTitle(@NonNull String sectionTitle)
-    {
-        this.sectionTitle = sectionTitle;
-    }
-
     @NonNull
-    public Stream<Progress> getSectionProgess()
+    public List<String> getSectionBody()
     {
-        return sectionProgess;
+        return sectionBody;
     }
 
-    public void setSectionProgess(@NonNull Stream<Progress> sectionProgess)
-    {
-        this.sectionProgess = sectionProgess;
-    }
 }

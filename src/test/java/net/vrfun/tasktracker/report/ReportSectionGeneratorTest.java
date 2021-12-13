@@ -24,6 +24,22 @@ class ReportSectionGeneratorTest {
         return sectionsNames.equals(testNames);
     }
 
+    private static Progress getVanillaProgress()
+    {
+        Progress progress = new Progress("OWNER", 1L);
+        Team team = new Team("Team", "");
+        Task task = new Task("task");
+        task.setTeams(List.of(team));
+        progress.setTask(task);
+        Instant instant = Instant.now();
+        LocalDate localdate = LocalDate.ofInstant(instant, ZoneId.of("UTC"));
+        progress.setDateCreation(instant);
+        progress.setReportWeek(localdate);
+        progress.setText("");
+        progress.setTitle("title");
+        return progress;
+    }
+
     @Test
     void getSectionsSortByTeam() {
         List<String> testNames = new ArrayList<>(Arrays.asList( "c", "b", "a"));
@@ -43,11 +59,13 @@ class ReportSectionGeneratorTest {
         task2.setTeams(teams2);
 
         List<Progress> progresses = new ArrayList<>();
-        Progress progress1 = new Progress();
+        Progress progress1 = getVanillaProgress();
         progress1.setTask(task1);
+        progress1.setReportWeek(LocalDate.ofInstant(Instant.parse("1982-01-09T10:15:13.00Z"), ZoneId.of("UTC")));
         progresses.add(progress1);
-        Progress progress2 = new Progress();
+        Progress progress2 = getVanillaProgress();
         progress2.setTask(task2);
+        progress2.setReportWeek(LocalDate.ofInstant(Instant.parse("1982-01-09T10:15:13.00Z"), ZoneId.of("UTC")));
         progresses.add(progress2);
 
         assertThat(compareWith(testNames, progresses, ReportSortType.REPORT_SORT_TYPE_TEAM)).isTrue();
@@ -58,7 +76,9 @@ class ReportSectionGeneratorTest {
         List<String> testNames = new ArrayList<>(Arrays.asList( "c", "b", "a"));
         List<Progress> progresses = new ArrayList<>();
         for (int i = 0; i < testNames.size(); ++i) {
-            progresses.add(new Progress(testNames.get(i), (long) i));
+            Progress progress = new Progress(testNames.get(i), (long) i);
+            progress.setReportWeek(LocalDate.ofInstant(Instant.parse("1982-01-09T10:15:13.00Z"), ZoneId.of("UTC")));
+            progresses.add(progress);
         }
         assertThat(compareWith(testNames, progresses, ReportSortType.REPORT_SORT_TYPE_USER)).isTrue();
     }
@@ -72,8 +92,9 @@ class ReportSectionGeneratorTest {
         }
         List<Progress> progresses = new ArrayList<>();
         for (Task task : tasks) {
-            Progress progress = new Progress();
+            Progress progress = getVanillaProgress();
             progress.setTask(task);
+            progress.setReportWeek(LocalDate.ofInstant(Instant.parse("1982-01-09T10:15:13.00Z"), ZoneId.of("UTC")));
             progresses.add(progress);
         }
 
@@ -94,7 +115,7 @@ class ReportSectionGeneratorTest {
         List<Progress> progresses = new ArrayList<>();
         List<String> weekNames = new ArrayList<>();
         for (Instant instant : instants) {
-            Progress progress = new Progress();
+            Progress progress = getVanillaProgress();
             progress.setDateCreation(instant);
             progress.setReportWeek(LocalDate.ofInstant(instant, ZoneId.of("UTC")));
             progresses.add(progress);

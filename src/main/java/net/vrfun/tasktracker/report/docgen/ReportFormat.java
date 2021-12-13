@@ -16,5 +16,7 @@ package net.vrfun.tasktracker.report.docgen;
 public enum ReportFormat {
     Unknown,
     PlainText,
-    PDF
+    PDF,
+    BITMAP,
+    PNG
 }
