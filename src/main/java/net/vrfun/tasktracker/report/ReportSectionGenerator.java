@@ -3,10 +3,9 @@ package net.vrfun.tasktracker.report;
 import net.vrfun.tasktracker.task.Progress;
 import net.vrfun.tasktracker.task.Task;
 import net.vrfun.tasktracker.user.Team;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 
+import javax.validation.constraints.NotEmpty;
 import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.function.Function;
@@ -15,19 +14,34 @@ import java.util.stream.Stream;
 
 public interface ReportSectionGenerator {
 
+    int MAXIM_REPORT_SORT_TYPES = 4;
     /**
-     * Divide the given Progress Stream into a ReportSection List, ordered by the ReportSortType
+     *  Divide the given Progress Stream into a ReportSection List
+     * @param progresses The stream which shall be ordered
+     * @param sortByType The field after which the progresses will be ordered
      */
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull ReportSortType sortByType) {
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType) {
         progresses = progresses.distinct();
-        return sortByField(progresses.collect(Collectors.toList()), sortByType);
+        return sortByFields(progresses.collect(Collectors.toList()), List.of(sortByType));
     }
 
-    static private Stream<String> getNoField(Progress progress) {
-        return (new ArrayList<String>().stream());
+    /**
+     *  Divide the given Progress Stream into a ReportSection List, ordered by the ReportSortType
+     * @param progresses The stream which shall be ordered
+     * @param sortByTypes The fields after which the progresses will be ordered. Their order is important!
+     *                    The first one determines the section title.
+     *                    Others are optional and may describe an additional ordering hierarchy
+     */
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes) {
+        progresses = progresses.distinct();
+        return sortByFields(progresses.collect(Collectors.toList()), sortByTypes);
     }
 
-    static private Stream<String> getTeamFields(Progress progress) {
+    static private Stream<String> getNoField(final Progress progress) {
+        return Stream.empty();
+    }
+
+    static private Stream<String> getTeamFields(final Progress progress) {
         Task task = progress.getTask();
         if (task != null) {
             Collection<Team> teams = task.getTeams();
@@ -35,10 +49,10 @@ public interface ReportSectionGenerator {
                 return teams.stream().map(Team::getName);
             }
         }
-        return (new ArrayList<String>().stream());
+        return Stream.empty();
     };
 
-    static private Stream<String> getTaskField(Progress progress) {
+    static private Stream<String> getTaskField(final Progress progress) {
         String field;
         Task task = progress.getTask();
         List<String> returnList = new ArrayList<>();
@@ -49,13 +63,13 @@ public interface ReportSectionGenerator {
         return returnList.stream();
     };
 
-    static private Stream<String> getUserField(Progress progress) {
+    static private Stream<String> getUserField(final Progress progress) {
         List<String> returnList = new ArrayList<>();
         returnList.add(progress.getOwnerName());
         return returnList.stream();
     };
 
-    static private Stream<String> getWeekField(Progress progress) {
+    static private Stream<String> getWeekField(final Progress progress) {
         List<String> returnList = new ArrayList<>();
         String yearWeek = progress.getReportWeek().get(ChronoField.YEAR) + " - W" +
                 progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
@@ -63,7 +77,7 @@ public interface ReportSectionGenerator {
         return returnList.stream();
     };
 
-    static private Function<Progress, Stream<String>> getProgressFieldExtractor(@NonNull ReportSortType sortByType) {
+    static private Function<Progress, Stream<String>> getProgressFieldExtractor(@NonNull final ReportSortType sortByType) {
         Function<Progress, Stream<String>> fieldExtractor = ReportSectionGenerator::getNoField;
         switch (sortByType)
         {
@@ -90,53 +104,69 @@ public interface ReportSectionGenerator {
         return fieldExtractor;
     }
 
-    private static List<Function<Progress, Stream<String>>> getSecondaryFieldExtractors(ReportSortType primaryField)
+    /**
+     * @param extractorFieldTypes List of extractor field types, INCLUDING the primary field! The primary field is used
+     *                            to determine the sorting hierarchy of secondary fields if any are not already given
+     * @return A List of unique of field extraction functions
+     */
+    private static List<Function<Progress, Stream<String>>> getSecondaryFieldExtractors(@NotEmpty final List<ReportSortType> extractorFieldTypes)
     {
         List<Function<Progress, Stream<String>>> secondaryFieldExtractors = new ArrayList<>();
+        ReportSortType primaryField = extractorFieldTypes.get(0);
+        List<ReportSortType> appendingTypes = new ArrayList<>();
         switch(primaryField)
         {
             case REPORT_SORT_TYPE_TEAM: {
-                secondaryFieldExtractors.add(ReportSectionGenerator::getUserField);
-                secondaryFieldExtractors.add(ReportSectionGenerator::getTaskField);
-                secondaryFieldExtractors.add(ReportSectionGenerator::getWeekField);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
                 break;
             }
 
             case REPORT_SORT_TYPE_TASK: {
-                secondaryFieldExtractors.add(ReportSectionGenerator::getUserField);
-                secondaryFieldExtractors.add(ReportSectionGenerator::getWeekField);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
                 break;
             }
 
             case REPORT_SORT_TYPE_USER: {
-                secondaryFieldExtractors.add(ReportSectionGenerator::getTaskField);
-                secondaryFieldExtractors.add(ReportSectionGenerator::getWeekField);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
                 break;
             }
 
             case REPORT_SORT_TYPE_WEEK: {
-                secondaryFieldExtractors.add(ReportSectionGenerator::getUserField);
-                secondaryFieldExtractors.add(ReportSectionGenerator::getTaskField);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
                 break;
             }
         }
+        Set<ReportSortType> uniqueTypes = new LinkedHashSet<>(extractorFieldTypes.subList(1, extractorFieldTypes.size()));
+        uniqueTypes.addAll(appendingTypes);
+        uniqueTypes.forEach(type -> {
+            secondaryFieldExtractors.add(getProgressFieldExtractor(type));
+        });
         return secondaryFieldExtractors;
     }
 
-    static private List<Progress> getMatchingProgresses(List<Progress> progresses,
-                                                        Function<Progress, Stream<String>> fieldExtractor,
-                                                        String key)
+    /**
+     *  Each progress is added if ANY of the extracted field String values matches the key
+     */
+    static private List<Progress> getMatchingProgresses(final List<Progress> progresses,
+                                                        final Function<Progress, Stream<String>> fieldExtractor,
+                                                        final String key)
     {
-        return progresses.stream().filter(
-                        p -> fieldExtractor.apply(p).anyMatch(key::equals))
+        return progresses
+                .stream()
+                .filter(p -> fieldExtractor.apply(p).anyMatch(key::equals))
                 .collect(Collectors.toList());
     }
 
     /**
      *  Sorts the Progress List according to the field extractors in DECLINING priority
      */
-    static private List<Progress> extractAndSubSort(List<Progress> progresses,
-                                                    List<Function<Progress, Stream<String>>> extractors)
+    static private List<Progress> extractAndSubSort(final List<Progress> progresses,
+                                                    final List<Function<Progress, Stream<String>>> extractors)
     {
         if (extractors.isEmpty())
         {
@@ -162,12 +192,16 @@ public interface ReportSectionGenerator {
     }
 
 
-    static private List<ReportSection> sortByField(List<Progress> progresses, ReportSortType sortByType)
+    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes)
     {
-        Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortByType);
-        List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortByType);
-
         List<ReportSection> sections = new ArrayList<>();
+        if (sortTypes.isEmpty())
+        {
+            return sections;
+        }
+        Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortTypes.get(0));
+        List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortTypes);
+
         Set<String> primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
         if (!primaryFields.isEmpty())
         {
@@ -181,15 +215,14 @@ public interface ReportSectionGenerator {
 
                 ///Extracts each progress text and prepends the secondary fields
                 List<String> progressStrings =  progressList.stream().map( progress -> {
-                    StringBuffer buffer = new StringBuffer();
+                    List<String> buffer = new ArrayList<>();
                     secondaryFieldExtractors.forEach(extractor -> {
-                        buffer.append(extractor.apply(progress).collect(Collectors.joining(", ")));
-                        buffer.append("  ");
+                        buffer.add(extractor.apply(progress).collect(Collectors.joining(" | ")));
                     });
-                    buffer.append("\n");
-                    buffer.append(progress.getText());
-                    buffer.append("\n");
-                    return buffer.toString();
+                    return String.join(", ", buffer)
+                            + "\n"
+                            + progress.getText()
+                            + "\n";
                 }).collect(Collectors.toList());
 
                 sections.add(new ReportSection(field, progressStrings));
