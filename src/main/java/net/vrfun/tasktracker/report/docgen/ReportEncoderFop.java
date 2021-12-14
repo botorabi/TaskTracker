@@ -93,12 +93,12 @@ public class ReportEncoderFop {
     }
 
     public void addSectionTitle(String text) {
-        String textContent = contentTitleTemplate.replace("@TEXT@", ("\n" + text));
+        String textContent = contentTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
 
     }
     public void addText(String text) {
-        String textContent = textTemplate.replace("@TEXT@", ("\n" + text));
+        String textContent = textTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
     }
 

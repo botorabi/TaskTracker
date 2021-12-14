@@ -89,7 +89,7 @@
 					<xsl:value-of select="text"/>
 				</xsl:when>
 				<xsl:when test="contenttitle">
-					<fo:block  font-weight="bold" font-size="16pt" linefeed-treatment="preserve">
+					<fo:block  font-weight="bold" font-size="14pt" linefeed-treatment="preserve">
 						<xsl:value-of select="contenttitle"/>
 					</fo:block>
 				</xsl:when>

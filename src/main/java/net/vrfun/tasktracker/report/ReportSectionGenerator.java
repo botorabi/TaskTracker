@@ -220,9 +220,9 @@ public interface ReportSectionGenerator {
                         buffer.add(extractor.apply(progress).collect(Collectors.joining(" | ")));
                     });
                     return String.join(", ", buffer)
-                            + "\n"
+                            + "\n\n"
                             + progress.getText()
-                            + "\n";
+                            + "\n\n";
                 }).collect(Collectors.toList());
 
                 sections.add(new ReportSection(field, progressStrings));
