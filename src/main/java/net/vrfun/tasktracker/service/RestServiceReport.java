@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.id;
+
 
 /**
  * Report related REST services
@@ -146,6 +148,51 @@ public class RestServiceReport {
                              StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
                              StringUtils.isEmpty(language) ? "en" : language)) {
 
+            return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not create report, reason: {}", throwable.getMessage());
+            throwable.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
+
+    @GetMapping(value = "/report/user/{userId}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}",
+            produces = MediaType.APPLICATION_PDF_VALUE)
+    @ResponseBody
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD, Role.ROLE_NAME_AUTHOR})
+    public ResponseEntity<ByteArrayResource> createUserReport(@PathVariable("userId")             final String userId,
+                                                              @PathVariable("fromDaysSinceEpoch") final String fromDate,
+                                                              @PathVariable("toDaysSinceEpoch")   final String toDate,
+                                                              @PathVariable("title")              final String title,
+                                                              @PathVariable("subTitle")           final String subTitle,
+                                                              @PathVariable("language")           final String language) {
+        Long id;
+        try {
+             id = Long.valueOf(userId);
+        }
+        catch (NumberFormatException e)
+        {
+            LOGGER.info("Invalid user id: {}", e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        if (!reports.validateUserId(id)) {
+            LOGGER.warn("Non authorized access of user {} ", userAuthenticator.getUserLogin());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        LocalDate fromInDaysSinceEpoch = LocalDate.ofEpochDay(Integer.parseInt(fromDate));
+        LocalDate toInDaysSinceEpoch   = LocalDate.ofEpochDay(Integer.parseInt(toDate));
+
+        try {
+            ByteArrayOutputStream report =
+                    reportComposer.createUserReport(
+                            id, fromInDaysSinceEpoch, toInDaysSinceEpoch,
+                            ReportFormat.PDF,
+                            StringUtils.isEmpty(title) ? "<Title>" : title,
+                            StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
+                            StringUtils.isEmpty(language) ? "en" : language);
             return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
         }
         catch(Throwable throwable) {

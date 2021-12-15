@@ -66,14 +66,22 @@ public class Reports {
     }
 
     public boolean validateUserId(@NonNull final Long userId) {
-
-        Optional<UserDTO> userDTO = userRepository.getUserById(userId);
-        boolean returnValue = false;
-        if (userDTO.isPresent())
-        {
-            returnValue = userDTO.get().getId() == userId;
+        if (userAuthenticator.isRoleAdmin()) {
+            return true;
         }
-        return returnValue;
+
+        if (userAuthenticator.isRoleTeamLead())
+        {
+            return true; //TODO: Add check if user is in one of the teamleads teams!
+        } else {
+
+            Optional<UserDTO> userDTO = userRepository.getUserById(userId);
+            boolean returnValue = false;
+            if (userDTO.isPresent()) {
+                returnValue = userDTO.get().getId() == userId;
+            }
+            return returnValue;
+        }
     }
 
     @NonNull
