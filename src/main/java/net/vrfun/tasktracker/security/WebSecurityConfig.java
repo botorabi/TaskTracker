@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.*;
 
 import java.util.Arrays;
@@ -69,6 +70,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //! NOTE we enable CORS during development
             LOGGER.debug("detected dev mode: enable CORS");
             http.cors().configurationSource(corsConfigurationSource());
+            //! NOTE we set the JSESSIONID cookie attribute sameSite to none,
+            //  this will allow the browser to accept cross site cookies, even from below top level
+            LOGGER.debug("detected dev mode: set JSESSIONID cookie attribute, sameSite=none");
+            http.addFilterAfter(new JSESSION_CookieFilter(), BasicAuthenticationFilter.class);
         }
 
         http.authorizeRequests().anyRequest().authenticated();
