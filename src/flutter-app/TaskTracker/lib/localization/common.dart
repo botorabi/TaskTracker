@@ -127,6 +127,18 @@ const Translations_Common = {
     'en': 'Progress Report',
     'de': 'Fortschrittsbericht',
   },
+  'Progress Report Team': {
+    'en': 'Progress Report Team',
+    'de': 'Fortschrittsbericht Team',
+  },
+  'Progress Report User': {
+    'en': 'Progress Report User',
+    'de': 'Fortschrittsbericht User',
+  },
+  'Week': {
+    'en': 'Week',
+    'de': 'Woche',
+  },
   'Weekly': {
     'en': 'Weekly',
     'de': 'Wöchentlich',

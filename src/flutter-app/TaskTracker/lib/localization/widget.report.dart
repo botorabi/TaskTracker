@@ -15,9 +15,13 @@ const Translations_WidgetReport = {
     'en': 'To',
     'de': 'Bis',
   },
-  'Report Period': {
-    'en': 'Report Period',
-    'de': 'Berichtszeitraum',
+  'Progress Period': {
+    'en': 'Progress Period',
+    'de': 'Aufgaben-Zeitraum',
+  },
+  'Sort Report By': {
+    'en': 'Sort Report By',
+    'de': 'Bericht sortieren nach',
   },
   'Please choose a date for \'From\' less than \'To\'.': {
     'en': 'Please choose a date for \'From\' less than \'To\'.',
@@ -27,12 +31,16 @@ const Translations_WidgetReport = {
     'en': 'Report document could not be created!',
     'de': 'Der Bericht konnte nicht erstellt werden!',
   },
-  'Select Teams for Report Creation': {
-    'en': 'Select Teams for Report Creation',
-    'de': 'Markieren Sie Teams für die Erstellung eines Berichts.',
+  'Select for Report Creation': {
+    'en': 'Select for Report Creation',
+    'de': 'Markieren um dem Bericht hinzuzufügen',
   },
   'Please select at least one team.': {
     'en': 'Please select at least one team.',
     'de': 'Bitte markieren Sie mindestens ein Team.',
+  },
+  'Please select one user': {
+    'en': 'Please select one user',
+    'de': 'Bitte markieren Sie einen Benutzer',
   },
 };
