@@ -66,7 +66,8 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "en"));
+                "en",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString()));
     }
 
     @Test
@@ -87,7 +88,8 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "INVALID-LANGUAGE")).isNotNull();
+                "INVALID-LANGUAGE",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString())).isNotNull();
     }
 
     @Test
@@ -108,6 +110,7 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "en")).isNotNull();
+                "en",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString())).isNotNull();
     }
 }

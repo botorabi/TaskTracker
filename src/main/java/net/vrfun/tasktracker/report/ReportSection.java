@@ -1,11 +1,7 @@
 package net.vrfun.tasktracker.report;
 
-import net.vrfun.tasktracker.task.Progress;
 import org.springframework.lang.NonNull;
-
-import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ReportSection {
 

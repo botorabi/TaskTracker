@@ -14,15 +14,24 @@ import java.util.stream.Stream;
 
 public interface ReportSectionGenerator {
 
-    int MAXIM_REPORT_SORT_TYPES = 4;
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType) {
+
+        return getSections(progresses, sortByType, new HashSet<>());
+    }
+
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes) {
+        return getSections(progresses, sortByTypes, new HashSet<>());
+    }
+
     /**
      *  Divide the given Progress Stream into a ReportSection List
      * @param progresses The stream which shall be ordered
      * @param sortByType The field after which the progresses will be ordered
+     * @param targetFields Reduces the output to entries where sortByType equals one of these values
      */
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType) {
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType, Set<String> targetFields) {
         progresses = progresses.distinct();
-        return sortByFields(progresses.collect(Collectors.toList()), List.of(sortByType));
+        return sortByFields(progresses.collect(Collectors.toList()), List.of(sortByType), targetFields);
     }
 
     /**
@@ -31,10 +40,11 @@ public interface ReportSectionGenerator {
      * @param sortByTypes The fields after which the progresses will be ordered. Their order is important!
      *                    The first one determines the section title.
      *                    Others are optional and may describe an additional ordering hierarchy
+     * @param targetFields Reduces the output to entries where sortByType equals one of these values
      */
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes) {
+    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes, Set<String> targetFields) {
         progresses = progresses.distinct();
-        return sortByFields(progresses.collect(Collectors.toList()), sortByTypes);
+        return sortByFields(progresses.collect(Collectors.toList()), sortByTypes, targetFields);
     }
 
     static private Stream<String> getNoField(final Progress progress) {
@@ -50,7 +60,7 @@ public interface ReportSectionGenerator {
             }
         }
         return Stream.empty();
-    };
+    }
 
     static private Stream<String> getTaskField(final Progress progress) {
         String field;
@@ -61,13 +71,13 @@ public interface ReportSectionGenerator {
             returnList.add(field);
         }
         return returnList.stream();
-    };
+    }
 
     static private Stream<String> getUserField(final Progress progress) {
         List<String> returnList = new ArrayList<>();
         returnList.add(progress.getOwnerName());
         return returnList.stream();
-    };
+    }
 
     static private Stream<String> getWeekField(final Progress progress) {
         List<String> returnList = new ArrayList<>();
@@ -75,7 +85,7 @@ public interface ReportSectionGenerator {
                 progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
         returnList.add(yearWeek);
         return returnList.stream();
-    };
+    }
 
     static private Function<Progress, Stream<String>> getProgressFieldExtractor(@NonNull final ReportSortType sortByType) {
         Function<Progress, Stream<String>> fieldExtractor = ReportSectionGenerator::getNoField;
@@ -143,9 +153,7 @@ public interface ReportSectionGenerator {
         }
         Set<ReportSortType> uniqueTypes = new LinkedHashSet<>(extractorFieldTypes.subList(1, extractorFieldTypes.size()));
         uniqueTypes.addAll(appendingTypes);
-        uniqueTypes.forEach(type -> {
-            secondaryFieldExtractors.add(getProgressFieldExtractor(type));
-        });
+        uniqueTypes.forEach(type -> secondaryFieldExtractors.add(getProgressFieldExtractor(type)));
         return secondaryFieldExtractors;
     }
 
@@ -192,7 +200,7 @@ public interface ReportSectionGenerator {
     }
 
 
-    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes)
+    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes, Set<String> primaryFields)
     {
         List<ReportSection> sections = new ArrayList<>();
         if (sortTypes.isEmpty())
@@ -202,7 +210,10 @@ public interface ReportSectionGenerator {
         Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortTypes.get(0));
         List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortTypes);
 
-        Set<String> primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
+        if (primaryFields.isEmpty()) {
+            primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
+        }
+
         if (!primaryFields.isEmpty())
         {
             List<String> sortedFields = new ArrayList<>(primaryFields);
@@ -216,9 +227,7 @@ public interface ReportSectionGenerator {
                 ///Extracts each progress text and prepends the secondary fields
                 List<String> progressStrings =  progressList.stream().map( progress -> {
                     List<String> buffer = new ArrayList<>();
-                    secondaryFieldExtractors.forEach(extractor -> {
-                        buffer.add(extractor.apply(progress).collect(Collectors.joining(" | ")));
-                    });
+                    secondaryFieldExtractors.forEach(extractor -> buffer.add(extractor.apply(progress).collect(Collectors.joining(" | "))));
                     return String.join(", ", buffer)
                             + "\n\n"
                             + progress.getText()
@@ -230,4 +239,6 @@ public interface ReportSectionGenerator {
         }
         return sections;
     }
+
+
 }

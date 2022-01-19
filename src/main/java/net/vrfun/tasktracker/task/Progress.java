@@ -33,7 +33,7 @@ public class Progress extends BaseEntity implements Serializable {
     @OneToMany(targetEntity = Tag.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Collection<Tag> tags;
 
-    @OneToOne(targetEntity = Task.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    @ManyToOne(targetEntity = Task.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Task task;
 
     @Column(nullable=false)

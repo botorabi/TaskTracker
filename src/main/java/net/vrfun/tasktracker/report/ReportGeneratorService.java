@@ -104,7 +104,8 @@ public class ReportGeneratorService {
                                     ReportFormat.PDF,
                                     StringUtils.isEmpty(configuration.getReportTitle()) ? "" : configuration.getReportTitle(),
                                     StringUtils.isEmpty(configuration.getReportSubTitle()) ? "" : configuration.getReportSubTitle(),
-                                    configuration.getLanguage());
+                                    configuration.getLanguage(),
+                                    ReportSortType.REPORT_SORT_TYPE_TEAM.toString());
 
                     String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
                     cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
