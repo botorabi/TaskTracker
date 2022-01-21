@@ -233,8 +233,9 @@ public interface ReportSectionGenerator {
                             + progress.getText()
                             + "\n\n";
                 }).collect(Collectors.toList());
-
-                sections.add(new ReportSection(field, progressStrings));
+                if (!progressStrings.isEmpty()) {
+                    sections.add(new ReportSection(field, progressStrings));
+                }
             });
         }
         return sections;
