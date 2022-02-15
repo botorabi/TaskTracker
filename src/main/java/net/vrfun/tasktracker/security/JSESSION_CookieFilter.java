@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
+ * https://github.com/botorabi/TaskTracker
+ *
+ * License: MIT License (MIT), read the LICENSE text in
+ *          main directory for more details.
+ */
 package net.vrfun.tasktracker.security;
 
-import net.vrfun.tasktracker.appconfig.WebMvcConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
