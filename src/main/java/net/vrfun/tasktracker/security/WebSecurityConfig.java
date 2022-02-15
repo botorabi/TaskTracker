@@ -9,15 +9,20 @@ package net.vrfun.tasktracker.security;
 
 
 import net.vrfun.tasktracker.appconfig.WebMvcConfig;
-import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.cors.*;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
@@ -33,7 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfig.class);
 
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Value("${enable-dev-mode: false}")
     private boolean developmentModeEnabled;
@@ -70,10 +75,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //! NOTE we enable CORS during development
             LOGGER.debug("detected dev mode: enable CORS");
             http.cors().configurationSource(corsConfigurationSource());
-            //! NOTE we set the JSESSIONID cookie attribute sameSite to none,
-            //  this will allow the browser to accept cross site cookies, even from below top level
-            LOGGER.debug("detected dev mode: set JSESSIONID cookie attribute, sameSite=none");
-            http.addFilterAfter(new JSESSION_CookieFilter(), BasicAuthenticationFilter.class);
         }
 
         http.authorizeRequests().anyRequest().authenticated();

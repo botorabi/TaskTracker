@@ -7,8 +7,11 @@
  */
 package net.vrfun.tasktracker.appconfig;
 
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
+import org.apache.tomcat.util.http.SameSiteCookies;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.context.annotation.*;
 import org.springframework.web.servlet.config.annotation.*;
 
@@ -56,5 +59,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
                     .addResourceHandler("/**")
                     .addResourceLocations(resourceFolder);
         }
+    }
+
+    @Bean
+    public TomcatContextCustomizer sameSiteCookiesConfig() {
+        return context -> {
+            if (developmentModeEnabled) {
+                final Rfc6265CookieProcessor cookieProcessor = new Rfc6265CookieProcessor();
+                cookieProcessor.setSameSiteCookies(SameSiteCookies.NONE.getValue());
+                context.setCookieProcessor(cookieProcessor);
+            }
+        };
     }
 }
