@@ -24,7 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ReportSectionGeneratorTest {
 
     private static boolean compareWith(List<String> testNames, List<Progress> progresses, ReportSortType type) {
-        List<ReportSection> sections =  ReportSectionGenerator.getSections(progresses.stream(), type);
+        var reportSectionGenerator = ReportSectionGenerator.build(progresses)
+                                                            .sortBy(type);
+        List<ReportSection> sections =  reportSectionGenerator.create();
         List<String> sectionsNames = sections.stream().map(ReportSection::getSectionTitle).collect(Collectors.toList());
 
         Collections.sort(testNames);

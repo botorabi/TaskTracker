@@ -19,41 +19,74 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface ReportSectionGenerator {
+public class ReportSectionGenerator {
 
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType) {
+    private List<Progress>          progresses;
+    private List<ReportSortType>    sortByTypes;
+    private Set<String> primarySortFieldValues;
 
-        return getSections(progresses, sortByType, new HashSet<>());
-    }
-
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes) {
-        return getSections(progresses, sortByTypes, new HashSet<>());
+    /**
+     * Private constructor which sets the default values
+     */
+    private ReportSectionGenerator(@NonNull List<Progress> progresses) {
+        this.progresses = progresses.stream().distinct().collect(Collectors.toList());
+        this.sortByTypes = new ArrayList<>();
+        this.primarySortFieldValues = new HashSet<>();
     }
 
     /**
-     * Divide the given Progress Stream into a ReportSection List
      *
-     * @param progresses   The stream which shall be ordered
-     * @param sortByType   The field after which the progresses will be ordered
-     * @param targetFields Reduces the output to entries where sortByType equals one of these values
+     * @param progresses Contain the report data
+     * @return the new ReportSectionGenerator instance
      */
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType, Set<String> targetFields) {
-        progresses = progresses.distinct();
-        return sortByFields(progresses.collect(Collectors.toList()), List.of(sortByType), targetFields);
+    static ReportSectionGenerator build(@NonNull List<Progress> progresses) {
+        return new ReportSectionGenerator(progresses);
     }
 
     /**
-     * Divide the given Progress Stream into a ReportSection List, ordered by the ReportSortType
-     *
-     * @param progresses   The stream which shall be ordered
-     * @param sortByTypes  The fields after which the progresses will be ordered. Their order is important!
-     *                     The first one determines the section title.
-     *                     Others are optional and may describe an additional ordering hierarchy
-     * @param targetFields Reduces the output to entries where sortByType equals one of these values
+     * Sorts output
+     * @param sortByField Field by which the progresses will be sorted
      */
-    static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes, Set<String> targetFields) {
-        progresses = progresses.distinct();
-        return sortByFields(progresses.collect(Collectors.toList()), sortByTypes, targetFields);
+    ReportSectionGenerator sortBy(@NonNull ReportSortType sortByField) {
+        this.sortByTypes = List.of(sortByField);
+        return this;
+    }
+
+    /**
+     * Sorts output
+     * @param sortByFields Fields by which the progresses will be sorted. The sorting hierarchy is by descending order.
+     */
+    ReportSectionGenerator sortBy(@NonNull final List<ReportSortType> sortByFields) {
+        this.sortByTypes = sortByFields;
+        return this;
+    }
+
+    /**
+     * Restricts output to specific progresses
+     * @param primarySortFieldValue Only progresses which contain this value in their first (or only) sorted by field will be
+     *                              taken into account. See {@link #sortBy withSortBy}.
+     */
+    ReportSectionGenerator withSortFieldValue(@NonNull String primarySortFieldValue) {
+        this.primarySortFieldValues = Set.of(primarySortFieldValue);
+        return this;
+    }
+
+    /**
+     *  Restricts output to specific progresses
+     * @param primarySortFieldValues Only progresses which contain one of these values in their first (or only) sorted by field
+     *                               will be taken into account. See  {@link #sortBy withSortBy}.
+     */
+    ReportSectionGenerator withSortFieldValues(@NonNull Set<String> primarySortFieldValues) {
+        this.primarySortFieldValues = primarySortFieldValues;
+        return this;
+    }
+
+    /**
+     * @return A list of ReportSection's which contain the data from the progresses
+     * @apiNote See {@link #sortBy withSortBy} and {@link #withSortFieldValues withSortFieldValues}
+     */
+    List<ReportSection> create() {
+        return sortByFields();
     }
 
     static private Stream<String> getNoField(final Progress progress) {
@@ -176,7 +209,7 @@ public interface ReportSectionGenerator {
     }
 
     /**
-     * Sorts the Progress List according to the field extractors in DECLINING priority
+     * Sorts the Progress List according to the field extractors in descending priority
      */
     static private List<Progress> extractAndSubSort(@NonNull final List<Progress> progresses,
                                                     @NonNull final List<Function<Progress, Stream<String>>> fieldExtractors) {
@@ -200,19 +233,19 @@ public interface ReportSectionGenerator {
     }
 
 
-    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes, Set<String> primaryFields) {
+    private List<ReportSection> sortByFields() {
         List<ReportSection> sections = new ArrayList<>();
-        if (sortTypes.isEmpty()) {
+        if (sortByTypes.isEmpty()) {
             return sections;
         }
-        Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortTypes.get(0));
-        List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortTypes);
+        Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortByTypes.get(0));
+        List<Function<Progress, Stream<String>>> secondaryFieldExtractors = getSecondaryFieldExtractors(sortByTypes);
 
-        if (primaryFields.isEmpty()) {
-            primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
+        if (primarySortFieldValues.isEmpty()) {
+            primarySortFieldValues = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
         }
 
-        List<String> sortedFields = new ArrayList<>(primaryFields);
+        List<String> sortedFields = new ArrayList<>(primarySortFieldValues);
         Collections.sort(sortedFields);
 
         sortedFields.forEach(field -> {

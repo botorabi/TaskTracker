@@ -29,7 +29,7 @@ public class ReportEncoderFop {
     private final static String FOP_CONTENT_IMAGE_TEMPLATE  = "doc-templates/template-content-image.xml";
     private final static String FOP_CONTENT_TEXT_TEMPLATE  = "doc-templates/template-content-text.xml";
     private final static String FOP_CONTENT_TITLE_TEMPLATE  = "doc-templates/template-content-title.xml";
-    private final static String FOP_CONTEN_SUBTTITLE_TEMPLATE  = "doc-templates/template-content-subtitle.xml";
+    private final static String FOP_CONTENT_SUBTTITLE_TEMPLATE = "doc-templates/template-content-subtitle.xml";
     private final static String FOP_CONTENT_METAINFORMATION_TEMPLATE = "doc-templates/template-content-metainformation.xml";
 
     private final String imageTemplate;
@@ -56,7 +56,7 @@ public class ReportEncoderFop {
     String getClassPathString(String classPath) throws IOException {
         Resource resource = new ClassPathResource(classPath);
         String returnValue;
-        try(InputStream inputStream = resource.getInputStream();) {
+        try(InputStream inputStream = resource.getInputStream()) {
             returnValue = new String(inputStream.readAllBytes());
         }
         return returnValue;
@@ -75,7 +75,7 @@ public class ReportEncoderFop {
             textTemplate = getClassPathString(FOP_CONTENT_TEXT_TEMPLATE);
             imageTemplate = getClassPathString(FOP_CONTENT_IMAGE_TEMPLATE);
             contentTitleTemplate = getClassPathString(FOP_CONTENT_TITLE_TEMPLATE);
-            contentSubTitleTemplate = getClassPathString(FOP_CONTEN_SUBTTITLE_TEMPLATE);
+            contentSubTitleTemplate = getClassPathString(FOP_CONTENT_SUBTTITLE_TEMPLATE);
             contentMetaInfoTemplate = getClassPathString(FOP_CONTENT_METAINFORMATION_TEMPLATE);
 
             currentPages = pagesTemplate;

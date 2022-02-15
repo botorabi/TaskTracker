@@ -161,10 +161,11 @@ public class ReportComposer {
                 });
                 teamNames.add(team.getName());
             });
+            var reportSectionGenerator = ReportSectionGenerator.build(progressList).sortBy(sortByType);
             if (sortByType == ReportSortType.REPORT_SORT_TYPE_TEAM) {
-                return ReportSectionGenerator.getSections(progressList.stream(), sortByType, teamNames);
+                return reportSectionGenerator.withSortFieldValues(teamNames).create();
             } else {
-                return ReportSectionGenerator.getSections(progressList.stream(), sortByType);
+                return reportSectionGenerator.create();
             }
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
@@ -182,7 +183,7 @@ public class ReportComposer {
 
         try {
             List<Progress> progresses = progressRepository.findProgressByOwnerIdAndReportWeekBetween(userId, fromDate, toDate);
-            return ReportSectionGenerator.getSections(progresses.stream(), sortByType);
+            return ReportSectionGenerator.build(progresses).sortBy(sortByType).create();
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
             throw throwable;
