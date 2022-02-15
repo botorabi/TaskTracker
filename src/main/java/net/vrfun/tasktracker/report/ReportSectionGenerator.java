@@ -31,9 +31,10 @@ public interface ReportSectionGenerator {
     }
 
     /**
-     *  Divide the given Progress Stream into a ReportSection List
-     * @param progresses The stream which shall be ordered
-     * @param sortByType The field after which the progresses will be ordered
+     * Divide the given Progress Stream into a ReportSection List
+     *
+     * @param progresses   The stream which shall be ordered
+     * @param sortByType   The field after which the progresses will be ordered
      * @param targetFields Reduces the output to entries where sortByType equals one of these values
      */
     static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final ReportSortType sortByType, Set<String> targetFields) {
@@ -42,11 +43,12 @@ public interface ReportSectionGenerator {
     }
 
     /**
-     *  Divide the given Progress Stream into a ReportSection List, ordered by the ReportSortType
-     * @param progresses The stream which shall be ordered
-     * @param sortByTypes The fields after which the progresses will be ordered. Their order is important!
-     *                    The first one determines the section title.
-     *                    Others are optional and may describe an additional ordering hierarchy
+     * Divide the given Progress Stream into a ReportSection List, ordered by the ReportSortType
+     *
+     * @param progresses   The stream which shall be ordered
+     * @param sortByTypes  The fields after which the progresses will be ordered. Their order is important!
+     *                     The first one determines the section title.
+     *                     Others are optional and may describe an additional ordering hierarchy
      * @param targetFields Reduces the output to entries where sortByType equals one of these values
      */
     static List<ReportSection> getSections(@NonNull Stream<Progress> progresses, @NonNull final List<ReportSortType> sortByTypes, Set<String> targetFields) {
@@ -96,8 +98,7 @@ public interface ReportSectionGenerator {
 
     static private Function<Progress, Stream<String>> getProgressFieldExtractor(@NonNull final ReportSortType sortByType) {
         Function<Progress, Stream<String>> fieldExtractor = ReportSectionGenerator::getNoField;
-        switch (sortByType)
-        {
+        switch (sortByType) {
             case REPORT_SORT_TYPE_TASK: {
                 fieldExtractor = ReportSectionGenerator::getTaskField;
                 break;
@@ -126,13 +127,11 @@ public interface ReportSectionGenerator {
      *                            to determine the sorting hierarchy of secondary fields if any are not already given
      * @return A List of unique of field extraction functions
      */
-    private static List<Function<Progress, Stream<String>>> getSecondaryFieldExtractors(@NotEmpty final List<ReportSortType> extractorFieldTypes)
-    {
+    private static List<Function<Progress, Stream<String>>> getSecondaryFieldExtractors(@NotEmpty final List<ReportSortType> extractorFieldTypes) {
         List<Function<Progress, Stream<String>>> secondaryFieldExtractors = new ArrayList<>();
         ReportSortType primaryField = extractorFieldTypes.get(0);
         List<ReportSortType> appendingTypes = new ArrayList<>();
-        switch(primaryField)
-        {
+        switch (primaryField) {
             case REPORT_SORT_TYPE_TEAM: {
                 appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
                 appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
@@ -165,12 +164,11 @@ public interface ReportSectionGenerator {
     }
 
     /**
-     *  Each progress is added if ANY of the extracted field String values matches the key
+     * Each progress is added if ANY of the extracted field String values matches the key
      */
     static private List<Progress> getMatchingProgresses(final List<Progress> progresses,
                                                         final Function<Progress, Stream<String>> fieldExtractor,
-                                                        final String key)
-    {
+                                                        final String key) {
         return progresses
                 .stream()
                 .filter(p -> fieldExtractor.apply(p).anyMatch(key::equals))
@@ -202,11 +200,9 @@ public interface ReportSectionGenerator {
     }
 
 
-    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes, Set<String> primaryFields)
-    {
+    static private List<ReportSection> sortByFields(final List<Progress> progresses, final List<ReportSortType> sortTypes, Set<String> primaryFields) {
         List<ReportSection> sections = new ArrayList<>();
-        if (sortTypes.isEmpty())
-        {
+        if (sortTypes.isEmpty()) {
             return sections;
         }
         Function<Progress, Stream<String>> primaryFieldExtractor = getProgressFieldExtractor(sortTypes.get(0));
