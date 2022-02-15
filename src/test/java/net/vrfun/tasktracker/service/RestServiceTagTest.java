@@ -8,11 +8,12 @@
 package net.vrfun.tasktracker.service;
 
 import net.vrfun.tasktracker.task.*;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.*;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.util.*;
 
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(SpringRunner.class)
+
 public class RestServiceTagTest {
 
     @Mock
@@ -28,7 +29,7 @@ public class RestServiceTagTest {
 
     private RestServiceTag restServiceTag;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

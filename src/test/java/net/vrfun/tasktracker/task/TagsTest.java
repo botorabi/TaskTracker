@@ -8,10 +8,11 @@
 package net.vrfun.tasktracker.task;
 
 import org.assertj.core.api.Assertions;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.util.*;
 
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doReturn;
 
-@RunWith(SpringRunner.class)
+
 public class TagsTest {
 
     @Mock
@@ -27,7 +28,7 @@ public class TagsTest {
 
     private Tags tags;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

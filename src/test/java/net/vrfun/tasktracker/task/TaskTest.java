@@ -7,19 +7,16 @@
  */
 package net.vrfun.tasktracker.task;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
 public class TaskTest {
 
-    @Before
+    @BeforeEach
     public void setup() {
     }
 

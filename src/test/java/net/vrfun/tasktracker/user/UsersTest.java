@@ -9,21 +9,22 @@ package net.vrfun.tasktracker.user;
 
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.task.TaskRepository;
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.stubbing.Answer;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(SpringRunner.class)
+
 public class UsersTest {
 
     @Mock
@@ -48,7 +49,7 @@ public class UsersTest {
 
     private int userCount;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

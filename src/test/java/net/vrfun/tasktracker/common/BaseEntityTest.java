@@ -7,13 +7,15 @@
  */
 package net.vrfun.tasktracker.common;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+
+
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+
 public class BaseEntityTest {
 
     public class MyEntity extends BaseEntity {
@@ -33,7 +35,7 @@ public class BaseEntityTest {
 
     private MyEntity myEntity;
 
-    @Before
+    @BeforeEach
     public void setup() {
         myEntity = new MyEntity();
     }

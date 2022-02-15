@@ -8,8 +8,9 @@
 package net.vrfun.tasktracker.security;
 
 import net.vrfun.tasktracker.user.*;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +18,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.util.*;
 
@@ -25,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(SpringRunner.class)
+
 public class UserAuthenticatorTest {
 
     @Mock
@@ -47,7 +48,7 @@ public class UserAuthenticatorTest {
     private UserAuthenticator userAuthenticator;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

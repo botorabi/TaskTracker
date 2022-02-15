@@ -10,10 +10,10 @@ package net.vrfun.tasktracker.report;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.task.*;
 import net.vrfun.tasktracker.user.*;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -21,9 +21,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-
-@RunWith(SpringRunner.class)
 
 public class ReportComposerTest {
 
@@ -39,7 +36,7 @@ public class ReportComposerTest {
     private ReportComposer reportComposer;
     private ReportCommonTest reportCommonTest;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

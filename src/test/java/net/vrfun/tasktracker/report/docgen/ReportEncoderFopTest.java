@@ -12,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class ReportEncoderFopTest {
 
