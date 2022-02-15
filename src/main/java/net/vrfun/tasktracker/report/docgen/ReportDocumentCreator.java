@@ -46,7 +46,12 @@ public interface ReportDocumentCreator {
 
     private static void addSection(ReportEncoderFop encoder, ReportSection section) {
         encoder.addSectionTitle(section.getSectionTitle());
-        encoder.addText(String.join("\n", section.getSectionBody()));
+        section.getSectionBody().forEach(sectionBody -> {
+                    encoder.addMetaInfo(sectionBody.getMetaInformation());
+                    encoder.addSubTitle(sectionBody.getSubtitle());
+                    encoder.addText(sectionBody.getText());
+                }
+        );
     }
 
 }

@@ -178,28 +178,23 @@ public interface ReportSectionGenerator {
     }
 
     /**
-     *  Sorts the Progress List according to the field extractors in DECLINING priority
+     * Sorts the Progress List according to the field extractors in DECLINING priority
      */
-    static private List<Progress> extractAndSubSort(final List<Progress> progresses,
-                                                    final List<Function<Progress, Stream<String>>> extractors)
-    {
-        if (extractors.isEmpty())
-        {
+    static private List<Progress> extractAndSubSort(@NonNull final List<Progress> progresses,
+                                                    @NonNull final List<Function<Progress, Stream<String>>> fieldExtractors) {
+        if (fieldExtractors.isEmpty()) {
             return progresses;
         }
-        Function<Progress, Stream<String>> primaryExtractor = extractors.get(0);
+        var primaryFieldExtractor = fieldExtractors.get(0);
 
-        HashSet<String> keys = progresses.stream().flatMap(primaryExtractor).collect(Collectors.toCollection(HashSet::new));
-        List<String> sortedKeys = keys.stream().sorted().collect(Collectors.toList());
+        var fieldValues = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toCollection(HashSet::new));
+        List<String> sortedKeys = fieldValues.stream().sorted().collect(Collectors.toList());
         List<Progress> sortedProgresses = new ArrayList<>();
         sortedKeys.forEach(key -> {
-            List<Progress> subProgresses = getMatchingProgresses(progresses, primaryExtractor, key);
-            if (extractors.size() > 1)
-            {
-                sortedProgresses.addAll(extractAndSubSort(subProgresses, extractors.subList(1, extractors.size())));
-            }
-            else
-            {
+            List<Progress> subProgresses = getMatchingProgresses(progresses, primaryFieldExtractor, key);
+            if (fieldExtractors.size() > 1) {
+                sortedProgresses.addAll(extractAndSubSort(subProgresses, fieldExtractors.subList(1, fieldExtractors.size())));
+            } else {
                 sortedProgresses.addAll(subProgresses);
             }
         });
@@ -221,30 +216,33 @@ public interface ReportSectionGenerator {
             primaryFields = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toSet());
         }
 
-        if (!primaryFields.isEmpty())
-        {
-            List<String> sortedFields = new ArrayList<>(primaryFields);
-            Collections.sort(sortedFields);
-            sortedFields.forEach(field -> {
-                List<Progress> progressList = progresses.stream().filter(
-                        s -> primaryFieldExtractor.apply(s).anyMatch(field::equals)
-                ).collect(Collectors.toList());
-                progressList = extractAndSubSort(progressList, secondaryFieldExtractors);
+        List<String> sortedFields = new ArrayList<>(primaryFields);
+        Collections.sort(sortedFields);
 
-                ///Extracts each progress text and prepends the secondary fields
-                List<String> progressStrings =  progressList.stream().map( progress -> {
-                    List<String> buffer = new ArrayList<>();
-                    secondaryFieldExtractors.forEach(extractor -> buffer.add(extractor.apply(progress).collect(Collectors.joining(" | "))));
-                    return String.join(", ", buffer)
-                            + "\n\n"
-                            + progress.getText()
-                            + "\n\n";
-                }).collect(Collectors.toList());
-                if (!progressStrings.isEmpty()) {
-                    sections.add(new ReportSection(field, progressStrings));
-                }
-            });
-        }
+        sortedFields.forEach(field -> {
+            List<Progress> progressList = progresses.stream().filter(
+                    s -> primaryFieldExtractor.apply(s).anyMatch(field::equals)
+            ).collect(Collectors.toList());
+            progressList = extractAndSubSort(progressList, secondaryFieldExtractors);
+
+            ///Extracts each progress text and prepends the secondary fields
+            List<ReportSectionBody> progressStrings = progressList.stream().map(progress -> {
+                List<String> metaInfoBuffer = new ArrayList<>();
+
+                //Extracted fields might contain more than one value. If so, they are listed with the given delimiter.
+                secondaryFieldExtractors.forEach(extractor -> metaInfoBuffer.add(extractor.apply(progress).collect(Collectors.joining(" | "))));
+
+                var sectionBody = new ReportSectionBody();
+                sectionBody.setText(progress.getText());
+                sectionBody.setSubtitle(progress.getTitle());
+                sectionBody.setMetaInformation(String.join(", ", metaInfoBuffer));
+                return sectionBody;
+            }).collect(Collectors.toList());
+            if (!progressStrings.isEmpty()) {
+                sections.add(new ReportSection(field, progressStrings));
+            }
+        });
+
         return sections;
     }
 

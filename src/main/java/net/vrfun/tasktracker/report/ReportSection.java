@@ -12,23 +12,23 @@ import java.util.List;
 
 public class ReportSection {
 
-    private String sectionTitle;
-    private List<String> sectionBody;
+    private String title;
+    private List<ReportSectionBody> sectionBody;
 
-    public ReportSection(@NonNull String sectionTitle, @NonNull List<String> sectionBody)
+    public ReportSection(@NonNull String sectionTitle, @NonNull List<ReportSectionBody> sectionBody)
     {
         this.sectionBody = sectionBody;
-        this.sectionTitle = sectionTitle;
+        this.title = sectionTitle;
     }
 
     @NonNull
     public String getSectionTitle()
     {
-        return sectionTitle;
+        return title;
     }
 
     @NonNull
-    public List<String> getSectionBody()
+    public List<ReportSectionBody> getSectionBody()
     {
         return sectionBody;
     }

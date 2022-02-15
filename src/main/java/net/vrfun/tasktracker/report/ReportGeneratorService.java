@@ -123,7 +123,7 @@ public class ReportGeneratorService {
                                 reportDocument);
                     }
                     else {
-                        LOGGER.warn(" Could not generate report and send mail, no progress for configuration {}", configuration.getName());
+                        LOGGER.info("Did not send mail: No progress to report. Configuration {}", configuration.getName());
                     }
                 }
                 else {

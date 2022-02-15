@@ -28,11 +28,15 @@ public class ReportEncoderFop {
     private final static String FOP_PAGES_TEMPLATE  = "doc-templates/template-standard_pages.xml";
     private final static String FOP_CONTENT_IMAGE_TEMPLATE  = "doc-templates/template-content-image.xml";
     private final static String FOP_CONTENT_TEXT_TEMPLATE  = "doc-templates/template-content-text.xml";
-    private final static String FOP_CONTENTTITLE_TEMPLATE  = "doc-templates/template-content-title.xml";
+    private final static String FOP_CONTENT_TITLE_TEMPLATE  = "doc-templates/template-content-title.xml";
+    private final static String FOP_CONTEN_SUBTTITLE_TEMPLATE  = "doc-templates/template-content-subtitle.xml";
+    private final static String FOP_CONTENT_METAINFORMATION_TEMPLATE = "doc-templates/template-content-metainformation.xml";
 
     private final String imageTemplate;
     private final String textTemplate;
     private final String contentTitleTemplate;
+    private final String contentSubTitleTemplate;
+    private final String contentMetaInfoTemplate;
     private final String reportFormat;
     private final String pagesTemplate;
     private String currentPages;
@@ -70,7 +74,9 @@ public class ReportEncoderFop {
             reportFormat = getClassPathString(FOP_REPORT_FORMAT);
             textTemplate = getClassPathString(FOP_CONTENT_TEXT_TEMPLATE);
             imageTemplate = getClassPathString(FOP_CONTENT_IMAGE_TEMPLATE);
-            contentTitleTemplate = getClassPathString(FOP_CONTENTTITLE_TEMPLATE);
+            contentTitleTemplate = getClassPathString(FOP_CONTENT_TITLE_TEMPLATE);
+            contentSubTitleTemplate = getClassPathString(FOP_CONTEN_SUBTTITLE_TEMPLATE);
+            contentMetaInfoTemplate = getClassPathString(FOP_CONTENT_METAINFORMATION_TEMPLATE);
 
             currentPages = pagesTemplate;
             content = new StringBuffer();
@@ -104,6 +110,16 @@ public class ReportEncoderFop {
         content.append(textContent);
 
     }
+    public void addSubTitle(String text) {
+        String textContent = contentSubTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
+        content.append(textContent);
+    }
+
+    public void addMetaInfo(String text) {
+        String textContent = contentMetaInfoTemplate.replace("@TEXT@", ("\n" + text + "\n"));
+        content.append(textContent);
+    }
+
     public void addText(String text) {
         String textContent = textTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
@@ -130,7 +146,7 @@ public class ReportEncoderFop {
             }
         }
         prefix.append(";base64,");
-        String imageContent = imageTemplate.replace("@IMAGE@", prefix.toString() + base64EncodedString);
+        String imageContent = imageTemplate.replace("@IMAGE@", prefix + base64EncodedString);
         content.append(imageContent);
     }
 
