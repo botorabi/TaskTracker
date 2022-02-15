@@ -10,18 +10,15 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class JSESSION_CookieFilter extends GenericFilterBean {
-    private final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfig.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(JSESSION_CookieFilter.class);
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
