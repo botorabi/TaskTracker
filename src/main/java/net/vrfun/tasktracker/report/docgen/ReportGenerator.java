@@ -24,7 +24,7 @@ import java.util.List;
  * @author          boto
  * Creation Date    September 2020
  */
-public interface ReportGenerator {
+interface ReportGenerator {
 
     /**
      * Set report generator's locale.

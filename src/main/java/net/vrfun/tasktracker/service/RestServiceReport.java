@@ -7,7 +7,10 @@
  */
 package net.vrfun.tasktracker.service;
 
-import net.vrfun.tasktracker.report.*;
+import net.vrfun.tasktracker.report.ReportComposer;
+import net.vrfun.tasktracker.report.ReportMailConfigurationDTO;
+import net.vrfun.tasktracker.report.Reports;
+import net.vrfun.tasktracker.report.ReqReportMailConfiguration;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.Role;
@@ -16,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +31,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static org.bouncycastle.asn1.x509.X509ObjectIdentifiers.id;
 
 
 /**

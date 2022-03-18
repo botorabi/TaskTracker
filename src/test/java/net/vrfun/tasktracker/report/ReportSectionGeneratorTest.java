@@ -85,7 +85,9 @@ class ReportSectionGeneratorTest {
         List<String> testNames = new ArrayList<>(Arrays.asList( "c", "b", "a"));
         List<Progress> progresses = new ArrayList<>();
         for (int i = 0; i < testNames.size(); ++i) {
-            Progress progress = new Progress(testNames.get(i), (long) i);
+            Progress progress = getVanillaProgress();
+            progress.setOwnerName(testNames.get(i));
+            progress.setOwnerId((long)i);
             progress.setReportWeek(LocalDate.ofInstant(Instant.parse("1982-01-09T10:15:13.00Z"), ZoneId.of("UTC")));
             progresses.add(progress);
         }

@@ -37,7 +37,6 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
     private ReportI18n reportI18n;
 
-    private FopFactory fopFactory;
     private Fop fop;
 
     private ByteArrayOutputStream outputStream;
@@ -71,7 +70,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
         try (InputStream documentInputStream = resourceDocument.getInputStream();
              InputStream progressInputStream = resourceContent.getInputStream()) {
 
-            fopFactory = FopFactory.newInstance(new File(".").toURI());
+            FopFactory fopFactory = FopFactory.newInstance(new File(".").toURI());
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 
             outputStream = new ByteArrayOutputStream();
@@ -143,7 +142,7 @@ public class ReportGeneratorPDF implements ReportGenerator {
 
             StringBuffer tags = new StringBuffer();
             if (progress.getTags() != null && !progress.getTags().isEmpty()) {
-                progress.getTags().forEach((tag) -> tags.append(tag.getName() + " "));
+                progress.getTags().forEach((tag) -> tags.append(tag.getName()).append(" "));
             }
             progressSection = progressSection.replace("@TAGS@", encodeFoString(tags.toString()));
 
@@ -193,12 +192,12 @@ public class ReportGeneratorPDF implements ReportGenerator {
         if (text == null) {
             return "";
         }
-        String multiLineText = "";
-        String textLines[] = text.split("\n");
+        StringBuilder multiLineText = new StringBuilder();
+        String[] textLines = text.split("\n");
         for (String line: textLines) {
-            multiLineText += "\n<fo:block space-after=\"6pt\" >" + encodeFoString(line) + "</fo:block>\n";
+            multiLineText.append("\n<fo:block space-after=\"6pt\" >").append(encodeFoString(line)).append("</fo:block>\n");
         }
-        return multiLineText;
+        return multiLineText.toString();
     }
 
     @Override
@@ -237,7 +236,9 @@ public class ReportGeneratorPDF implements ReportGenerator {
             throw new IllegalStateException(exception.getMessage());
         } finally {
             try {
-                inputStreamFo.close();
+                if (inputStreamFo != null) {
+                    inputStreamFo.close();
+                }
             } catch (IOException ignored) {
             }
             documentContentFo = "";

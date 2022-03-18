@@ -78,7 +78,7 @@ public class Reports {
             Optional<UserDTO> userDTO = userRepository.getUserById(userId);
             boolean returnValue = false;
             if (userDTO.isPresent()) {
-                returnValue = userDTO.get().getId() == userId;
+                returnValue =  userId.equals(userDTO.get().getId());
             }
             return returnValue;
         }

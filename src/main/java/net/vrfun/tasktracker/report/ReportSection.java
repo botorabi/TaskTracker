@@ -12,10 +12,10 @@ import java.util.List;
 
 public class ReportSection {
 
-    private String title;
-    private List<ReportSectionBody> sectionBody;
+    private final String title;
+    private final List<ReportSectionBody> sectionBody;
 
-    public ReportSection(@NonNull String sectionTitle, @NonNull List<ReportSectionBody> sectionBody)
+    public ReportSection(@NonNull final String sectionTitle, @NonNull final List<ReportSectionBody> sectionBody)
     {
         this.sectionBody = sectionBody;
         this.title = sectionTitle;

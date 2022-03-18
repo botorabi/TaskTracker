@@ -27,8 +27,8 @@ public enum ReportSortType {
     public static ReportSortType fromString(@NonNull final String reportWeekDay) {
         try {
             return valueOf(reportWeekDay);
+        } catch(Throwable throwable) {
+            return REPORT_SORT_TYPE_NONE;
         }
-        catch(Throwable throwable) {}
-        return REPORT_SORT_TYPE_NONE;
     }
 }

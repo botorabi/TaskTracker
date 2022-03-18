@@ -69,18 +69,6 @@ public class ReportComposer {
         this.userRepository = userRepository;
     }
 
-    ReportSortType sortTypeUiToBackend(@NonNull final String sortTypeFromUi) {
-        if (StringUtils.containsIgnoreCase(sortTypeFromUi, "team")) {
-            return ReportSortType.REPORT_SORT_TYPE_TEAM;
-        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "user")) {
-            return ReportSortType.REPORT_SORT_TYPE_USER;
-        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "week")) {
-            return ReportSortType.REPORT_SORT_TYPE_WEEK;
-        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "task")) {
-            return ReportSortType.REPORT_SORT_TYPE_TASK;
-        }
-        return ReportSortType.REPORT_SORT_TYPE_NONE;
-    }
 
     @NonNull
     public ByteArrayOutputStream createTeamReport(@NonNull final List<Long> teamIDs,
@@ -97,7 +85,7 @@ public class ReportComposer {
     }
 
     @NonNull
-    public ByteArrayOutputStream createUserReport(@NonNull final Long      userId,
+    public ByteArrayOutputStream createUserReport(@NonNull final Long userId,
                                                   @NonNull final LocalDate fromDate,
                                                   @NonNull final LocalDate toDate,
                                                   @NonNull final ReportFormat reportFormat,
@@ -129,7 +117,7 @@ public class ReportComposer {
                     + "\n " + periodLocal + ": " + fromDate.format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT)) + " - "
                     + toDate.format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT))
                     + "\n " + createdLocal + ": " + LocalDateTime.now().format(DateTimeFormatter.ofPattern(REPORT_DATE_FORMAT + " / HH:mm"));
-            return ReportDocumentCreator.getAs(reportFormat, reportSections, title, compoundSubtitle, "", footer);
+            return ReportDocument.build().create(reportFormat, reportSections, title, compoundSubtitle, "", footer);
 
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
@@ -139,9 +127,9 @@ public class ReportComposer {
 
 
     @NonNull
-    public List<ReportSection> getTeamReportSections(@NonNull final List<Long>     teamIDs,
-                                                     @NonNull final LocalDate      fromDate,
-                                                     @NonNull final LocalDate      toDate,
+    public List<ReportSection> getTeamReportSections(@NonNull final List<Long> teamIDs,
+                                                     @NonNull final LocalDate fromDate,
+                                                     @NonNull final LocalDate toDate,
                                                      @NonNull final ReportSortType sortByType) {
 
         List<Team> teamList = teamRepository.findAllById(teamIDs);
@@ -208,5 +196,19 @@ public class ReportComposer {
         } catch (Exception exception) {
             throw new IllegalArgumentException("Could not setup the locale, reason: " + exception.getMessage());
         }
+    }
+
+    @NonNull
+    private ReportSortType sortTypeUiToBackend(@NonNull final String sortTypeFromUi) {
+        if (StringUtils.containsIgnoreCase(sortTypeFromUi, "team")) {
+            return ReportSortType.REPORT_SORT_TYPE_TEAM;
+        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "user")) {
+            return ReportSortType.REPORT_SORT_TYPE_USER;
+        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "week")) {
+            return ReportSortType.REPORT_SORT_TYPE_WEEK;
+        } else if (StringUtils.containsIgnoreCase(sortTypeFromUi, "task")) {
+            return ReportSortType.REPORT_SORT_TYPE_TASK;
+        }
+        return ReportSortType.REPORT_SORT_TYPE_NONE;
     }
 }

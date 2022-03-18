@@ -8,26 +8,26 @@
 package net.vrfun.tasktracker.report.docgen;
 
 import net.vrfun.tasktracker.report.ReportSection;
-import net.vrfun.tasktracker.task.Progress;
-import org.springframework.stereotype.Component;
+import org.springframework.lang.NonNull;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-public interface ReportDocumentCreator {
+public class ReportDocument {
 
-    static ByteArrayOutputStream getAs(ReportFormat type,
-                                          List<ReportSection> sections,
-                                          String title,
-                                          String subTitle,
-                                          String header,
-                                          String footer) {
+    @NonNull
+    public static ReportDocument build() {
+        return new ReportDocument();
+    }
+
+    @NonNull
+    public ByteArrayOutputStream create(@NonNull final ReportFormat type,
+                                        @NonNull final List<ReportSection> sections,
+                                        @NonNull final String title,
+                                        @NonNull final String subTitle,
+                                        @NonNull final String header,
+                                        @NonNull final String footer) {
 
         ReportEncoderFop encoder = new ReportEncoderFop(type);
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
@@ -44,7 +44,7 @@ public interface ReportDocumentCreator {
         return outStream;
     }
 
-    private static void addSection(ReportEncoderFop encoder, ReportSection section) {
+    private void addSection(@NonNull final ReportEncoderFop encoder, @NonNull final ReportSection section) {
         encoder.addSectionTitle(section.getSectionTitle());
         section.getSectionBody().forEach(sectionBody -> {
                     encoder.addMetaInfo(sectionBody.getMetaInformation());

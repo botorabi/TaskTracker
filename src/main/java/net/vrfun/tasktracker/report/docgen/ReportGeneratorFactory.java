@@ -13,7 +13,7 @@ package net.vrfun.tasktracker.report.docgen;
  * @author          boto
  * Creation Date    September 2020
  */
-public interface ReportGeneratorFactory {
+interface ReportGeneratorFactory {
 
     static ReportGenerator build(ReportFormat reportFormat) {
         switch(reportFormat) {

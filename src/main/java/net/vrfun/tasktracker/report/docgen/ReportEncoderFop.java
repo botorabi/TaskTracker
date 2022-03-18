@@ -12,6 +12,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.lang.NonNull;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -47,22 +48,7 @@ public class ReportEncoderFop {
     private final FopFactory fopFactory;
     private OutputStream out;
 
-    private void setContent() {
-        currentPages = currentPages.replace("@CONTENT@", content.toString());
-        setHeader("");
-        setFooter("");
-    }
-
-    String getClassPathString(String classPath) throws IOException {
-        Resource resource = new ClassPathResource(classPath);
-        String returnValue;
-        try(InputStream inputStream = resource.getInputStream()) {
-            returnValue = new String(inputStream.readAllBytes());
-        }
-        return returnValue;
-    }
-
-    public ReportEncoderFop(ReportFormat type) {
+    public ReportEncoderFop(@NonNull final ReportFormat type) {
         if (type == ReportFormat.Unknown) {
             throw new RuntimeException("Invalid DocumentEncoding used for FOP encoder!");
         }
@@ -88,49 +74,49 @@ public class ReportEncoderFop {
         }
     }
 
-    public void start(BufferedOutputStream document) {
+    public void start(@NonNull final BufferedOutputStream document) {
         out = document;
     }
 
-    public void setTitle(String title, String subTitle) {
+    public void setTitle(@NonNull final String title, @NonNull final String subTitle) {
         report = report.replace("@TITLE@", title);
         report = report.replace("@SUBTITLE@", subTitle);
     }
 
-    public void setHeader(String header) {
+    public void setHeader(@NonNull final String header) {
         currentPages = currentPages.replace("@HEADER@", header);
     }
 
-    public void setFooter(String footer) {
+    public void setFooter(@NonNull final String footer) {
         currentPages = currentPages.replace("@FOOTER@", footer);
     }
 
-    public void addSectionTitle(String text) {
+    public void addSectionTitle(@NonNull final String text) {
         String textContent = contentTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
 
     }
-    public void addSubTitle(String text) {
+    public void addSubTitle(@NonNull final String text) {
         String textContent = contentSubTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
     }
 
-    public void addMetaInfo(String text) {
+    public void addMetaInfo(@NonNull final String text) {
         String textContent = contentMetaInfoTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
     }
 
-    public void addText(String text) {
+    public void addText(@NonNull final String text) {
         String textContent = textTemplate.replace("@TEXT@", ("\n" + text + "\n"));
         content.append(textContent);
     }
 
-    public void addImage(String imageUri) {
+    public void addImage(@NonNull final String imageUri) {
         String imageContent = imageTemplate.replace("@IMAGE@", imageUri);
         content.append(imageContent);
     }
 
-    public void addImage(String base64EncodedString, ReportFormat imageType) {
+    public void addImage(@NonNull final String base64EncodedString, @NonNull final ReportFormat imageType) {
         StringBuilder prefix = new StringBuilder("data:image/");
         switch (imageType) {
             case PNG: {
@@ -196,5 +182,21 @@ public class ReportEncoderFop {
         } catch (Exception exception) {
             throw new RuntimeException("Failed at encoding file, reason: " + exception.getMessage());
         }
+    }
+
+    private void setContent() {
+        currentPages = currentPages.replace("@CONTENT@", content.toString());
+        setHeader("");
+        setFooter("");
+    }
+
+    @NonNull
+    private String getClassPathString(@NonNull final String classPath) throws IOException {
+        Resource resource = new ClassPathResource(classPath);
+        String returnValue;
+        try(InputStream inputStream = resource.getInputStream()) {
+            returnValue = new String(inputStream.readAllBytes());
+        }
+        return returnValue;
     }
 }
