@@ -35,19 +35,10 @@ public class ReportSectionGenerator {
     }
 
     /**
-     * Private constructor which sets the default values
-     */
-    private ReportSectionGenerator(@NonNull final List<Progress> progresses) {
-        this.progresses = progresses.stream().distinct().collect(Collectors.toList());
-        this.sortByTypes = new ArrayList<>();
-        this.primarySortFieldValues = new HashSet<>();
-    }
-
-    /**
      * Sorts output
      * @param sortByField Field by which the progresses will be sorted
      */
-    ReportSectionGenerator sortBy(@NonNull final ReportSortType sortByField) {
+    public ReportSectionGenerator sortBy(@NonNull final ReportSortType sortByField) {
         this.sortByTypes = List.of(sortByField);
         return this;
     }
@@ -56,7 +47,7 @@ public class ReportSectionGenerator {
      * Sorts output
      * @param sortByFields Fields by which the progresses will be sorted. The sorting hierarchy is by descending order.
      */
-    ReportSectionGenerator sortBy(@NonNull final List<ReportSortType> sortByFields) {
+    public ReportSectionGenerator sortBy(@NonNull final List<ReportSortType> sortByFields) {
         this.sortByTypes = sortByFields;
         return this;
     }
@@ -66,7 +57,7 @@ public class ReportSectionGenerator {
      * @param primarySortFieldValue Only progresses which contain this value in their first (or only) sorted by field will be
      *                              taken into account. See {@link #sortBy withSortBy}.
      */
-    ReportSectionGenerator withSortFieldValue(@NonNull final String primarySortFieldValue) {
+    public ReportSectionGenerator withSortFieldValue(@NonNull final String primarySortFieldValue) {
         this.primarySortFieldValues = Set.of(primarySortFieldValue);
         return this;
     }
@@ -76,7 +67,7 @@ public class ReportSectionGenerator {
      * @param primarySortFieldValues Only progresses which contain one of these values in their first (or only) sorted by field
      *                               will be taken into account. See  {@link #sortBy withSortBy}.
      */
-    ReportSectionGenerator withSortFieldValues(@NonNull final Set<String> primarySortFieldValues) {
+    public ReportSectionGenerator withSortFieldValues(@NonNull final Set<String> primarySortFieldValues) {
         this.primarySortFieldValues = primarySortFieldValues;
         return this;
     }
@@ -85,8 +76,17 @@ public class ReportSectionGenerator {
      * @return A list of ReportSection's which contain the data from the progresses
      * @apiNote See {@link #sortBy withSortBy} and {@link #withSortFieldValues withSortFieldValues}
      */
-    List<ReportSection> create() {
+    public List<ReportSection> create() {
         return sortByFields();
+    }
+
+    /**
+     * Private constructor which sets the default values
+     */
+    private ReportSectionGenerator(@NonNull final List<Progress> progresses) {
+        this.progresses = progresses.stream().distinct().collect(Collectors.toList());
+        this.sortByTypes = new ArrayList<>();
+        this.primarySortFieldValues = new HashSet<>();
     }
 
     private static Stream<String> getNoField(@NonNull final Progress progress) {
