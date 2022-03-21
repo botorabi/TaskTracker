@@ -1,0 +1,13 @@
+---
+version: '2'
+services:
+  tasktracker:
+    # NOTE Adapt the image tag
+    image: tasktracker:v1.1.0
+    expose:
+      - 8083
+    ports:
+      - "8083:8083"
+    environment:
+      # This is the IP of the mysql database server
+      - TASK_TRACKER_DB_SRV=192.168.178.20

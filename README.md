@@ -13,3 +13,8 @@
 
 **Task Tracker** is a web application for tracking and reporting project progress. The back-end is implemented by using Spring Boot and provides a REST API. The front-end uses Flutter.
 
+# Development
+
+User following arguments in JVM for starting the web application in dev mode:
+
+```-Denable-dev-mode=true -Duse-filesystem-resource=true -Dserver.servlet.session.cookie.secure=true -DTASK_TRACKER_DB_SRV=localhost```
