@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -33,7 +33,7 @@ public class Progress extends BaseEntity implements Serializable {
     @OneToMany(targetEntity = Tag.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Collection<Tag> tags;
 
-    @OneToOne(targetEntity = Task.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
+    @ManyToOne(targetEntity = Task.class, cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE})
     private Task task;
 
     @Column(nullable=false)

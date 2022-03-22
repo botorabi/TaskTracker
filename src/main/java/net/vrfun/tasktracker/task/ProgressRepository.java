@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -23,6 +23,10 @@ public interface ProgressRepository extends CrudRepository<Progress, Long> {
     long countProgressByOwnerIdIn(@NonNull final List<Long> ownerIds);
 
     List<Progress> findProgressByOwnerIdInOrderByReportWeekDesc(@NonNull final List<Long> ownerIds, @NonNull final Pageable pageable);
+
+    List<Progress> findProgressByOwnerIdAndReportWeekBetween(@NonNull final Long userId,
+                                                             @NonNull final LocalDate fromDate,
+                                                             @NonNull final LocalDate toDate);
 
     long countProgressByTaskId(@NonNull final Long taskId);
 

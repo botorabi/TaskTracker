@@ -1,0 +1,13 @@
+<report>
+
+	<cover_page>
+		<title>@TITLE@</title>
+		<subtitle>@SUBTITLE@</subtitle>
+	</cover_page>
+
+	@PAGES@
+	
+</report>
+
+
+

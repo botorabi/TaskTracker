@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -11,11 +11,12 @@ import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.Team;
 import net.vrfun.tasktracker.user.TeamRepository;
 import net.vrfun.tasktracker.user.User;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.lang.NonNull;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
@@ -26,7 +27,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 
-@RunWith(SpringRunner.class)
 public class ProgressesTest {
 
     @Mock
@@ -49,7 +49,7 @@ public class ProgressesTest {
 
     private Progresses progresses;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 

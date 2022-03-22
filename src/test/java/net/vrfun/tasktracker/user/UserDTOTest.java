@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -7,15 +7,14 @@
  */
 package net.vrfun.tasktracker.user;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+
 public class UserDTOTest {
 
     @Test

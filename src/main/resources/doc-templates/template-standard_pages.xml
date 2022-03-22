@@ -1,0 +1,11 @@
+	<standard_page>
+		@CONTENT@
+				
+		<header>
+			<text>@HEADER@</text>
+		</header>
+		<footer>
+			<text>@FOOTER@</text>
+		</footer>
+		
+	</standard_page>

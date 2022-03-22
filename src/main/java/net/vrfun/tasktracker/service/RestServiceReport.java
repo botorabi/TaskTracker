@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -7,7 +7,10 @@
  */
 package net.vrfun.tasktracker.service;
 
-import net.vrfun.tasktracker.report.*;
+import net.vrfun.tasktracker.report.ReportComposer;
+import net.vrfun.tasktracker.report.ReportMailConfigurationDTO;
+import net.vrfun.tasktracker.report.Reports;
+import net.vrfun.tasktracker.report.ReqReportMailConfiguration;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.security.UserAuthenticator;
 import net.vrfun.tasktracker.user.Role;
@@ -16,7 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -115,7 +120,7 @@ public class RestServiceReport {
         }
     }
 
-    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}",
+    @GetMapping(value = "/report/team/{teamIDs}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}/{sortType}",
                 produces = MediaType.APPLICATION_PDF_VALUE)
     @ResponseBody
     @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD})
@@ -124,7 +129,8 @@ public class RestServiceReport {
                                                               @PathVariable("toDaysSinceEpoch")   final String toDate,
                                                               @PathVariable("title")              final String title,
                                                               @PathVariable("subTitle")           final String subTitle,
-                                                              @PathVariable("language")           final String language) {
+                                                              @PathVariable("language")           final String language,
+                                                              @PathVariable("sortType")           final String sortType) {
 
         List<Long> ids = Arrays.stream(teamIDs.split(","))
                 .map((val) -> Long.valueOf(val.trim()))
@@ -144,8 +150,55 @@ public class RestServiceReport {
                              ReportFormat.PDF,
                              StringUtils.isEmpty(title) ? "<Title>" : title,
                              StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
-                             StringUtils.isEmpty(language) ? "en" : language)) {
+                             StringUtils.isEmpty(language) ? "en" : language,
+                             sortType)) {
+            return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
+        }
+        catch(Throwable throwable) {
+            LOGGER.info("Could not create report, reason: {}", throwable.getMessage());
+            throwable.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+    }
 
+    @GetMapping(value = "/report/user/{userId}/{fromDaysSinceEpoch}/{toDaysSinceEpoch}/{title}/{subTitle}/{language}/{sortType}",
+            produces = MediaType.APPLICATION_PDF_VALUE)
+    @ResponseBody
+    @Secured({Role.ROLE_NAME_ADMIN, Role.ROLE_NAME_TEAM_LEAD, Role.ROLE_NAME_AUTHOR})
+    public ResponseEntity<ByteArrayResource> createUserReport(@PathVariable("userId")             final String userId,
+                                                              @PathVariable("fromDaysSinceEpoch") final String fromDate,
+                                                              @PathVariable("toDaysSinceEpoch")   final String toDate,
+                                                              @PathVariable("title")              final String title,
+                                                              @PathVariable("subTitle")           final String subTitle,
+                                                              @PathVariable("language")           final String language,
+                                                              @PathVariable("sortType")           final String sortType) {
+        Long id;
+        try {
+             id = Long.valueOf(userId);
+        }
+        catch (NumberFormatException e)
+        {
+            LOGGER.info("Invalid user id: {}", e.getMessage());
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+        if (!reports.validateUserId(id)) {
+            LOGGER.warn("Non authorized access of user {} ", userAuthenticator.getUserLogin());
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        LocalDate fromInDaysSinceEpoch = LocalDate.ofEpochDay(Integer.parseInt(fromDate));
+        LocalDate toInDaysSinceEpoch   = LocalDate.ofEpochDay(Integer.parseInt(toDate));
+
+        try {
+            ByteArrayOutputStream report =
+                    reportComposer.createUserReport(
+                            id, fromInDaysSinceEpoch, toInDaysSinceEpoch,
+                            ReportFormat.PDF,
+                            StringUtils.isEmpty(title) ? "<Title>" : title,
+                            StringUtils.isEmpty(subTitle) ? "<Sub-Title>" : subTitle,
+                            StringUtils.isEmpty(language) ? "en" : language,
+                            sortType);
             return new ResponseEntity<>(new ByteArrayResource(report.toByteArray()), HttpStatus.OK);
         }
         catch(Throwable throwable) {

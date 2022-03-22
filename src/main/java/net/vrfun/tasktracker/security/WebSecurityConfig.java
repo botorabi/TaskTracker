@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -9,14 +9,20 @@ package net.vrfun.tasktracker.security;
 
 
 import net.vrfun.tasktracker.appconfig.WebMvcConfig;
-import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.context.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.cors.*;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
@@ -32,7 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfig.class);
 
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
     @Value("${enable-dev-mode: false}")
     private boolean developmentModeEnabled;

@@ -22,7 +22,8 @@ abstract class NavigationLinks {
   static const String NAV_VIEW_PROGRESS   = '/viewprogress';
   static const String NAV_NEW_PROGRESS    = '/newprogress';
   static const String NAV_EDIT_PROGRESS   = '/editprogress';
-  static const String NAV_REPORT          = '/report';
+  static const String NAV_TEAM_REPORT     = '/report/team';
+  static const String NAV_USER_REPORT     = '/report/user';
   static const String NAV_EDIT_REPORT_CFG = '/editreportconfig';
   static const String NAV_NEW_REPORT_CFG  = '/newreportconfig';
 }
