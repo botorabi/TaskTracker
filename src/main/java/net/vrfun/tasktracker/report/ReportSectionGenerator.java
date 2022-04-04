@@ -13,7 +13,8 @@ import net.vrfun.tasktracker.user.Team;
 import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.NotEmpty;
-import java.time.temporal.ChronoField;
+import java.time.DayOfWeek;
+import java.time.temporal.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,6 +25,10 @@ public class ReportSectionGenerator {
     private final List<Progress> progresses;
     private List<ReportSortType> sortByTypes;
     private Set<String> primarySortFieldValues;
+    private List<ReportSortType> suppressedFields;
+
+    private static DayOfWeek weekDayFirst = WeekFields.of(Locale.GERMANY).getFirstDayOfWeek();
+    private static DayOfWeek weekDayLast = DayOfWeek.of(((weekDayFirst.getValue() + 5) % DayOfWeek.values().length) + 1);
 
     /**
      *
@@ -39,8 +44,7 @@ public class ReportSectionGenerator {
      * @param sortByField Field by which the progresses will be sorted
      */
     public ReportSectionGenerator sortBy(@NonNull final ReportSortType sortByField) {
-        this.sortByTypes = List.of(sortByField);
-        return this;
+        return sortBy(List.of(sortByField));
     }
 
     /**
@@ -48,7 +52,17 @@ public class ReportSectionGenerator {
      * @param sortByFields Fields by which the progresses will be sorted. The sorting hierarchy is by descending order.
      */
     public ReportSectionGenerator sortBy(@NonNull final List<ReportSortType> sortByFields) {
+        return sortBy(sortByFields, new ArrayList<>());
+    }
+
+    /**
+     * Sorts output
+     * @param sortByFields Fields by which the progresses will be sorted. The sorting hierarchy is by descending order.
+     * @param suppressedFields Fields which shall be ignored.
+     */
+    public ReportSectionGenerator sortBy(@NonNull final List<ReportSortType> sortByFields, @NonNull final List<ReportSortType> suppressedFields) {
         this.sortByTypes = sortByFields;
+        this.suppressedFields = suppressedFields;
         return this;
     }
 
@@ -123,8 +137,15 @@ public class ReportSectionGenerator {
 
     private static Stream<String> getWeekField(@NonNull final Progress progress) {
         List<String> returnList = new ArrayList<>();
-        String yearWeek = progress.getReportWeek().get(ChronoField.YEAR) + " - W" +
-                progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        var week = progress.getReportWeek();
+        var fromDate = week.with(TemporalAdjusters.previousOrSame(weekDayFirst));
+        var toDate = week.with(TemporalAdjusters.nextOrSame(weekDayLast));
+        String yearWeek = "W" + week.get(ChronoField.ALIGNED_WEEK_OF_YEAR)
+                            + " : "
+                            + fromDate.toString()
+                            + " - "
+                            + toDate.toString();
+
         returnList.add(yearWeek);
         return returnList.stream();
     }
@@ -162,34 +183,46 @@ public class ReportSectionGenerator {
      */
     private List<Function<Progress, Stream<String>>> getSecondaryFieldExtractors(@NotEmpty final List<ReportSortType> extractorFieldTypes) {
         List<Function<Progress, Stream<String>>> secondaryFieldExtractors = new ArrayList<>();
-        ReportSortType primaryField = extractorFieldTypes.get(0);
         List<ReportSortType> appendingTypes = new ArrayList<>();
-        switch (primaryField) {
-            case REPORT_SORT_TYPE_TEAM: {
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
-                break;
-            }
 
-            case REPORT_SORT_TYPE_TASK: {
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
-                break;
-            }
+        if (extractorFieldTypes.size() == 1) {
+            ReportSortType primaryField = extractorFieldTypes.get(0);
+            switch (primaryField) {
+                case REPORT_SORT_TYPE_TEAM: {
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
+                    break;
+                }
 
-            case REPORT_SORT_TYPE_USER: {
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
-                break;
-            }
+                case REPORT_SORT_TYPE_TASK: {
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
+                    break;
+                }
 
-            case REPORT_SORT_TYPE_WEEK: {
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
-                appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
-                break;
+                case REPORT_SORT_TYPE_USER: {
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_WEEK);
+                    break;
+                }
+
+                case REPORT_SORT_TYPE_WEEK: {
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_USER);
+                    appendingTypes.add(ReportSortType.REPORT_SORT_TYPE_TASK);
+                    break;
+                }
+            }
+        } else {
+            for (int i = 1 ; i < extractorFieldTypes.size(); ++i) {
+                appendingTypes.add(extractorFieldTypes.get(i));
             }
         }
+
+        for (var element : suppressedFields) {
+            appendingTypes.remove(element);
+        }
+
         Set<ReportSortType> uniqueTypes = new LinkedHashSet<>(extractorFieldTypes.subList(1, extractorFieldTypes.size()));
         uniqueTypes.addAll(appendingTypes);
         uniqueTypes.forEach(type -> secondaryFieldExtractors.add(getProgressFieldExtractor(type)));

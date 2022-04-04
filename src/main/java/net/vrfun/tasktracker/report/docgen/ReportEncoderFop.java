@@ -7,6 +7,7 @@
  */
 package net.vrfun.tasktracker.report.docgen;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
@@ -79,40 +80,35 @@ public class ReportEncoderFop {
     }
 
     public void setTitle(@NonNull final String title, @NonNull final String subTitle) {
-        report = report.replace("@TITLE@", title);
-        report = report.replace("@SUBTITLE@", subTitle);
+        report = report.replace("@TITLE@", StringEscapeUtils.escapeXml(title));
+        report = report.replace("@SUBTITLE@", StringEscapeUtils.escapeXml(subTitle));
     }
 
     public void setHeader(@NonNull final String header) {
-        currentPages = currentPages.replace("@HEADER@", header);
+        currentPages = currentPages.replace("@HEADER@", StringEscapeUtils.escapeXml(header));
     }
 
     public void setFooter(@NonNull final String footer) {
-        currentPages = currentPages.replace("@FOOTER@", footer);
+        currentPages = currentPages.replace("@FOOTER@", StringEscapeUtils.escapeXml(footer));
     }
 
     public void addSectionTitle(@NonNull final String text) {
-        String textContent = contentTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
-        content.append(textContent);
-
+        appendFilledTextTemplateToContent(contentTitleTemplate, text);
     }
     public void addSubTitle(@NonNull final String text) {
-        String textContent = contentSubTitleTemplate.replace("@TEXT@", ("\n" + text + "\n"));
-        content.append(textContent);
+        appendFilledTextTemplateToContent(contentSubTitleTemplate, text);
     }
 
     public void addMetaInfo(@NonNull final String text) {
-        String textContent = contentMetaInfoTemplate.replace("@TEXT@", ("\n" + text + "\n"));
-        content.append(textContent);
+        appendFilledTextTemplateToContent(contentMetaInfoTemplate, text);
     }
 
     public void addText(@NonNull final String text) {
-        String textContent = textTemplate.replace("@TEXT@", ("\n" + text + "\n"));
-        content.append(textContent);
+        appendFilledTextTemplateToContent(textTemplate, text);
     }
 
     public void addImage(@NonNull final String imageUri) {
-        String imageContent = imageTemplate.replace("@IMAGE@", imageUri);
+        String imageContent = imageTemplate.replace("@IMAGE@", StringEscapeUtils.escapeXml(imageUri));
         content.append(imageContent);
     }
 
@@ -132,7 +128,7 @@ public class ReportEncoderFop {
             }
         }
         prefix.append(";base64,");
-        String imageContent = imageTemplate.replace("@IMAGE@", prefix + base64EncodedString);
+        String imageContent = imageTemplate.replace("@IMAGE@", prefix + StringEscapeUtils.escapeXml(base64EncodedString));
         content.append(imageContent);
     }
 
@@ -182,6 +178,11 @@ public class ReportEncoderFop {
         } catch (Exception exception) {
             throw new RuntimeException("Failed at encoding file, reason: " + exception.getMessage());
         }
+    }
+
+    private void appendFilledTextTemplateToContent(final String template, String textReplacement) {
+        String textContent = template.replace("@TEXT@", ("\n" + StringEscapeUtils.escapeXml(textReplacement) + "\n"));
+        content.append(textContent);
     }
 
     private void setContent() {
