@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -96,26 +96,35 @@ public class ReportGeneratorService {
             try {
                 recipients = getAllRecipients(team, additionalRecipients, configuration.getReportToTeamLeads(), configuration.getReportToTeamMembers());
                 if (!recipients.isEmpty()) {
-                    ByteArrayOutputStream reportDocument =
-                            reportComposer.createTeamReport(
-                                    Collections.singletonList(team.getId()),
-                                    fromDate,
-                                    toDate,
-                                    ReportFormat.PDF,
-                                    StringUtils.isEmpty(configuration.getReportTitle()) ? "" : configuration.getReportTitle(),
-                                    StringUtils.isEmpty(configuration.getReportSubTitle()) ? "" : configuration.getReportSubTitle(),
-                                    configuration.getLanguage());
 
-                    String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
-                    cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
 
-                    LOGGER.info(" Sending report mail '{}' to recipients: '{}'", configuration.getMailSubject(), recipients);
+                    List<ReportSection> sections = reportComposer.getTeamReportSections(Collections.singletonList(team.getId()),
+                                                                                        fromDate,
+                                                                                        toDate,
+                                                                                        ReportSortType.REPORT_SORT_TYPE_TEAM);
+                    if (!sections.isEmpty()) {
+                        ByteArrayOutputStream reportDocument = reportComposer.finalizeReport(sections,
+                                fromDate,
+                                toDate,
+                                ReportFormat.PDF,
+                                StringUtils.isEmpty(configuration.getReportTitle()) ? "" : configuration.getReportTitle(),
+                                StringUtils.isEmpty(configuration.getReportSubTitle()) ? "" : configuration.getReportSubTitle(),
+                                configuration.getLanguage());
 
-                    sendMail(cleanMailSender,
-                            recipients,
-                            configuration.getMailSubject(),
-                            configuration.getMailText(),
-                            reportDocument);
+                        String cleanMailSender = configuration.getMailSenderName().trim().replace(" ", "-");
+                        cleanMailSender = cleanMailSender.replaceAll("\\P{Print}", "");
+
+                        LOGGER.info(" Sending report mail '{}' to recipients: '{}'", configuration.getMailSubject(), recipients);
+
+                        sendMail(cleanMailSender,
+                                recipients,
+                                configuration.getMailSubject(),
+                                configuration.getMailText(),
+                                reportDocument);
+                    }
+                    else {
+                        LOGGER.info("Did not send mail: No progress to report. Configuration {}", configuration.getName());
+                    }
                 }
                 else {
                     LOGGER.warn(" Could not send report mail, no recipients for configuration {}", configuration.getName());

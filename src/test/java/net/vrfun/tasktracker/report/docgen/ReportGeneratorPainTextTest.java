@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -7,27 +7,29 @@
  */
 package net.vrfun.tasktracker.report.docgen;
 
-import net.vrfun.tasktracker.task.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import net.vrfun.tasktracker.task.Progress;
+import net.vrfun.tasktracker.task.Tag;
+import net.vrfun.tasktracker.task.Task;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-@RunWith(SpringRunner.class)
+
 public class ReportGeneratorPainTextTest {
 
     private ReportGeneratorPlainText reportGeneratorPlainText;
 
-    @Before
+    @BeforeEach
     public void setup() {
         reportGeneratorPlainText = (ReportGeneratorPlainText) ReportGeneratorFactory.build(ReportFormat.PlainText);
     }

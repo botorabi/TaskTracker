@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 by Botorabi. All rights reserved.
+ * Copyright (c) 2020-2022 by Botorabi. All rights reserved.
  * https://github.com/botorabi/TaskTracker
  *
  * License: MIT License (MIT), read the LICENSE text in
@@ -10,10 +10,10 @@ package net.vrfun.tasktracker.report;
 import net.vrfun.tasktracker.report.docgen.ReportFormat;
 import net.vrfun.tasktracker.task.*;
 import net.vrfun.tasktracker.user.*;
-import org.junit.*;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -21,9 +21,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-
-
-@RunWith(SpringRunner.class)
 
 public class ReportComposerTest {
 
@@ -33,18 +30,21 @@ public class ReportComposerTest {
     private TeamRepository teamRepository;
     @Mock
     private TaskRepository taskRepository;
+    @Mock
+    private UserRepository userRepository;
 
     private ReportComposer reportComposer;
     private ReportCommonTest reportCommonTest;
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
         reportComposer = new ReportComposer(
                 progressRepository,
                 teamRepository,
-                taskRepository);
+                taskRepository,
+                userRepository);
 
         reportCommonTest = new ReportCommonTest();
     }
@@ -63,7 +63,8 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "en"));
+                "en",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString()));
     }
 
     @Test
@@ -84,7 +85,8 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "INVALID-LANGUAGE")).isNotNull();
+                "INVALID-LANGUAGE",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString())).isNotNull();
     }
 
     @Test
@@ -105,6 +107,7 @@ public class ReportComposerTest {
                 ReportFormat.PDF,
                 "Title",
                 "SubTitle",
-                "en")).isNotNull();
+                "en",
+                ReportSortType.REPORT_SORT_TYPE_TEAM.toString())).isNotNull();
     }
 }

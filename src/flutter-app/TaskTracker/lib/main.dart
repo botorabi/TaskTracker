@@ -73,7 +73,8 @@ class _AppTaskTrackerState extends State<AppTaskTracker> {
 
   @override
   Widget build(BuildContext context) {
-    final shortcutsWithNoESC = Map.of(WidgetsApp.defaultShortcuts)..remove(LogicalKeySet(LogicalKeyboardKey.escape));
+    final shortcutsWithNoESC = Map.of(WidgetsApp.defaultShortcuts)
+                                  ..remove(LogicalKeySet(LogicalKeyboardKey.escape));
     return MaterialApp(
       title: Translator.text('AppTaskTracker', 'Task Tracker'),
       shortcuts: shortcutsWithNoESC,
@@ -97,7 +98,8 @@ class _AppTaskTrackerState extends State<AppTaskTracker> {
         NavigationLinks.NAV_VIEW_PROGRESS   : (context) => PageViewProgress(title: Translator.text('AppTaskTracker', 'View Progress')),
         NavigationLinks.NAV_NEW_PROGRESS    : (context) => PageNewProgress(title: Translator.text('AppTaskTracker', 'Create New Progress Entry')),
         NavigationLinks.NAV_EDIT_PROGRESS   : (context) => PageEditProgress(title: Translator.text('AppTaskTracker', 'Edit Progress Entry')),
-        NavigationLinks.NAV_REPORT          : (context) => PageReport(title: Translator.text('Common', 'Progress Report')),
+        NavigationLinks.NAV_TEAM_REPORT     : (context) => PageReport(title: Translator.text('Common', 'Progress Report'), isTeamReport: true),
+        NavigationLinks.NAV_USER_REPORT     : (context) => PageReport(title: Translator.text('Common', 'Progress Report'), isTeamReport: false),
         NavigationLinks.NAV_NEW_REPORT_CFG  : (context) => PageNewReportConfiguration(title: Translator.text('AppTaskTracker', 'Create New Report Configuration')),
         NavigationLinks.NAV_EDIT_REPORT_CFG : (context) => PageEditReportConfiguration(title: Translator.text('AppTaskTracker', 'Edit Report Configuration')),
       },

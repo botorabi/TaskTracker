@@ -122,15 +122,23 @@ class NavDrawer extends StatelessWidget {
                   ),
                 ),
                 Visibility(
-                visible: (Config.authStatus.isTeamLead() || Config.authStatus.isAdmin()),
+                  visible: (Config.authStatus.isTeamLead() || Config.authStatus.isAdmin()),
                   child: ListTile(
                     leading: Icon(Icons.insert_chart),
-                    title: Text(Translator.text('Common', 'Progress Report')),
+                    title: Text(Translator.text('Common', 'Progress Report Team')),
                     onTap: () {
                       Navigator.of(context).pop();
-                      Navigator.pushNamed(context, NavigationLinks.NAV_REPORT);
+                      Navigator.pushNamed(context, NavigationLinks.NAV_TEAM_REPORT);
                     },
                   ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.insert_chart),
+                  title: Text(Translator.text('Common', 'Progress Report User')),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushNamed(context, NavigationLinks.NAV_USER_REPORT);
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.exit_to_app),
