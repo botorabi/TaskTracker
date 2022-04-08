@@ -168,10 +168,9 @@ public class ReportComposer {
                                                      @NonNull final ReportSortType sortByType) throws IllegalAccessException {
         Optional<User> user = userRepository.findById(userId);
         user.orElseThrow(() -> new IllegalAccessException("User with given login does not exist!"));
-
         try {
             List<Progress> progresses = progressRepository.findProgressByOwnerIdAndReportWeekBetween(userId, fromDate, toDate);
-            return ReportSectionGenerator.build(progresses).sortBy(sortByType).create();
+            return ReportSectionGenerator.build(progresses).sortBy(List.of(sortByType), List.of(ReportSortType.REPORT_SORT_TYPE_USER)).create();
         } catch (Throwable throwable) {
             LOGGER.error("Could not create report file, reason: {}", throwable.getMessage());
             throw throwable;

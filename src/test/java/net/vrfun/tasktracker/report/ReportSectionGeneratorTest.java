@@ -12,10 +12,13 @@ import net.vrfun.tasktracker.task.Task;
 import net.vrfun.tasktracker.user.Team;
 import org.junit.jupiter.api.Test;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,13 +128,25 @@ class ReportSectionGeneratorTest {
         }
         List<Progress> progresses = new ArrayList<>();
         List<String> weekNames = new ArrayList<>();
+
+        DayOfWeek weekDayFirst = WeekFields.of(Locale.GERMANY).getFirstDayOfWeek();
+        DayOfWeek weekDayLast = DayOfWeek.of(((weekDayFirst.getValue() + 5) % DayOfWeek.values().length) + 1);
+
         for (Instant instant : instants) {
             Progress progress = getVanillaProgress();
             progress.setDateCreation(instant);
             progress.setReportWeek(LocalDate.ofInstant(instant, ZoneId.of("UTC")));
             progresses.add(progress);
-            String yearWeek = progress.getReportWeek().get(ChronoField.YEAR) + " - W" +
-                    progress.getReportWeek().get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+
+            var week = progress.getReportWeek();
+            var fromDate = week.with(TemporalAdjusters.previousOrSame(weekDayFirst));
+            var toDate = week.with(TemporalAdjusters.nextOrSame(weekDayLast));
+            String yearWeek = "W" + week.get(ChronoField.ALIGNED_WEEK_OF_YEAR)
+                    + " : "
+                    + fromDate.toString()
+                    + " - "
+                    + toDate.toString();
+
             weekNames.add(yearWeek);
         }
 
