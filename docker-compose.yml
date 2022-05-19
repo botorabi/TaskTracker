@@ -3,7 +3,7 @@ version: '2'
 services:
   tasktracker:
     # NOTE Adapt the image tag
-    image: tasktracker:v1.1.0
+    image: tasktracker:v1.1.1
     expose:
       - 8080
     ports:
