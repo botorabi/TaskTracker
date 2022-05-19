@@ -7,9 +7,12 @@
  */
 package net.vrfun.tasktracker.report;
 
+import net.vrfun.tasktracker.appconfig.WebMvcConfig;
 import net.vrfun.tasktracker.task.Progress;
 import net.vrfun.tasktracker.task.Task;
 import net.vrfun.tasktracker.user.Team;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.NotEmpty;
@@ -17,11 +20,13 @@ import java.time.DayOfWeek;
 import java.time.temporal.*;
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ReportSectionGenerator {
 
+    private final Logger LOGGER = LoggerFactory.getLogger(WebMvcConfig.class);
     private final List<Progress> progresses;
     private List<ReportSortType> sortByTypes;
     private Set<String> primarySortFieldValues;
@@ -252,7 +257,14 @@ public class ReportSectionGenerator {
         var primaryFieldExtractor = fieldExtractors.get(0);
 
         var fieldValues = progresses.stream().flatMap(primaryFieldExtractor).collect(Collectors.toCollection(HashSet::new));
-        List<String> sortedKeys = fieldValues.stream().sorted().collect(Collectors.toList());
+
+        LOGGER.debug("Sorting...");
+        //We need a custom comparator to correctly sort by week if so demanded
+        List<String> sortedKeys = fieldValues
+                                    .stream()
+                                    .sorted(new ReportSectionFieldComparator())
+                                    .collect(Collectors.toList());
+
         List<Progress> sortedProgresses = new ArrayList<>();
         sortedKeys.forEach(key -> {
             List<Progress> subProgresses = getMatchingProgresses(progresses, primaryFieldExtractor, key);
@@ -279,7 +291,7 @@ public class ReportSectionGenerator {
         }
 
         List<String> sortedFields = new ArrayList<>(primarySortFieldValues);
-        Collections.sort(sortedFields);
+        Collections.sort(sortedFields, new ReportSectionFieldComparator());
 
         sortedFields.forEach(field -> {
             List<Progress> progressList = progresses.stream().filter(
